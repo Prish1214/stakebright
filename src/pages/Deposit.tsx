@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { Copy, QrCode, CheckCircle, Clock, XCircle } from 'lucide-react';
+import depositQr from '@/assets/deposit-qr.jpg';
 
 interface DepositHistory {
   id: string;
@@ -150,10 +151,14 @@ const Deposit = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* QR Code Placeholder - In production, you'd generate an actual QR code */}
+            {/* QR Code for Deposit */}
             <div className="bg-muted rounded-lg p-6 text-center space-y-4">
-              <div className="w-32 h-32 bg-card border-2 border-dashed border-border rounded-lg mx-auto flex items-center justify-center">
-                <QrCode className="h-16 w-16 text-muted-foreground" />
+              <div className="w-48 h-48 mx-auto">
+                <img 
+                  src={depositQr} 
+                  alt="USDT Deposit QR Code" 
+                  className="w-full h-full object-contain rounded-lg"
+                />
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-medium">USDT BEP20 Address</p>

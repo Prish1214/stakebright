@@ -28,8 +28,6 @@ const menuItems = [
   { title: 'Staking', url: '/staking', icon: TrendingUp },
   { title: 'Withdraw', url: '/withdraw', icon: ArrowUpCircle },
   { title: 'Referrals', url: '/referrals', icon: Users },
-  { title: 'Calculator', url: '/calculator', icon: Calculator },
-  { title: 'History', url: '/history', icon: History },
 ];
 
 const adminItems = [
@@ -81,23 +79,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
-                      <item.icon className="w-4 h-4 mr-2" />
-                      {state !== 'collapsed' && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
