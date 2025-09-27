@@ -317,6 +317,7 @@ export type Database = {
           stake_id: string | null
           status: string | null
           user_id: string
+          withdrawal_address: string
           withdrawal_type: string
         }
         Insert: {
@@ -331,6 +332,7 @@ export type Database = {
           stake_id?: string | null
           status?: string | null
           user_id: string
+          withdrawal_address?: string
           withdrawal_type: string
         }
         Update: {
@@ -345,6 +347,7 @@ export type Database = {
           stake_id?: string | null
           status?: string | null
           user_id?: string
+          withdrawal_address?: string
           withdrawal_type?: string
         }
         Relationships: [

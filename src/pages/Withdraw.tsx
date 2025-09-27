@@ -16,6 +16,7 @@ interface WithdrawalHistory {
   fee_amount: number;
   status: string;
   withdrawal_type: string;
+  withdrawal_address: string;
   created_at: string;
   processed_at: string | null;
 }
@@ -29,6 +30,7 @@ const Withdraw = () => {
   const [availableBalance, setAvailableBalance] = useState(0);
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [withdrawalType, setWithdrawalType] = useState('earnings');
+  const [withdrawalAddress, setWithdrawalAddress] = useState('');
   const [withdrawalHistory, setWithdrawalHistory] = useState<WithdrawalHistory[]>([]);
   const [feePercentage, setFeePercentage] = useState(10);
   const [loading, setLoading] = useState(true);
@@ -131,6 +133,15 @@ const Withdraw = () => {
       return;
     }
 
+    if (!withdrawalAddress.trim()) {
+      toast({
+        title: "Address Required",
+        description: "Please enter your USDT BEP20 withdrawal address",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const amount = Number(withdrawalAmount);
     if (amount > availableBalance) {
       toast({
@@ -154,6 +165,7 @@ const Withdraw = () => {
           fee_amount: feeAmount,
           net_amount: netAmount,
           withdrawal_type: withdrawalType,
+          withdrawal_address: withdrawalAddress.trim(),
           status: 'pending'
         });
 
@@ -165,6 +177,7 @@ const Withdraw = () => {
       });
 
       setWithdrawalAmount('');
+      setWithdrawalAddress('');
       fetchData(); // Refresh data
     } catch (error: any) {
       toast({
@@ -267,6 +280,20 @@ const Withdraw = () => {
               />
             </div>
 
+            <div>
+              <Label htmlFor="address">USDT BEP20 Withdrawal Address</Label>
+              <Input
+                id="address"
+                type="text"
+                placeholder="Enter your USDT BEP20 address (0x...)"
+                value={withdrawalAddress}
+                onChange={(e) => setWithdrawalAddress(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                ⚠️ Only enter USDT BEP20 network addresses. Wrong network = lost funds!
+              </p>
+            </div>
+
             {withdrawalAmount && Number(withdrawalAmount) > 0 && (
               <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm">
@@ -288,7 +315,7 @@ const Withdraw = () => {
 
             <Button 
               onClick={handleWithdraw} 
-              disabled={submitting || !withdrawalAmount || Number(withdrawalAmount) <= 0}
+              disabled={submitting || !withdrawalAmount || Number(withdrawalAmount) <= 0 || !withdrawalAddress.trim()}
               className="w-full"
             >
               {submitting ? 'Processing...' : 'Request Withdrawal'}
