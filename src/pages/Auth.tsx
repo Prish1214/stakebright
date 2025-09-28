@@ -37,8 +37,9 @@ const Auth = () => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const username = formData.get('username') as string;
+    const referralCode = formData.get('referralCode') as string;
     
-    await signUp(email, password, username);
+    await signUp(email, password, username, referralCode);
     setLoading(false);
   };
 
@@ -160,6 +161,20 @@ const Auth = () => {
                       required
                       minLength={6}
                     />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-referral">Referral Code <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="signup-referral"
+                      name="referralCode"
+                      type="text"
+                      placeholder="Enter referral code (required)"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      You must enter a valid referral code to sign up
+                    </p>
                   </div>
                   
                   <Button type="submit" className="w-full" disabled={loading}>

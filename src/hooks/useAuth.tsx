@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, username?: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, username?: string, referralCode?: string) => Promise<{ error?: any }>;
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
 }
@@ -51,8 +51,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, username?: string) => {
+  const signUp = async (email: string, password: string, username?: string, referralCode?: string) => {
     try {
+      // Validate referral code if provided
+      if (referralCode) {
+        const { data: referrerProfile, error: referrerError } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('referral_code', referralCode)
+          .single();
+
+        if (referrerError || !referrerProfile) {
+          toast({
+            title: "Invalid referral code",
+            description: "The referral code you entered is not valid. Please check and try again.",
+            variant: "destructive"
+          });
+          return { error: { message: "Invalid referral code" } };
+        }
+      } else {
+        toast({
+          title: "Referral code required",
+          description: "You must enter a valid referral code to sign up.",
+          variant: "destructive"
+        });
+        return { error: { message: "Referral code required" } };
+      }
+
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
@@ -61,7 +86,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            username: username || email.split('@')[0]
+            username: username || email.split('@')[0],
+            referralCode: referralCode
           }
         }
       });
