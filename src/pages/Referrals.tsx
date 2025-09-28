@@ -18,12 +18,22 @@ interface ReferralEarning {
   percentage: number;
   created_at: string;
   referred_id: string;
+  profiles?: {
+    username: string;
+  };
+}
+
+interface ReferredUser {
+  id: string;
+  username: string;
+  created_at: string;
 }
 
 const Referrals = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [referralEarnings, setReferralEarnings] = useState<ReferralEarning[]>([]);
+  const [referredUsers, setReferredUsers] = useState<ReferredUser[]>([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -47,15 +57,35 @@ const Referrals = () => {
       if (profileError) throw profileError;
       setProfile(profileData);
 
-      // Fetch referral earnings
+      // Fetch referral earnings with referred user info
       const { data: earningsData, error: earningsError } = await supabase
         .from('referral_earnings')
-        .select('*')
+        .select(`
+          *,
+          profiles!referral_earnings_referred_id_fkey (
+            username
+          )
+        `)
         .eq('referrer_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (earningsError) throw earningsError;
       setReferralEarnings(earningsData || []);
+      
+      // Fetch all referred users
+      const { data: referredData, error: referredError } = await supabase
+        .from('profiles')
+        .select('user_id, username, created_at')
+        .eq('referred_by', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (referredError) throw referredError;
+      const referredUsersData = referredData?.map(user => ({
+        id: user.user_id,
+        username: user.username,
+        created_at: user.created_at
+      })) || [];
+      setReferredUsers(referredUsersData);
       
       const total = earningsData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
       setTotalEarnings(total);
@@ -144,43 +174,76 @@ const Referrals = () => {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Referral Earnings History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {referralEarnings.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No referral earnings yet</p>
-              <p className="text-sm">Share your referral link to start earning!</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {referralEarnings.map((earning) => (
-                <div
-                  key={earning.id}
-                  className="flex items-center justify-between p-4 bg-card/50 rounded-lg border"
-                >
-                  <div>
-                    <p className="font-medium text-crypto-gold">
-                      +{Number(earning.amount).toFixed(2)} USDT
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {earning.percentage}% commission
-                    </p>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Referred Users</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {referredUsers.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No referred users yet</p>
+                <p className="text-sm">Share your referral link to start!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {referredUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 bg-card/50 rounded-lg border"
+                  >
+                    <div>
+                      <p className="font-medium">{user.username}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Joined {new Date(user.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(earning.created_at).toLocaleDateString()}
-                    </p>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Referral Earnings History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {referralEarnings.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No referral earnings yet</p>
+                <p className="text-sm">Wait for your referrals to make deposits!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {referralEarnings.map((earning) => (
+                  <div
+                    key={earning.id}
+                    className="flex items-center justify-between p-4 bg-card/50 rounded-lg border"
+                  >
+                    <div>
+                      <p className="font-medium text-crypto-gold">
+                        +{Number(earning.amount).toFixed(2)} USDT
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        From {earning.profiles?.username || 'Unknown user'} • {earning.percentage}% commission
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(earning.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       <Card className="bg-gradient-to-r from-crypto-purple/10 to-crypto-gold/10 border-crypto-purple/20">
         <CardContent className="pt-6">
