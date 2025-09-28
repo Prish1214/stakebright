@@ -379,6 +379,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_daily_staking_earnings: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
