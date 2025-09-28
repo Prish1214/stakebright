@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           .from('profiles')
           .select('user_id')
           .eq('referral_code', referralCode)
-          .single();
+          .maybeSingle();
 
         if (referrerError || !referrerProfile) {
           toast({
