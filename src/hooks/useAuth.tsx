@@ -53,22 +53,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = async (email: string, password: string, username?: string, referralCode?: string) => {
     try {
-      console.log('SignUp called with:', { email, username, referralCode });
-      
       // Validate referral code if provided
       if (referralCode) {
-        console.log('Validating referral code:', referralCode);
-        
         const { data: referrerProfile, error: referrerError } = await supabase
           .from('profiles')
           .select('user_id, referral_code')
           .eq('referral_code', referralCode)
           .maybeSingle();
 
-        console.log('Referrer validation result:', { referrerProfile, referrerError });
-
         if (referrerError) {
-          console.error('Database error during referral validation:', referrerError);
           toast({
             title: "Database error",
             description: "There was an error validating the referral code. Please try again.",
@@ -78,7 +71,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
 
         if (!referrerProfile) {
-          console.log('No referrer found with code:', referralCode);
           toast({
             title: "Invalid referral code",
             description: "The referral code you entered is not valid. Please check and try again.",
@@ -86,10 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           });
           return { error: { message: "Invalid referral code" } };
         }
-
-        console.log('Referral code validated successfully for:', referrerProfile);
       } else {
-        console.log('No referral code provided');
         toast({
           title: "Referral code required",
           description: "You must enter a valid referral code to sign up.",
