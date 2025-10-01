@@ -26,6 +26,27 @@ const Deposit = () => {
 
   useEffect(() => {
     fetchDepositHistory();
+    
+    // Set up real-time subscription for deposit changes
+    const channel = supabase
+      .channel('deposit-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'deposits',
+          filter: `user_id=eq.${user?.id}`
+        },
+        () => {
+          fetchDepositHistory();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const fetchDepositHistory = async () => {
@@ -108,6 +129,7 @@ const Deposit = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
+      case 'confirmed':
         return <CheckCircle className="h-4 w-4 text-success" />;
       case 'pending':
         return <Clock className="h-4 w-4 text-warning" />;
@@ -121,6 +143,7 @@ const Deposit = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
+      case 'confirmed':
         return 'bg-success/10 text-success border-success/20';
       case 'pending':
         return 'bg-warning/10 text-warning border-warning/20';
