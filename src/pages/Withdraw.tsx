@@ -70,7 +70,7 @@ const Withdraw = () => {
           filter: `user_id=eq.${user?.id}`
         },
         () => {
-          calculateAvailableBalance();
+          fetchData(); // Refresh all data including withdrawals
         }
       )
       .subscribe();
