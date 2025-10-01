@@ -40,6 +40,27 @@ const Withdraw = () => {
     if (user) {
       fetchData();
     }
+
+    // Set up real-time subscription for withdrawal changes
+    const channel = supabase
+      .channel('withdrawal-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'withdrawals',
+          filter: `user_id=eq.${user?.id}`
+        },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const fetchData = async () => {
@@ -193,6 +214,8 @@ const Withdraw = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
+      case 'approved':
+      case 'confirmed':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'pending':
         return <Clock className="h-4 w-4 text-yellow-500" />;
@@ -204,6 +227,8 @@ const Withdraw = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
+      case 'approved':
+      case 'confirmed':
         return 'text-green-500';
       case 'pending':
         return 'text-yellow-500';
