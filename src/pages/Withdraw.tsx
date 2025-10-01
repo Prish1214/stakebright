@@ -42,7 +42,7 @@ const Withdraw = () => {
     }
 
     // Set up real-time subscription for withdrawal changes
-    const channel = supabase
+    const withdrawalChannel = supabase
       .channel('withdrawal-changes')
       .on(
         'postgres_changes',
@@ -58,8 +58,26 @@ const Withdraw = () => {
       )
       .subscribe();
 
+    // Also subscribe to profile changes (wallet balance updates)
+    const profileChannel = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `user_id=eq.${user?.id}`
+        },
+        () => {
+          calculateAvailableBalance();
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(withdrawalChannel);
+      supabase.removeChannel(profileChannel);
     };
   }, [user]);
 
