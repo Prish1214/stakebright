@@ -119,12 +119,12 @@ const Withdraw = () => {
       if (referralError) throw referralError;
       const referralEarnings = referralData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
 
-      // Get total withdrawn
+      // Get total withdrawn (including approved, confirmed, and completed)
       const { data: withdrawnData, error: withdrawnError } = await supabase
         .from('withdrawals')
         .select('net_amount')
         .eq('user_id', user?.id)
-        .eq('status', 'completed');
+        .in('status', ['completed', 'approved', 'confirmed']);
 
       if (withdrawnError) throw withdrawnError;
       const totalWithdrawn = withdrawnData?.reduce((sum, withdrawal) => sum + Number(withdrawal.net_amount), 0) || 0;
