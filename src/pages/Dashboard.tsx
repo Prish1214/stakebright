@@ -41,6 +41,7 @@ const Dashboard = () => {
   const [activeStakes, setActiveStakes] = useState<ActiveStake[]>([]);
   const [referralEarnings, setReferralEarnings] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
+  const [dailyEarnings, setDailyEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -84,6 +85,10 @@ const Dashboard = () => {
 
       // Calculate total earnings from stakes
       const stakesEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.total_earned), 0) || 0;
+
+      // Calculate daily earnings from all active stakes
+      const totalDailyEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
+      setDailyEarnings(totalDailyEarnings);
 
       // Fetch referral earnings
       const { data: referralData, error: referralError } = await supabase
@@ -164,12 +169,12 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+            <CardTitle className="text-sm font-medium">Daily Earnings</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">{totalEarnings.toFixed(2)} USDT</div>
-            <p className="text-xs text-muted-foreground">From staking & referrals</p>
+            <div className="text-2xl font-bold text-success">+{dailyEarnings.toFixed(2)} USDT</div>
+            <p className="text-xs text-muted-foreground">Per day from all stakes</p>
           </CardContent>
         </Card>
 
