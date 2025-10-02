@@ -169,12 +169,12 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Daily Earnings</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">+{dailyEarnings.toFixed(2)} USDT</div>
-            <p className="text-xs text-muted-foreground">Per day from all stakes</p>
+            <div className="text-2xl font-bold text-success">{totalEarnings.toFixed(2)} USDT</div>
+            <p className="text-xs text-muted-foreground">Daily returns + referral earnings</p>
           </CardContent>
         </Card>
 
