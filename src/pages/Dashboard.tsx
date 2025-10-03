@@ -83,8 +83,22 @@ const Dashboard = () => {
       if (stakesError) throw stakesError;
       setActiveStakes(stakesData || []);
 
-      // Calculate total earnings from stakes
-      const stakesEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.total_earned), 0) || 0;
+      // Calculate total earnings from stakes (including real-time accumulated earnings)
+      const stakesEarnings = stakesData?.reduce((sum, stake) => {
+        const startDate = new Date(stake.start_date);
+        const now = new Date();
+        const endDate = new Date(stake.end_date);
+        const effectiveEndDate = now < endDate ? now : endDate;
+        
+        // Calculate days passed since start
+        const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Calculate accumulated earnings: stored total_earned + (days * daily_return)
+        // This ensures we show real-time earnings even before cron runs
+        const accumulatedEarnings = Number(stake.total_earned) + (daysPassed * Number(stake.daily_return));
+        
+        return sum + accumulatedEarnings;
+      }, 0) || 0;
 
       // Calculate daily earnings from all active stakes
       const totalDailyEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
