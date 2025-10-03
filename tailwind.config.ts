@@ -69,6 +69,10 @@ export default {
           DEFAULT: "hsl(var(--crypto-gold))",
           foreground: "hsl(var(--crypto-gold-foreground))",
         },
+        "crypto-purple": {
+          DEFAULT: "hsl(var(--crypto-purple))",
+          foreground: "hsl(var(--crypto-purple-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
