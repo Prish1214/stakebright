@@ -418,7 +418,6 @@ const Withdraw = () => {
         <CardContent className="pt-6">
           <h3 className="font-semibold mb-4 text-amber-800 dark:text-amber-200">Important Notes</h3>
           <div className="space-y-2 text-sm text-amber-700 dark:text-amber-300">
-            <p>• All withdrawal requests require admin approval</p>
             <p>• A {feePercentage}% fee is applied to all withdrawals</p>
             <p>• Principal amounts can only be withdrawn after the staking period ends</p>
             <p>• Processing time is typically 24-48 hours</p>
