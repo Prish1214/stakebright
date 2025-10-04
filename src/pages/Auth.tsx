@@ -213,6 +213,9 @@ const Auth = () => {
                       required
                       minLength={6}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Please remember your Password - it can not be changed once set
+                    </p>
                   </div>
                   
                   <div className="space-y-2">
