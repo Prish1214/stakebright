@@ -6,15 +6,56 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { DollarSign, Shield, TrendingUp } from 'lucide-react';
+import { DollarSign, Shield, TrendingUp, Mail } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const { user, signIn, signUp } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   // Redirect if already authenticated
   if (user) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Show verification message after signup
+  if (showVerificationMessage) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
+            <CardDescription>
+              We've sent a verification link to
+            </CardDescription>
+            <p className="font-semibold text-primary">{userEmail}</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+              <p className="text-sm font-medium">Next steps:</p>
+              <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                <li>Click the verification link sent to your email</li>
+                <li>After verification, return to this page</li>
+                <li>Login with your email and password</li>
+              </ol>
+            </div>
+            <Button 
+              onClick={() => setShowVerificationMessage(false)} 
+              className="w-full"
+              variant="outline"
+            >
+              Back to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,8 +80,19 @@ const Auth = () => {
     const username = formData.get('username') as string;
     const referralCode = formData.get('referralCode') as string;
     
-    await signUp(email, password, username, referralCode);
+    const { error } = await signUp(email, password, username, referralCode);
     setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create account",
+        variant: "destructive",
+      });
+    } else {
+      setUserEmail(email);
+      setShowVerificationMessage(true);
+    }
   };
 
   return (
