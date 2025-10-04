@@ -390,6 +390,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_daily_staking_returns: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
