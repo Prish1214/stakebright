@@ -153,14 +153,15 @@ const Withdraw = () => {
       const referralEarnings = referralData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
 
       // Get total withdrawn (including approved, confirmed, and completed)
+      // Use 'amount' not 'net_amount' because the full amount including fee should be deducted
       const { data: withdrawnData, error: withdrawnError } = await supabase
         .from('withdrawals')
-        .select('net_amount')
+        .select('amount')
         .eq('user_id', user?.id)
         .in('status', ['completed', 'approved', 'confirmed']);
 
       if (withdrawnError) throw withdrawnError;
-      const totalWithdrawn = withdrawnData?.reduce((sum, withdrawal) => sum + Number(withdrawal.net_amount), 0) || 0;
+      const totalWithdrawn = withdrawnData?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
 
       const available = totalEarnings + referralEarnings - totalWithdrawn;
       setAvailableBalance(Math.max(0, available));
