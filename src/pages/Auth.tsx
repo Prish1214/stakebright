@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
@@ -164,10 +165,9 @@ const Auth = () => {
                   
                   <div className="space-y-2">
                     <Label htmlFor="signin-password">Password</Label>
-                    <Input
+                    <PasswordInput
                       id="signin-password"
                       name="password"
-                      type="password"
                       placeholder="Enter your password"
                       required
                     />
@@ -205,10 +205,9 @@ const Auth = () => {
                   
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input
+                    <PasswordInput
                       id="signup-password"
                       name="password"
-                      type="password"
                       placeholder="Create a password"
                       required
                       minLength={6}
