@@ -118,14 +118,30 @@ const Withdraw = () => {
 
   const calculateAvailableBalance = async () => {
     try {
-      // Get total earned from stakes
+      // Get total earned from stakes with real-time calculation (same as Dashboard)
       const { data: stakesData, error: stakesError } = await supabase
         .from('stakes')
-        .select('total_earned')
-        .eq('user_id', user?.id);
+        .select('total_earned, daily_return, start_date, end_date')
+        .eq('user_id', user?.id)
+        .eq('is_active', true);
 
       if (stakesError) throw stakesError;
-      const totalEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.total_earned), 0) || 0;
+      
+      // Calculate total earnings from stakes (including real-time accumulated earnings)
+      const totalEarnings = stakesData?.reduce((sum, stake) => {
+        const startDate = new Date(stake.start_date);
+        const now = new Date();
+        const endDate = new Date(stake.end_date);
+        const effectiveEndDate = now < endDate ? now : endDate;
+        
+        // Calculate days passed since start
+        const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Calculate accumulated earnings: stored total_earned + (days * daily_return)
+        const accumulatedEarnings = Number(stake.total_earned) + (daysPassed * Number(stake.daily_return));
+        
+        return sum + accumulatedEarnings;
+      }, 0) || 0;
 
       // Get referral earnings
       const { data: referralData, error: referralError } = await supabase
