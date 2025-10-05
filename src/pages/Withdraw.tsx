@@ -29,7 +29,6 @@ const Withdraw = () => {
   const { user } = useAuth();
   const [availableBalance, setAvailableBalance] = useState(0);
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
-  const [withdrawalType, setWithdrawalType] = useState('earnings');
   const [withdrawalAddress, setWithdrawalAddress] = useState('');
   const [withdrawalHistory, setWithdrawalHistory] = useState<WithdrawalHistory[]>([]);
   const [feePercentage, setFeePercentage] = useState(10);
@@ -203,7 +202,7 @@ const Withdraw = () => {
           amount,
           fee_amount: feeAmount,
           net_amount: netAmount,
-          withdrawal_type: withdrawalType,
+          withdrawal_type: 'earnings',
           withdrawal_address: withdrawalAddress.trim(),
           status: 'pending'
         });
@@ -298,19 +297,6 @@ const Withdraw = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="withdrawal-type">Withdrawal Type</Label>
-              <Select value={withdrawalType} onValueChange={setWithdrawalType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="earnings">Earnings Only</SelectItem>
-                  <SelectItem value="principal">Principal (After Lock Period)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             <div>
               <Label htmlFor="amount">Amount (USDT)</Label>
               <Input
