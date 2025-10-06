@@ -36,13 +36,17 @@ const adminItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent/50";
+
+  const handleMenuClick = () => {
+    setOpenMobile(false);
+  };
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -68,7 +72,7 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink to={item.url} className={getNavCls} onClick={handleMenuClick}>
                       <item.icon className="w-4 h-4 mr-2" />
                       {state !== 'collapsed' && <span>{item.title}</span>}
                     </NavLink>
