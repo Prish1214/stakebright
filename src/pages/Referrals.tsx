@@ -100,12 +100,14 @@ const Referrals = () => {
     }
   };
 
-  const copyReferralLink = () => {
-    navigator.clipboard.writeText(referralLink);
-    toast({
-      title: "Copied!",
-      description: "Referral link copied to clipboard"
-    });
+  const copyReferralCode = () => {
+    if (profile?.referral_code) {
+      navigator.clipboard.writeText(profile.referral_code);
+      toast({
+        title: "Copied!",
+        description: "Referral code copied to clipboard"
+      });
+    }
   };
 
   if (loading) {
@@ -130,27 +132,25 @@ const Referrals = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-crypto-purple" />
-              Your Referral Link
+              Your Referral Code
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="referral-link">Share this link to earn commissions</Label>
+              <Label htmlFor="referral-code">Share this code to earn commissions</Label>
               <div className="flex gap-2 mt-2">
                 <Input
-                  id="referral-link"
-                  value={referralLink}
+                  id="referral-code"
+                  value={profile?.referral_code || ''}
                   readOnly
-                  className="flex-1"
+                  className="flex-1 font-mono text-lg"
                 />
-                <Button onClick={copyReferralLink} size="icon">
+                <Button onClick={copyReferralCode} size="icon">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
-            <div className="p-4 bg-crypto-purple/10 rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                Your referral code: <span className="font-mono text-crypto-purple">{profile?.referral_code}</span>
+              <p className="text-xs text-muted-foreground mt-2">
+                Paste this referral code when creating a new account
               </p>
             </div>
           </CardContent>
@@ -251,7 +251,7 @@ const Referrals = () => {
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">1</div>
-              <p>Share your unique referral link with friends and family</p>
+              <p>Share your unique referral code with friends and family</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">2</div>
