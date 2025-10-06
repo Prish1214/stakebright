@@ -37,8 +37,6 @@ const Referrals = () => {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const referralLink = profile ? `${window.location.origin}/auth?ref=${profile.referral_code}` : '';
-
   useEffect(() => {
     if (user) {
       fetchData();
@@ -184,7 +182,7 @@ const Referrals = () => {
               <div className="text-center py-8 text-muted-foreground">
                 <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>No referred users yet</p>
-                <p className="text-sm">Share your referral link to start!</p>
+                <p className="text-sm">Share your referral code to start!</p>
               </div>
             ) : (
               <div className="space-y-4">
