@@ -118,30 +118,40 @@ const Withdraw = () => {
 
   const calculateAvailableBalance = async () => {
     try {
-      // Get total earned from stakes with real-time calculation (same as Dashboard)
+      // Get all stakes (both active and ended)
       const { data: stakesData, error: stakesError } = await supabase
         .from('stakes')
-        .select('total_earned, daily_return, start_date, end_date')
-        .eq('user_id', user?.id)
-        .eq('is_active', true);
+        .select('amount, total_earned, daily_return, start_date, end_date, is_active, principal_withdrawn')
+        .eq('user_id', user?.id);
 
       if (stakesError) throw stakesError;
       
-      // Calculate total earnings from stakes (including real-time accumulated earnings)
-      const totalEarnings = stakesData?.reduce((sum, stake) => {
+      // Calculate total earnings and available principal from stakes
+      let totalEarnings = 0;
+      let availablePrincipal = 0;
+
+      stakesData?.forEach(stake => {
         const startDate = new Date(stake.start_date);
         const now = new Date();
         const endDate = new Date(stake.end_date);
-        const effectiveEndDate = now < endDate ? now : endDate;
+        const stakeEnded = now >= endDate;
         
-        // Calculate days passed since start
-        const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        // Calculate accumulated earnings: stored total_earned + (days * daily_return)
-        const accumulatedEarnings = Number(stake.total_earned) + (daysPassed * Number(stake.daily_return));
-        
-        return sum + accumulatedEarnings;
-      }, 0) || 0;
+        if (stake.is_active) {
+          // Active stakes: calculate real-time earnings
+          const effectiveEndDate = stakeEnded ? endDate : now;
+          const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+          const accumulatedEarnings = Number(stake.total_earned) + (daysPassed * Number(stake.daily_return));
+          totalEarnings += accumulatedEarnings;
+        } else {
+          // Inactive stakes: just add total_earned
+          totalEarnings += Number(stake.total_earned);
+        }
+
+        // If stake period has ended and principal not withdrawn yet, add to available balance
+        if (stakeEnded && !stake.principal_withdrawn) {
+          availablePrincipal += Number(stake.amount);
+        }
+      });
 
       // Get referral earnings
       const { data: referralData, error: referralError } = await supabase
@@ -163,7 +173,7 @@ const Withdraw = () => {
       if (withdrawnError) throw withdrawnError;
       const totalWithdrawn = withdrawnData?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
 
-      const available = totalEarnings + referralEarnings - totalWithdrawn;
+      const available = totalEarnings + referralEarnings + availablePrincipal - totalWithdrawn;
       setAvailableBalance(Math.max(0, available));
     } catch (error: any) {
       console.error('Error calculating balance:', error);
@@ -301,7 +311,7 @@ const Withdraw = () => {
               {availableBalance.toFixed(2)} USDT
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              From staking rewards and referral earnings
+              From staking rewards, completed principals, and referral earnings
             </p>
           </CardContent>
         </Card>
