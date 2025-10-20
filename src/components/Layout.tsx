@@ -3,6 +3,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
+import { Send, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,6 +37,28 @@ export const Layout = ({ children }: LayoutProps) => {
           <main className="flex-1 p-6">
             {children}
           </main>
+        </div>
+
+        {/* Floating action buttons */}
+        <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+          <Button
+            size="icon"
+            className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform"
+            asChild
+          >
+            <a href="https://t.me/StakeBright" target="_blank" rel="noopener noreferrer">
+              <Send className="h-5 w-5" />
+            </a>
+          </Button>
+          <Button
+            size="icon"
+            className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform"
+            asChild
+          >
+            <a href="mailto:stakebright@proton.me">
+              <Mail className="h-5 w-5" />
+            </a>
+          </Button>
         </div>
       </div>
     </SidebarProvider>
