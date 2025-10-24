@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,9 +13,18 @@ import { useToast } from '@/hooks/use-toast';
 const Auth = () => {
   const { user, signIn, signUp } = useAuth();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   if (user) {
@@ -224,6 +233,8 @@ const Auth = () => {
                       name="referralCode"
                       type="text"
                       placeholder="Enter referral code (required)"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value)}
                       required
                     />
                     <p className="text-xs text-muted-foreground">

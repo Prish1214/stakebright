@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Copy, Users, DollarSign } from 'lucide-react';
+import { Copy, Users, DollarSign, Link } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -108,6 +108,17 @@ const Referrals = () => {
     }
   };
 
+  const copyReferralLink = () => {
+    if (profile?.referral_code) {
+      const referralLink = `${window.location.origin}/auth?ref=${profile.referral_code}`;
+      navigator.clipboard.writeText(referralLink);
+      toast({
+        title: "Copied!",
+        description: "Referral link copied to clipboard"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -149,6 +160,23 @@ const Referrals = () => {
               </div>
               <p className="text-xs text-muted-foreground mt-2">
                 Paste this referral code when creating a new account
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="referral-link">Or share this referral link</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  id="referral-link"
+                  value={profile?.referral_code ? `${window.location.origin}/auth?ref=${profile.referral_code}` : ''}
+                  readOnly
+                  className="flex-1 text-sm"
+                />
+                <Button onClick={copyReferralLink} size="icon">
+                  <Link className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Users clicking this link will have the code auto-filled
               </p>
             </div>
           </CardContent>
