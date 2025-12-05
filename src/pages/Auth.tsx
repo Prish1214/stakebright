@@ -110,29 +110,26 @@ const Auth = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto lg:mx-0">
-                <DollarSign className="w-6 h-6 text-primary" />
+          <div className="grid grid-cols-3 gap-2 sm:gap-6">
+            <div className="space-y-1 sm:space-y-2 text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
-              <h3 className="font-semibold">High Returns</h3>
-              <p className="text-sm text-muted-foreground">​</p>
+              <h3 className="font-semibold text-xs sm:text-base">High Returns</h3>
             </div>
             
-            <div className="space-y-2">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto lg:mx-0">
-                <Shield className="w-6 h-6 text-primary" />
+            <div className="space-y-1 sm:space-y-2 text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
-              <h3 className="font-semibold">Secure</h3>
-              <p className="text-sm text-muted-foreground">​</p>
+              <h3 className="font-semibold text-xs sm:text-base">Secure</h3>
             </div>
             
-            <div className="space-y-2">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto lg:mx-0">
-                <TrendingUp className="w-6 h-6 text-primary" />
+            <div className="space-y-1 sm:space-y-2 text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
-              <h3 className="font-semibold">Referral Rewards</h3>
-              <p className="text-sm text-muted-foreground">​</p>
+              <h3 className="font-semibold text-xs sm:text-base">Referral Rewards</h3>
             </div>
           </div>
         </div>
