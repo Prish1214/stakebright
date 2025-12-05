@@ -9,16 +9,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { DollarSign, Shield, TrendingUp, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
-  const { toast } = useToast();
+  const {
+    user,
+    signIn,
+    signUp
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [referralCode, setReferralCode] = useState('');
-
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
@@ -33,8 +37,7 @@ const Auth = () => {
 
   // Show verification message after signup
   if (showVerificationMessage) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    return <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -55,67 +58,55 @@ const Auth = () => {
                 <li>Login with your email and password</li>
               </ol>
             </div>
-            <Button 
-              onClick={() => setShowVerificationMessage(false)} 
-              className="w-full"
-              variant="outline"
-            >
+            <Button onClick={() => setShowVerificationMessage(false)} className="w-full" variant="outline">
               Back to Login
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    
     await signIn(email, password);
     setLoading(false);
   };
-
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const username = formData.get('username') as string;
     const referralCode = formData.get('referralCode') as string;
-    
-    const { error } = await signUp(email, password, username, referralCode);
+    const {
+      error
+    } = await signUp(email, password, username, referralCode);
     setLoading(false);
-
     if (error) {
       toast({
         title: "Error",
         description: error.message || "Failed to create account",
-        variant: "destructive",
+        variant: "destructive"
       });
     } else {
       setUserEmail(email);
       setShowVerificationMessage(true);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+  return <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         {/* Left side - Branding */}
         <div className="space-y-8 text-center lg:text-left">
           <div className="space-y-4">
             <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary to-crypto-gold bg-clip-text text-transparent">
-              USDT Staking
+              Welcome STAKE BRIGHT 
             </h1>
             <p className="text-xl text-muted-foreground max-w-md mx-auto lg:mx-0">
-              Secure, high-yield USDT staking platform with competitive returns and referral rewards.
+              Secure, high-yield staking platform with competitive returns and referral rewards.
             </p>
           </div>
           
@@ -125,7 +116,7 @@ const Auth = () => {
                 <DollarSign className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold">High Returns</h3>
-              <p className="text-sm text-muted-foreground">Up to 2.5% daily returns</p>
+              <p className="text-sm text-muted-foreground">​</p>
             </div>
             
             <div className="space-y-2">
@@ -133,7 +124,7 @@ const Auth = () => {
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold">Secure</h3>
-              <p className="text-sm text-muted-foreground">Bank-level security</p>
+              <p className="text-sm text-muted-foreground">​</p>
             </div>
             
             <div className="space-y-2">
@@ -141,7 +132,7 @@ const Auth = () => {
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold">Referral Rewards</h3>
-              <p className="text-sm text-muted-foreground">5% commission</p>
+              <p className="text-sm text-muted-foreground">​</p>
             </div>
           </div>
         </div>
@@ -163,23 +154,12 @@ const Auth = () => {
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      required
-                    />
+                    <Input id="signin-email" name="email" type="email" placeholder="Enter your email" required />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="signin-password">Password</Label>
-                    <PasswordInput
-                      id="signin-password"
-                      name="password"
-                      placeholder="Enter your password"
-                      required
-                    />
+                    <PasswordInput id="signin-password" name="password" placeholder="Enter your password" required />
                   </div>
                   
                   <Button type="submit" className="w-full" disabled={loading}>
@@ -192,35 +172,17 @@ const Auth = () => {
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-username">Username</Label>
-                    <Input
-                      id="signup-username"
-                      name="username"
-                      type="text"
-                      placeholder="Choose a username"
-                      required
-                    />
+                    <Input id="signup-username" name="username" type="text" placeholder="Choose a username" required />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      required
-                    />
+                    <Input id="signup-email" name="email" type="email" placeholder="Enter your email" required />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <PasswordInput
-                      id="signup-password"
-                      name="password"
-                      placeholder="Create a password"
-                      required
-                      minLength={6}
-                    />
+                    <PasswordInput id="signup-password" name="password" placeholder="Create a password" required minLength={6} />
                     <p className="text-xs text-muted-foreground">
                       Please remember your Password - it can not be changed once set
                     </p>
@@ -228,15 +190,7 @@ const Auth = () => {
                   
                   <div className="space-y-2">
                     <Label htmlFor="signup-referral">Referral Code <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="signup-referral"
-                      name="referralCode"
-                      type="text"
-                      placeholder="Enter referral code (required)"
-                      value={referralCode}
-                      onChange={(e) => setReferralCode(e.target.value)}
-                      required
-                    />
+                    <Input id="signup-referral" name="referralCode" type="text" placeholder="Enter referral code (required)" value={referralCode} onChange={e => setReferralCode(e.target.value)} required />
                     <p className="text-xs text-muted-foreground">
                       You must enter a valid referral code to sign up
                     </p>
@@ -251,8 +205,6 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
