@@ -48,7 +48,7 @@ const CryptoProfitsTicker = () => {
   }, []);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-40 overflow-hidden">
+    <div className="fixed top-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-b border-border z-40 overflow-hidden">
       <div className="flex items-center">
         <div className="bg-primary px-4 py-2 flex items-center gap-2 shrink-0 z-10">
           <TrendingUp className="h-4 w-4 text-primary-foreground" />
