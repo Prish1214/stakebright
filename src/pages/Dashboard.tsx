@@ -7,7 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import CryptoProfitsTicker from '@/components/CryptoProfitsTicker';
 import {
   Wallet,
   TrendingUp,
@@ -155,7 +154,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-6 pt-14">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -317,8 +316,6 @@ const Dashboard = () => {
           </Link>
         </Card>
       </div>
-
-      <CryptoProfitsTicker />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { Send, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CryptoProfitsTicker from '@/components/CryptoProfitsTicker';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -30,9 +31,10 @@ export const Layout = ({ children }: LayoutProps) => {
 
   return (
     <SidebarProvider>
+      <CryptoProfitsTicker />
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col pt-10">
           <Header />
           <main className="flex-1 p-6">
             {children}
