@@ -379,10 +379,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_daily_staking_earnings: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      add_daily_staking_earnings: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -390,10 +387,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      process_daily_staking_returns: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      process_daily_staking_returns: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
