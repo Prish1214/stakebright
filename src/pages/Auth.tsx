@@ -103,7 +103,7 @@ const Auth = () => {
         <div className="space-y-8 text-center lg:text-left">
           <div className="space-y-4">
             <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary to-crypto-gold bg-clip-text text-transparent">
-              Welcome STAKE BRIGHT 
+              STAKE BRIGHT 
             </h1>
             <p className="text-xl text-muted-foreground max-w-md mx-auto lg:mx-0">
               Secure, high-yield staking platform with competitive returns and referral rewards.
