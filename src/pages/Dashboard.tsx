@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import CyberCard from '@/components/ui/CyberCard';
+import NeonButton from '@/components/ui/NeonButton';
+import GlowingIcon from '@/components/ui/GlowingIcon';
+import AnimatedNumber from '@/components/ui/AnimatedNumber';
 import {
   Wallet,
   TrendingUp,
@@ -14,7 +17,9 @@ import {
   Users,
   DollarSign,
   Clock,
-  Award
+  Award,
+  Zap,
+  Target
 } from 'lucide-react';
 
 interface UserProfile {
@@ -52,7 +57,6 @@ const Dashboard = () => {
     if (!user) return;
 
     try {
-      // Fetch user profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('wallet_balance, referral_code')
@@ -62,7 +66,6 @@ const Dashboard = () => {
       if (profileError) throw profileError;
       setProfile(profileData);
 
-      // Fetch active stakes
       const { data: stakesData, error: stakesError } = await supabase
         .from('stakes')
         .select(`
@@ -83,28 +86,19 @@ const Dashboard = () => {
       if (stakesError) throw stakesError;
       setActiveStakes(stakesData || []);
 
-      // Calculate total earnings from stakes (including real-time accumulated earnings)
       const stakesEarnings = stakesData?.reduce((sum, stake) => {
         const startDate = new Date(stake.start_date);
         const now = new Date();
         const endDate = new Date(stake.end_date);
         const effectiveEndDate = now < endDate ? now : endDate;
-        
-        // Calculate days passed since start
         const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        // Calculate accumulated earnings: stored total_earned + (days * daily_return)
-        // This ensures we show real-time earnings even before cron runs
         const accumulatedEarnings = Number(stake.total_earned) + (daysPassed * Number(stake.daily_return));
-        
         return sum + accumulatedEarnings;
       }, 0) || 0;
 
-      // Calculate daily earnings from all active stakes
       const totalDailyEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
       setDailyEarnings(totalDailyEarnings);
 
-      // Fetch referral earnings
       const { data: referralData, error: referralError } = await supabase
         .from('referral_earnings')
         .select('amount')
@@ -139,14 +133,10 @@ const Dashboard = () => {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="pb-2">
-                <div className="h-4 bg-muted rounded w-24"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-muted rounded w-16"></div>
-              </CardContent>
-            </Card>
+            <div key={i} className="cyber-card rounded-xl p-6 animate-pulse">
+              <div className="h-4 bg-primary/20 rounded w-24 mb-4"></div>
+              <div className="h-8 bg-primary/10 rounded w-20"></div>
+            </div>
           ))}
         </div>
       </div>
@@ -155,166 +145,176 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="animate-fade-in-up">
+          <h1 className="text-3xl font-mono font-bold gradient-text">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here's your staking overview.</p>
         </div>
         <Link to="/staking">
-          <Button className="bg-primary hover:bg-primary/90">
+          <NeonButton glowColor="purple" pulse>
             <TrendingUp className="mr-2 h-4 w-4" />
             Stake More
-          </Button>
+          </NeonButton>
         </Link>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{Number(profile?.wallet_balance || 0).toFixed(2)} USDT</div>
-            <p className="text-xs text-muted-foreground">Available for staking</p>
-          </CardContent>
-        </Card>
+        <CyberCard glowColor="cyan" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Wallet Balance</span>
+            <GlowingIcon icon={Wallet} size="sm" color="cyan" animated={false} />
+          </div>
+          <div className="text-2xl font-mono font-bold text-secondary">
+            <AnimatedNumber value={Number(profile?.wallet_balance || 0)} glowColor="cyan" suffix=" USDT" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Available for staking</p>
+        </CyberCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">{totalEarnings.toFixed(2)} USDT</div>
-            <p className="text-xs text-muted-foreground">Daily returns + referral earnings</p>
-          </CardContent>
-        </Card>
+        <CyberCard glowColor="green" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Total Earnings</span>
+            <GlowingIcon icon={DollarSign} size="sm" color="green" animated={false} />
+          </div>
+          <div className="text-2xl font-mono font-bold text-success">
+            <AnimatedNumber value={totalEarnings} glowColor="green" suffix=" USDT" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Daily returns + referral earnings</p>
+        </CyberCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Stakes</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeStakes.length}</div>
-            <p className="text-xs text-muted-foreground">Currently earning</p>
-          </CardContent>
-        </Card>
+        <CyberCard glowColor="purple" className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Active Stakes</span>
+            <GlowingIcon icon={TrendingUp} size="sm" color="purple" animated={false} />
+          </div>
+          <div className="text-2xl font-mono font-bold text-primary">
+            {activeStakes.length}
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Currently earning</p>
+        </CyberCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Referral Earnings</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-crypto-gold">{referralEarnings.toFixed(2)} USDT</div>
-            <p className="text-xs text-muted-foreground">5% commission</p>
-          </CardContent>
-        </Card>
+        <CyberCard glowColor="gold" className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Referral Earnings</span>
+            <GlowingIcon icon={Users} size="sm" color="gold" animated={false} />
+          </div>
+          <div className="text-2xl font-mono font-bold text-crypto-gold">
+            <AnimatedNumber value={referralEarnings} glowColor="gold" suffix=" USDT" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">5% commission</p>
+        </CyberCard>
       </div>
 
       {/* Active Stakes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Active Stakes
-            </CardTitle>
-            <CardDescription>Your current staking positions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {activeStakes.length === 0 ? (
-              <div className="text-center py-8">
-                <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Active Stakes</h3>
-                <p className="text-muted-foreground mb-4">Start staking to earn daily returns</p>
-                <Link to="/staking">
-                  <Button>Start Staking</Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {activeStakes.map((stake) => {
-                  const daysRemaining = getDaysRemaining(stake.end_date);
-                  const totalDays = stake.staking_plans.duration_days;
-                  const progress = ((totalDays - daysRemaining) / totalDays) * 100;
-                  
-                  return (
-                    <div key={stake.id} className="border rounded-lg p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline">{stake.staking_plans.name}</Badge>
-                          <span className="font-semibold">{Number(stake.amount).toFixed(2)} USDT</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm text-success font-medium">
-                            +{Number(stake.daily_return).toFixed(2)} USDT/day
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Total earned: {Number(stake.total_earned).toFixed(2)} USDT
-                          </div>
-                        </div>
+      <CyberCard glowColor="purple" className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+        <div className="flex items-center gap-3 mb-6">
+          <GlowingIcon icon={Zap} size="md" color="purple" />
+          <div>
+            <h2 className="text-xl font-mono font-bold">Active Stakes</h2>
+            <p className="text-sm text-muted-foreground">Your current staking positions</p>
+          </div>
+        </div>
+
+        {activeStakes.length === 0 ? (
+          <div className="text-center py-12 border border-primary/20 rounded-xl bg-muted/10">
+            <TrendingUp className="h-16 w-16 text-primary/30 mx-auto mb-4" />
+            <h3 className="text-lg font-mono font-semibold mb-2">No Active Stakes</h3>
+            <p className="text-muted-foreground mb-6">Start staking to earn daily returns</p>
+            <Link to="/staking">
+              <NeonButton>Start Staking</NeonButton>
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {activeStakes.map((stake, index) => {
+              const daysRemaining = getDaysRemaining(stake.end_date);
+              const totalDays = stake.staking_plans.duration_days;
+              const progress = ((totalDays - daysRemaining) / totalDays) * 100;
+              
+              return (
+                <div 
+                  key={stake.id} 
+                  className="border border-primary/20 rounded-xl p-5 bg-muted/5 hover:bg-muted/10 transition-all duration-300 hover:border-primary/40 animate-fade-in-up"
+                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-primary/20 text-primary border-primary/30 font-mono">
+                        {stake.staking_plans.name}
+                      </Badge>
+                      <span className="font-mono font-semibold text-lg">{Number(stake.amount).toFixed(2)} USDT</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-mono text-success flex items-center gap-1">
+                        <Zap className="h-3 w-3" />
+                        +{Number(stake.daily_return).toFixed(2)} USDT/day
                       </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {daysRemaining} days remaining
-                          </span>
-                          <span>{Math.round(progress)}% complete</span>
-                        </div>
-                        <Progress value={progress} className="h-2" />
+                      <div className="text-xs text-muted-foreground">
+                        Total earned: <span className="text-crypto-gold">{Number(stake.total_earned).toFixed(2)} USDT</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {daysRemaining} days remaining
+                      </span>
+                      <span className="font-mono text-primary">{Math.round(progress)}%</span>
+                    </div>
+                    <div className="relative h-2 bg-muted/30 rounded-full overflow-hidden">
+                      <div 
+                        className="absolute inset-y-0 left-0 bg-neon-gradient rounded-full transition-all duration-1000"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CyberCard>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <Link to="/deposit" className="block">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Wallet className="h-5 w-5 text-primary" />
-                Deposit USDT
-              </CardTitle>
-              <CardDescription>Add funds to your wallet</CardDescription>
-            </CardHeader>
-          </Link>
-        </Card>
+        <Link to="/deposit" className="block">
+          <CyberCard glowColor="cyan" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={Wallet} color="cyan" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">Deposit USDT</h3>
+                <p className="text-sm text-muted-foreground">Add funds to your wallet</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <Link to="/withdraw" className="block">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <ArrowUpCircle className="h-5 w-5 text-success" />
-                Withdraw Earnings
-              </CardTitle>
-              <CardDescription>Cash out your profits</CardDescription>
-            </CardHeader>
-          </Link>
-        </Card>
+        <Link to="/withdraw" className="block">
+          <CyberCard glowColor="green" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={ArrowUpCircle} color="green" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">Withdraw Earnings</h3>
+                <p className="text-sm text-muted-foreground">Cash out your profits</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <Link to="/referrals" className="block">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Award className="h-5 w-5 text-crypto-gold" />
-                Refer & Earn
-              </CardTitle>
-              <CardDescription>Earn 5% commission</CardDescription>
-            </CardHeader>
-          </Link>
-        </Card>
+        <Link to="/referrals" className="block">
+          <CyberCard glowColor="gold" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={Award} color="gold" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">Refer & Earn</h3>
+                <p className="text-sm text-muted-foreground">Earn 5% commission</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
       </div>
     </div>
   );

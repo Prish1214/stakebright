@@ -2,109 +2,120 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Cyberpunk Neon Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card: 240 10% 7%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover: 240 10% 7%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 280 100% 70%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 214 32% 91%;
+    --secondary: 190 100% 50%;
     --secondary-foreground: 0 0% 0%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 0 0% 30%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 210 40% 96%;
+    --accent: 320 100% 60%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 280 50% 20%;
+    --input: 240 5% 15%;
+    --ring: 280 100% 70%;
 
     --radius: 0.75rem;
     
-    /* Crypto-specific colors */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --warning: 45 93% 47%;
+    /* Cyberpunk Neon colors */
+    --success: 160 100% 45%;
+    --success-foreground: 0 0% 0%;
+    --warning: 45 100% 60%;
     --warning-foreground: 0 0% 0%;
-    --crypto-gold: 45 93% 47%;
+    
+    --crypto-gold: 45 100% 60%;
     --crypto-gold-foreground: 0 0% 0%;
-    --crypto-purple: 250 70% 60%;
-    --crypto-purple-foreground: 0 0% 100%;
+    --crypto-purple: 280 100% 70%;
+    --crypto-purple-foreground: 0 0% 0%;
+    
+    --neon-cyan: 190 100% 50%;
+    --neon-pink: 320 100% 60%;
+    --neon-purple: 280 100% 70%;
+    --neon-blue: 210 100% 60%;
+    --neon-green: 160 100% 50%;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 240 10% 5%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 280 100% 70%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 240 10% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 280 50% 20%;
+    --sidebar-ring: 280 100% 70%;
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 240 10% 4%;
     --foreground: 0 0% 98%;
 
-    --card: 222 47% 11%;
+    --card: 240 10% 7%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 11%;
+    --popover: 240 10% 7%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 280 100% 70%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 190 100% 50%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 217 33% 17%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 320 100% 60%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    --border: 280 50% 20%;
+    --input: 240 5% 15%;
+    --ring: 280 100% 70%;
     
-    /* Dark mode crypto colors */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
-    --warning: 45 93% 47%;
+    --success: 160 100% 45%;
+    --success-foreground: 0 0% 0%;
+    --warning: 45 100% 60%;
     --warning-foreground: 0 0% 0%;
-    --crypto-gold: 45 93% 47%;
-    --crypto-gold-foreground: 0 0% 0%;
-    --crypto-purple: 250 70% 60%;
-    --crypto-purple-foreground: 0 0% 100%;
     
-    --sidebar-background: 222 47% 11%;
+    --crypto-gold: 45 100% 60%;
+    --crypto-gold-foreground: 0 0% 0%;
+    --crypto-purple: 280 100% 70%;
+    --crypto-purple-foreground: 0 0% 0%;
+    
+    --neon-cyan: 190 100% 50%;
+    --neon-pink: 320 100% 60%;
+    --neon-purple: 280 100% 70%;
+    --neon-blue: 210 100% 60%;
+    --neon-green: 160 100% 50%;
+    
+    --sidebar-background: 240 10% 5%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-primary: 280 100% 70%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 240 10% 12%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-border: 280 50% 20%;
+    --sidebar-ring: 280 100% 70%;
   }
 }
 
@@ -115,5 +126,270 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, hsl(280 100% 70% / 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, hsl(190 100% 50% / 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, hsl(320 100% 60% / 0.05) 0%, transparent 70%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  /* Neon Glow Effects */
+  .neon-glow-purple {
+    box-shadow: 
+      0 0 5px hsl(280 100% 70% / 0.5),
+      0 0 20px hsl(280 100% 70% / 0.3),
+      0 0 40px hsl(280 100% 70% / 0.2);
+  }
+  
+  .neon-glow-cyan {
+    box-shadow: 
+      0 0 5px hsl(190 100% 50% / 0.5),
+      0 0 20px hsl(190 100% 50% / 0.3),
+      0 0 40px hsl(190 100% 50% / 0.2);
+  }
+  
+  .neon-glow-pink {
+    box-shadow: 
+      0 0 5px hsl(320 100% 60% / 0.5),
+      0 0 20px hsl(320 100% 60% / 0.3),
+      0 0 40px hsl(320 100% 60% / 0.2);
+  }
+  
+  .neon-glow-gold {
+    box-shadow: 
+      0 0 5px hsl(45 100% 60% / 0.5),
+      0 0 20px hsl(45 100% 60% / 0.3),
+      0 0 40px hsl(45 100% 60% / 0.2);
+  }
+  
+  .neon-text-purple {
+    text-shadow: 
+      0 0 5px hsl(280 100% 70% / 0.8),
+      0 0 20px hsl(280 100% 70% / 0.5),
+      0 0 40px hsl(280 100% 70% / 0.3);
+  }
+  
+  .neon-text-cyan {
+    text-shadow: 
+      0 0 5px hsl(190 100% 50% / 0.8),
+      0 0 20px hsl(190 100% 50% / 0.5),
+      0 0 40px hsl(190 100% 50% / 0.3);
+  }
+  
+  .neon-text-gold {
+    text-shadow: 
+      0 0 5px hsl(45 100% 60% / 0.8),
+      0 0 20px hsl(45 100% 60% / 0.5),
+      0 0 40px hsl(45 100% 60% / 0.3);
+  }
+
+  /* Cyberpunk Card Styles */
+  .cyber-card {
+    @apply relative overflow-hidden;
+    background: linear-gradient(
+      135deg,
+      hsl(240 10% 8%) 0%,
+      hsl(240 10% 5%) 100%
+    );
+    border: 1px solid hsl(280 100% 70% / 0.2);
+  }
+  
+  .cyber-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(280 100% 70% / 0.5),
+      hsl(190 100% 50% / 0.5),
+      transparent
+    );
+  }
+  
+  .cyber-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(190 100% 50% / 0.3),
+      hsl(280 100% 70% / 0.3),
+      transparent
+    );
+  }
+
+  /* 3D Transform Perspective */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .transform-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-8px) rotateX(5deg);
+    box-shadow: 
+      0 20px 40px -20px hsl(280 100% 70% / 0.4),
+      0 0 20px hsl(280 100% 70% / 0.2);
+  }
+
+  /* Animated Grid Background */
+  .grid-bg {
+    background-image: 
+      linear-gradient(hsl(280 100% 70% / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(280 100% 70% / 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Glitch Effect */
+  .glitch {
+    animation: glitch 2s infinite;
+  }
+  
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+  }
+
+  /* Pulse Glow */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 
+        0 0 5px hsl(280 100% 70% / 0.5),
+        0 0 20px hsl(280 100% 70% / 0.3);
+    }
+    50% {
+      box-shadow: 
+        0 0 10px hsl(280 100% 70% / 0.8),
+        0 0 40px hsl(280 100% 70% / 0.5),
+        0 0 60px hsl(280 100% 70% / 0.3);
+    }
+  }
+
+  /* Floating Animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  /* Scan Line Effect */
+  .scan-line {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+      transparent 0%,
+      hsl(280 100% 70% / 0.03) 50%,
+      transparent 100%
+    );
+    animation: scanLine 3s linear infinite;
+  }
+  
+  @keyframes scanLine {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      hsl(280 100% 70%) 0%,
+      hsl(190 100% 50%) 50%,
+      hsl(320 100% 60%) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Rotating Border */
+  .rotating-border {
+    position: relative;
+  }
+  
+  .rotating-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+      var(--rotate, 0deg),
+      hsl(280 100% 70%),
+      hsl(190 100% 50%),
+      hsl(320 100% 60%),
+      hsl(280 100% 70%)
+    );
+    border-radius: inherit;
+    z-index: -1;
+    animation: rotateBorder 4s linear infinite;
+  }
+  
+  @keyframes rotateBorder {
+    0% { --rotate: 0deg; }
+    100% { --rotate: 360deg; }
+  }
+
+  /* Data Stream Effect */
+  .data-stream {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      hsl(280 100% 70% / 0.05) 2px,
+      hsl(280 100% 70% / 0.05) 4px
+    );
+  }
+
+  /* Holographic Shimmer */
+  .holographic {
+    background: linear-gradient(
+      135deg,
+      hsl(280 100% 70% / 0.1) 0%,
+      hsl(190 100% 50% / 0.1) 25%,
+      hsl(320 100% 60% / 0.1) 50%,
+      hsl(45 100% 60% / 0.1) 75%,
+      hsl(280 100% 70% / 0.1) 100%
+    );
+    background-size: 400% 400%;
+    animation: holographicShimmer 8s ease infinite;
+  }
+  
+  @keyframes holographicShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
 }

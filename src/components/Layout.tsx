@@ -16,10 +16,10 @@ export const Layout = ({ children }: LayoutProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background grid-bg flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto neon-glow-purple"></div>
+          <p className="text-muted-foreground font-mono">Loading...</p>
         </div>
       </div>
     );
@@ -32,7 +32,7 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <SidebarProvider>
       <CryptoProfitsTicker />
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-background grid-bg">
         <AppSidebar />
         <div className="flex-1 flex flex-col pt-10">
           <Header />
@@ -45,7 +45,7 @@ export const Layout = ({ children }: LayoutProps) => {
         <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
           <Button
             size="icon"
-            className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform"
+            className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform neon-glow-cyan bg-secondary hover:bg-secondary/90"
             asChild
           >
             <a href="https://t.me/StakeBright" target="_blank" rel="noopener noreferrer">
@@ -54,7 +54,7 @@ export const Layout = ({ children }: LayoutProps) => {
           </Button>
           <Button
             size="icon"
-            className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform"
+            className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform neon-glow-purple"
             asChild
           >
             <a href="mailto:stakebright@proton.me">
