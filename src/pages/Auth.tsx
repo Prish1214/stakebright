@@ -148,15 +148,15 @@ const Auth = () => {
           {/* Stats Section */}
           <div className="hidden lg:grid grid-cols-3 gap-4 pt-8 border-t border-primary/20">
             <div className="text-center">
-              <p className="text-3xl font-mono font-bold text-primary neon-text-purple">$2M+</p>
+              <p className="text-3xl font-mono font-bold text-primary neon-text-purple">$120K+</p>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Staked</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-mono font-bold text-secondary neon-text-cyan">15K+</p>
+              <p className="text-3xl font-mono font-bold text-secondary neon-text-cyan">10K+</p>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Active Users</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-mono font-bold text-crypto-gold neon-text-gold">99.9%</p>
+              <p className="text-3xl font-mono font-bold text-crypto-gold neon-text-gold">97%</p>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Uptime</p>
             </div>
           </div>
