@@ -10,33 +10,36 @@ import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users } from 'lucide-r
 import { useToast } from '@/hooks/use-toast';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
-
 const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
-  const { toast } = useToast();
+  const {
+    user,
+    signIn,
+    signUp
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [referralCode, setReferralCode] = useState('');
-
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
       setReferralCode(refCode);
     }
   }, [searchParams]);
-
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
-
   if (showVerificationMessage) {
-    return (
-      <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
+    return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{
+          animationDelay: '2s'
+        }} />
         </div>
         
         <Card className="w-full max-w-md cyber-card animate-scale-in">
@@ -55,20 +58,13 @@ const Auth = () => {
                 <li>Login with your email and password</li>
               </ol>
             </div>
-            <NeonButton 
-              onClick={() => setShowVerificationMessage(false)} 
-              className="w-full" 
-              variant="outline"
-              glowColor="cyan"
-            >
+            <NeonButton onClick={() => setShowVerificationMessage(false)} className="w-full" variant="outline" glowColor="cyan">
               Back to Login
             </NeonButton>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -78,7 +74,6 @@ const Auth = () => {
     await signIn(email, password);
     setLoading(false);
   };
-
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -87,7 +82,9 @@ const Auth = () => {
     const password = formData.get('password') as string;
     const username = formData.get('username') as string;
     const referralCode = formData.get('referralCode') as string;
-    const { error } = await signUp(email, password, username, referralCode);
+    const {
+      error
+    } = await signUp(email, password, username, referralCode);
     setLoading(false);
     if (error) {
       toast({
@@ -100,28 +97,24 @@ const Auth = () => {
       setShowVerificationMessage(true);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4 overflow-hidden">
+  return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4 overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{
+        animationDelay: '2s'
+      }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl animate-float" style={{
+        animationDelay: '4s'
+      }} />
         
         {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-primary/50 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${4 + Math.random() * 4}s`,
-            }}
-          />
-        ))}
+        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-1 h-1 bg-primary/50 rounded-full animate-float" style={{
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${4 + Math.random() * 4}s`
+      }} />)}
       </div>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
@@ -132,9 +125,7 @@ const Auth = () => {
               STAKE BRIGHT
             </h1>
             <div className="h-1 w-32 bg-neon-gradient mx-auto lg:mx-0 rounded-full" />
-            <p className="text-xl text-muted-foreground max-w-md mx-auto lg:mx-0">
-              Secure, high-yield staking platform with competitive returns and referral rewards.
-            </p>
+            <p className="text-xl text-muted-foreground max-w-md mx-auto lg:mx-0">Secure, high-yield staking platform with competitive returns from Trading Profits and referral rewards.</p>
           </div>
           
           <div className="grid grid-cols-3 gap-2 sm:gap-6">
@@ -172,7 +163,9 @@ const Auth = () => {
         </div>
 
         {/* Right side - Auth forms */}
-        <Card className="w-full max-w-md mx-auto cyber-card animate-scale-in" style={{ animationDelay: '0.2s' }}>
+        <Card className="w-full max-w-md mx-auto cyber-card animate-scale-in" style={{
+        animationDelay: '0.2s'
+      }}>
           <CardHeader className="text-center">
             <CardTitle className="font-mono text-2xl gradient-text">Welcome</CardTitle>
             <CardDescription>Sign in to your account or create a new one</CardDescription>
@@ -192,39 +185,22 @@ const Auth = () => {
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email" className="font-mono text-sm">Email</Label>
-                    <Input 
-                      id="signin-email" 
-                      name="email" 
-                      type="email" 
-                      placeholder="Enter your email" 
-                      required 
-                      className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50"
-                    />
+                    <Input id="signin-email" name="email" type="email" placeholder="Enter your email" required className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50" />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="signin-password" className="font-mono text-sm">Password</Label>
-                    <PasswordInput 
-                      id="signin-password" 
-                      name="password" 
-                      placeholder="Enter your password" 
-                      required 
-                      className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50"
-                    />
+                    <PasswordInput id="signin-password" name="password" placeholder="Enter your password" required className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50" />
                   </div>
                   
                   <NeonButton type="submit" className="w-full" disabled={loading} pulse>
-                    {loading ? (
-                      <span className="flex items-center gap-2">
+                    {loading ? <span className="flex items-center gap-2">
                         <Zap className="h-4 w-4 animate-pulse" />
                         Connecting...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
+                      </span> : <span className="flex items-center gap-2">
                         <Lock className="h-4 w-4" />
                         Sign In
-                      </span>
-                    )}
+                      </span>}
                   </NeonButton>
                 </form>
               </TabsContent>
@@ -233,38 +209,17 @@ const Auth = () => {
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-username" className="font-mono text-sm">Username</Label>
-                    <Input 
-                      id="signup-username" 
-                      name="username" 
-                      type="text" 
-                      placeholder="Choose a username" 
-                      required 
-                      className="bg-muted/30 border-primary/20 focus:border-primary"
-                    />
+                    <Input id="signup-username" name="username" type="text" placeholder="Choose a username" required className="bg-muted/30 border-primary/20 focus:border-primary" />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="font-mono text-sm">Email</Label>
-                    <Input 
-                      id="signup-email" 
-                      name="email" 
-                      type="email" 
-                      placeholder="Enter your email" 
-                      required 
-                      className="bg-muted/30 border-primary/20 focus:border-primary"
-                    />
+                    <Input id="signup-email" name="email" type="email" placeholder="Enter your email" required className="bg-muted/30 border-primary/20 focus:border-primary" />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="signup-password" className="font-mono text-sm">Password</Label>
-                    <PasswordInput 
-                      id="signup-password" 
-                      name="password" 
-                      placeholder="Create a password" 
-                      required 
-                      minLength={6} 
-                      className="bg-muted/30 border-primary/20 focus:border-primary"
-                    />
+                    <PasswordInput id="signup-password" name="password" placeholder="Create a password" required minLength={6} className="bg-muted/30 border-primary/20 focus:border-primary" />
                     <p className="text-xs text-warning">
                       ⚠️ Password cannot be changed once set
                     </p>
@@ -274,30 +229,17 @@ const Auth = () => {
                     <Label htmlFor="signup-referral" className="font-mono text-sm">
                       Referral Code <span className="text-accent">*</span>
                     </Label>
-                    <Input 
-                      id="signup-referral" 
-                      name="referralCode" 
-                      type="text" 
-                      placeholder="Enter referral code (required)" 
-                      value={referralCode} 
-                      onChange={e => setReferralCode(e.target.value)} 
-                      required 
-                      className="bg-muted/30 border-primary/20 focus:border-primary"
-                    />
+                    <Input id="signup-referral" name="referralCode" type="text" placeholder="Enter referral code (required)" value={referralCode} onChange={e => setReferralCode(e.target.value)} required className="bg-muted/30 border-primary/20 focus:border-primary" />
                   </div>
                   
                   <NeonButton type="submit" className="w-full" disabled={loading} glowColor="cyan">
-                    {loading ? (
-                      <span className="flex items-center gap-2">
+                    {loading ? <span className="flex items-center gap-2">
                         <Zap className="h-4 w-4 animate-pulse" />
                         Creating...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
+                      </span> : <span className="flex items-center gap-2">
                         <Users className="h-4 w-4" />
                         Create Account
-                      </span>
-                    )}
+                      </span>}
                   </NeonButton>
                 </form>
               </TabsContent>
@@ -305,8 +247,6 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
