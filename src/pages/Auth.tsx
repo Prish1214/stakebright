@@ -6,42 +6,41 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, 
-  Target, Headphones, BarChart3, Globe, Wallet, ArrowRight,
-  CheckCircle2, MessageCircle, ChevronDown
-} from 'lucide-react';
+import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, Target, Headphones, BarChart3, Wallet, ArrowRight, CheckCircle2, MessageCircle, ChevronDown, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
 import CyberCard from '@/components/ui/CyberCard';
-
 const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
-  const { toast } = useToast();
+  const {
+    user,
+    signIn,
+    signUp
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [referralCode, setReferralCode] = useState('');
-
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
       setReferralCode(refCode);
     }
   }, [searchParams]);
-
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
-
   if (showVerificationMessage) {
-    return (
-      <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
+    return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{
+          animationDelay: '2s'
+        }} />
         </div>
         
         <Card className="w-full max-w-md cyber-card animate-scale-in">
@@ -65,10 +64,8 @@ const Auth = () => {
             </NeonButton>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -78,7 +75,6 @@ const Auth = () => {
     await signIn(email, password);
     setLoading(false);
   };
-
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -87,7 +83,9 @@ const Auth = () => {
     const password = formData.get('password') as string;
     const username = formData.get('username') as string;
     const referralCode = formData.get('referralCode') as string;
-    const { error } = await signUp(email, password, username, referralCode);
+    const {
+      error
+    } = await signUp(email, password, username, referralCode);
     setLoading(false);
     if (error) {
       toast({
@@ -100,47 +98,64 @@ const Auth = () => {
       setShowVerificationMessage(true);
     }
   };
-
   const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(id)?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
-  const partners = [
-    { name: 'Ethereum', symbol: 'ETH' },
-    { name: 'Binance', symbol: 'BNB' },
-    { name: 'Polygon', symbol: 'MATIC' },
-    { name: 'Arbitrum', symbol: 'ARB' },
-    { name: 'Tether', symbol: 'USDT' },
-    { name: 'USD Coin', symbol: 'USDC' },
-  ];
-
-  const tradingStats = [
-    { label: 'Win Rate', value: '94.7%', color: 'text-crypto-green' },
-    { label: 'Avg. Monthly Return', value: '18.5%', color: 'text-crypto-gold' },
-    { label: 'Total Trades', value: '125K+', color: 'text-secondary' },
-    { label: 'Years Experience', value: '7+', color: 'text-primary' },
-  ];
-
-  return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+  const partners = [{
+    name: 'Ethereum',
+    symbol: 'ETH'
+  }, {
+    name: 'Binance',
+    symbol: 'BNB'
+  }, {
+    name: 'Polygon',
+    symbol: 'MATIC'
+  }, {
+    name: 'Arbitrum',
+    symbol: 'ARB'
+  }, {
+    name: 'Tether',
+    symbol: 'USDT'
+  }, {
+    name: 'USD Coin',
+    symbol: 'USDC'
+  }];
+  const tradingStats = [{
+    label: 'Win Rate',
+    value: '94.7%',
+    color: 'text-crypto-green'
+  }, {
+    label: 'Avg. Monthly Return',
+    value: '18.5%',
+    color: 'text-crypto-gold'
+  }, {
+    label: 'Total Trades',
+    value: '125K+',
+    color: 'text-secondary'
+  }, {
+    label: 'Years Experience',
+    value: '7+',
+    color: 'text-primary'
+  }];
+  return <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 grid-bg pointer-events-none" />
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-5 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-5 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-primary/50 rounded-full animate-float hidden sm:block"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${4 + Math.random() * 4}s`
-            }}
-          />
-        ))}
+        <div className="absolute bottom-20 right-5 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{
+        animationDelay: '2s'
+      }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] bg-accent/10 rounded-full blur-3xl animate-float" style={{
+        animationDelay: '4s'
+      }} />
+        {[...Array(15)].map((_, i) => <div key={i} className="absolute w-1 h-1 bg-primary/50 rounded-full animate-float hidden sm:block" style={{
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${4 + Math.random() * 4}s`
+      }} />)}
       </div>
 
       {/* Navigation */}
@@ -205,7 +220,7 @@ const Auth = () => {
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Profits Paid</p>
               </div>
               <div className="text-center lg:text-left">
-                <p className="text-lg sm:text-2xl md:text-3xl font-mono font-bold text-crypto-gold neon-text-gold">99.9%</p>
+                <p className="text-lg sm:text-2xl md:text-3xl font-mono font-bold text-crypto-gold neon-text-gold">96%</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Uptime</p>
               </div>
             </div>
@@ -213,7 +228,9 @@ const Auth = () => {
 
           {/* Right - Auth Form */}
           <div id="auth" className="scroll-mt-20 sm:scroll-mt-24 order-1 lg:order-2">
-            <Card className="w-full max-w-sm sm:max-w-md mx-auto cyber-card animate-scale-in" style={{ animationDelay: '0.2s' }}>
+            <Card className="w-full max-w-sm sm:max-w-md mx-auto cyber-card animate-scale-in" style={{
+            animationDelay: '0.2s'
+          }}>
               <CardHeader className="text-center p-4 sm:p-6">
                 <CardTitle className="font-mono text-xl sm:text-2xl gradient-text">Join Now</CardTitle>
                 <CardDescription className="text-sm">Start earning passive income today</CardDescription>
@@ -242,17 +259,13 @@ const Auth = () => {
                       </div>
                       
                       <NeonButton type="submit" className="w-full text-sm" disabled={loading} pulse>
-                        {loading ? (
-                          <span className="flex items-center gap-2">
+                        {loading ? <span className="flex items-center gap-2">
                             <Zap className="h-4 w-4 animate-pulse" />
                             Connecting...
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2">
+                          </span> : <span className="flex items-center gap-2">
                             <Lock className="h-4 w-4" />
                             Sign In
-                          </span>
-                        )}
+                          </span>}
                       </NeonButton>
                     </form>
                   </TabsContent>
@@ -283,17 +296,13 @@ const Auth = () => {
                       </div>
                       
                       <NeonButton type="submit" className="w-full text-sm" disabled={loading} glowColor="cyan">
-                        {loading ? (
-                          <span className="flex items-center gap-2">
+                        {loading ? <span className="flex items-center gap-2">
                             <Zap className="h-4 w-4 animate-pulse" />
                             Creating...
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2">
+                          </span> : <span className="flex items-center gap-2">
                             <Users className="h-4 w-4" />
                             Create Account
-                          </span>
-                        )}
+                          </span>}
                       </NeonButton>
                     </form>
                   </TabsContent>
@@ -320,7 +329,9 @@ const Auth = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <CyberCard hoverable className="animate-fade-in-up" style={{
+            animationDelay: '0.1s'
+          }}>
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={Wallet} color="purple" size="md" className="sm:hidden" />
                 <GlowingIcon icon={Wallet} color="purple" size="lg" className="hidden sm:flex" />
@@ -332,7 +343,9 @@ const Auth = () => {
               </div>
             </CyberCard>
 
-            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <CyberCard hoverable className="animate-fade-in-up" style={{
+            animationDelay: '0.2s'
+          }}>
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={BarChart3} color="cyan" size="md" className="sm:hidden" />
                 <GlowingIcon icon={BarChart3} color="cyan" size="lg" className="hidden sm:flex" />
@@ -344,7 +357,9 @@ const Auth = () => {
               </div>
             </CyberCard>
 
-            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <CyberCard hoverable className="animate-fade-in-up" style={{
+            animationDelay: '0.3s'
+          }}>
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={TrendingUp} color="gold" size="md" className="sm:hidden" />
                 <GlowingIcon icon={TrendingUp} color="gold" size="lg" className="hidden sm:flex" />
@@ -356,7 +371,9 @@ const Auth = () => {
               </div>
             </CyberCard>
 
-            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <CyberCard hoverable className="animate-fade-in-up" style={{
+            animationDelay: '0.4s'
+          }}>
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={Shield} color="cyan" size="md" className="sm:hidden" />
                 <GlowingIcon icon={Shield} color="cyan" size="lg" className="hidden sm:flex" />
@@ -368,7 +385,9 @@ const Auth = () => {
               </div>
             </CyberCard>
 
-            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+            <CyberCard hoverable className="animate-fade-in-up" style={{
+            animationDelay: '0.5s'
+          }}>
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={Users} color="purple" size="md" className="sm:hidden" />
                 <GlowingIcon icon={Users} color="purple" size="lg" className="hidden sm:flex" />
@@ -380,7 +399,9 @@ const Auth = () => {
               </div>
             </CyberCard>
 
-            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <CyberCard hoverable className="animate-fade-in-up" style={{
+            animationDelay: '0.6s'
+          }}>
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={Target} color="gold" size="md" className="sm:hidden" />
                 <GlowingIcon icon={Target} color="gold" size="lg" className="hidden sm:flex" />
@@ -406,33 +427,24 @@ const Auth = () => {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-12 md:mb-16">
-            {tradingStats.map((stat, index) => (
-              <CyberCard key={stat.label} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+            {tradingStats.map((stat, index) => <CyberCard key={stat.label} className="animate-fade-in-up" style={{
+            animationDelay: `${index * 0.1}s`
+          }}>
                 <div className="p-3 sm:p-4 md:p-6 text-center">
                   <p className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-mono font-bold ${stat.color}`}>{stat.value}</p>
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">{stat.label}</p>
                 </div>
-              </CyberCard>
-            ))}
+              </CyberCard>)}
           </div>
 
           <CyberCard glowColor="cyan" className="animate-fade-in-up">
             <div className="p-4 sm:p-6 md:p-8">
               <h3 className="text-lg sm:text-xl md:text-2xl font-mono font-bold mb-4 sm:mb-6 text-center gradient-text">Why Trade With Us?</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                {[
-                  'Algorithmic trading strategies backed by AI',
-                  'Risk management with strict stop-loss protocols',
-                  '24/7 market monitoring across all major exchanges',
-                  'Diversified portfolio across 50+ trading pairs',
-                  'Real-time profit distribution system',
-                  'Transparent performance reporting'
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start sm:items-center gap-2 sm:gap-3">
+                {['Algorithmic trading strategies backed by AI', 'Risk management with strict stop-loss protocols', '24/7 market monitoring across all major exchanges', 'Diversified portfolio across 50+ trading pairs', 'Real-time profit distribution system', 'Transparent performance reporting'].map((item, i) => <div key={i} className="flex items-start sm:items-center gap-2 sm:gap-3">
                     <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-crypto-green flex-shrink-0 mt-0.5 sm:mt-0" />
                     <span className="text-muted-foreground text-sm sm:text-base">{item}</span>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
           </CyberCard>
@@ -450,22 +462,17 @@ const Auth = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
-            {partners.map((partner, index) => (
-              <CyberCard 
-                key={partner.name} 
-                hoverable 
-                className="animate-fade-in-up group cursor-pointer" 
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
+            {partners.map((partner, index) => <CyberCard key={partner.name} hoverable className="animate-fade-in-up group cursor-pointer" style={{
+            animationDelay: `${index * 0.1}s`
+          }}>
                 <div className="p-3 sm:p-4 md:p-6 text-center">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/30 group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 group-hover:scale-110 transition-transform flex-row flex items-center justify-center">
                     <Globe className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary" />
                   </div>
                   <h4 className="font-mono font-semibold text-xs sm:text-sm md:text-base">{partner.name}</h4>
                   <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{partner.symbol}</p>
                 </div>
-              </CyberCard>
-            ))}
+              </CyberCard>)}
           </div>
 
           <div className="mt-8 sm:mt-12 md:mt-16 text-center">
@@ -493,12 +500,7 @@ const Auth = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
             <CyberCard hoverable glowColor="cyan" className="animate-fade-in-up">
-              <a 
-                href="https://t.me/StakeBright" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block p-4 sm:p-6 md:p-8 text-center group"
-              >
+              <a href="https://t.me/StakeBright" target="_blank" rel="noopener noreferrer" className="block p-4 sm:p-6 md:p-8 text-center group">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full bg-gradient-to-br from-secondary/30 to-primary/30 flex items-center justify-center border border-secondary/50 group-hover:scale-110 transition-transform">
                   <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-secondary" />
                 </div>
@@ -508,11 +510,10 @@ const Auth = () => {
               </a>
             </CyberCard>
 
-            <CyberCard hoverable glowColor="purple" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              <a 
-                href="mailto:stakebright@proton.me" 
-                className="block p-4 sm:p-6 md:p-8 text-center group"
-              >
+            <CyberCard hoverable glowColor="purple" className="animate-fade-in-up" style={{
+            animationDelay: '0.1s'
+          }}>
+              <a href="mailto:stakebright@proton.me" className="block p-4 sm:p-6 md:p-8 text-center group">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center border border-primary/50 group-hover:scale-110 transition-transform">
                   <Headphones className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-primary" />
                 </div>
@@ -604,8 +605,6 @@ const Auth = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
