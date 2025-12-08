@@ -6,40 +6,42 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users } from 'lucide-react';
+import { 
+  DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, 
+  Target, Headphones, BarChart3, Globe, Wallet, ArrowRight,
+  CheckCircle2, MessageCircle, ChevronDown
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
+import CyberCard from '@/components/ui/CyberCard';
+
 const Auth = () => {
-  const {
-    user,
-    signIn,
-    signUp
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { user, signIn, signUp } = useAuth();
+  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [referralCode, setReferralCode] = useState('');
+
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
       setReferralCode(refCode);
     }
   }, [searchParams]);
+
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
+
   if (showVerificationMessage) {
-    return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
+    return (
+      <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{
-          animationDelay: '2s'
-        }} />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
         </div>
         
         <Card className="w-full max-w-md cyber-card animate-scale-in">
@@ -63,8 +65,10 @@ const Auth = () => {
             </NeonButton>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
+
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -74,6 +78,7 @@ const Auth = () => {
     await signIn(email, password);
     setLoading(false);
   };
+
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -82,9 +87,7 @@ const Auth = () => {
     const password = formData.get('password') as string;
     const username = formData.get('username') as string;
     const referralCode = formData.get('referralCode') as string;
-    const {
-      error
-    } = await signUp(email, password, username, referralCode);
+    const { error } = await signUp(email, password, username, referralCode);
     setLoading(false);
     if (error) {
       toast({
@@ -97,156 +100,506 @@ const Auth = () => {
       setShowVerificationMessage(true);
     }
   };
-  return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-4 overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const partners = [
+    { name: 'Ethereum', symbol: 'ETH' },
+    { name: 'Binance', symbol: 'BNB' },
+    { name: 'Polygon', symbol: 'MATIC' },
+    { name: 'Arbitrum', symbol: 'ARB' },
+    { name: 'Tether', symbol: 'USDT' },
+    { name: 'USD Coin', symbol: 'USDC' },
+  ];
+
+  const tradingStats = [
+    { label: 'Win Rate', value: '94.7%', color: 'text-crypto-green' },
+    { label: 'Avg. Monthly Return', value: '18.5%', color: 'text-crypto-gold' },
+    { label: 'Total Trades', value: '125K+', color: 'text-secondary' },
+    { label: 'Years Experience', value: '7+', color: 'text-primary' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 grid-bg pointer-events-none" />
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{
-        animationDelay: '2s'
-      }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl animate-float" style={{
-        animationDelay: '4s'
-      }} />
-        
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-1 h-1 bg-primary/50 rounded-full animate-float" style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${4 + Math.random() * 4}s`
-      }} />)}
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-primary/50 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${4 + Math.random() * 4}s`
+            }}
+          />
+        ))}
       </div>
 
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
-        {/* Left side - Branding */}
-        <div className="space-y-8 text-center lg:text-left animate-fade-in-up">
-          <div className="space-y-4">
-            <h1 className="text-4xl lg:text-6xl font-mono font-bold gradient-text tracking-wider">
-              STAKE BRIGHT
-            </h1>
-            <div className="h-1 w-32 bg-neon-gradient mx-auto lg:mx-0 rounded-full" />
-            <p className="text-xl text-muted-foreground max-w-md mx-auto lg:mx-0">Secure, high-yield staking platform with competitive returns from Trading Profits and referral rewards.</p>
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-primary/20">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-lg bg-neon-gradient flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-background" />
+            </div>
+            <span className="font-mono text-xl font-bold gradient-text">STAKE BRIGHT</span>
           </div>
-          
-          <div className="grid grid-cols-3 gap-2 sm:gap-6">
-            <div className="space-y-2 text-center group cursor-pointer">
-              <GlowingIcon icon={DollarSign} color="gold" className="mx-auto group-hover:scale-110 transition-transform" />
-              <h3 className="font-mono text-xs sm:text-sm text-crypto-gold">High Returns</h3>
+          <div className="hidden md:flex items-center gap-6">
+            <button onClick={() => scrollToSection('about')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">About</button>
+            <button onClick={() => scrollToSection('performance')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Performance</button>
+            <button onClick={() => scrollToSection('partners')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Partners</button>
+            <button onClick={() => scrollToSection('helpdesk')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Support</button>
+          </div>
+          <NeonButton onClick={() => scrollToSection('auth')} size="sm">
+            Get Started
+          </NeonButton>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center justify-center px-4 pt-20 relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left - Branding */}
+          <div className="space-y-8 text-center lg:text-left animate-fade-in-up">
+            <div className="space-y-6">
+              <div className="inline-block px-4 py-2 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm">
+                <span className="text-sm font-mono text-primary">🚀 Trusted by 10,000+ Investors</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-mono font-bold leading-tight">
+                <span className="gradient-text">Your Funds</span>
+                <br />
+                <span className="text-foreground">Your Profits</span>
+              </h1>
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
+                Stake your stablecoins and let our expert traders generate consistent profits for you. 
+                Secure, transparent, and highly rewarding.
+              </p>
             </div>
             
-            <div className="space-y-2 text-center group cursor-pointer">
-              <GlowingIcon icon={Shield} color="cyan" className="mx-auto group-hover:scale-110 transition-transform" />
-              <h3 className="font-mono text-xs sm:text-sm text-secondary">Secure</h3>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <NeonButton onClick={() => scrollToSection('auth')} size="lg" pulse className="group">
+                Start Earning Now
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </NeonButton>
+              <NeonButton onClick={() => scrollToSection('about')} variant="outline" size="lg" glowColor="cyan">
+                Learn More
+              </NeonButton>
             </div>
-            
-            <div className="space-y-2 text-center group cursor-pointer">
-              <GlowingIcon icon={TrendingUp} color="purple" className="mx-auto group-hover:scale-110 transition-transform" />
-              <h3 className="font-mono text-xs sm:text-sm text-primary">Referral Rewards</h3>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-primary/20">
+              <div className="text-center lg:text-left">
+                <p className="text-2xl sm:text-3xl font-mono font-bold text-primary neon-text-purple">$2.5M+</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Staked</p>
+              </div>
+              <div className="text-center lg:text-left">
+                <p className="text-2xl sm:text-3xl font-mono font-bold text-secondary neon-text-cyan">$890K+</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Profits Paid</p>
+              </div>
+              <div className="text-center lg:text-left">
+                <p className="text-2xl sm:text-3xl font-mono font-bold text-crypto-gold neon-text-gold">99.9%</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Uptime</p>
+              </div>
             </div>
           </div>
 
-          {/* Stats Section */}
-          <div className="hidden lg:grid grid-cols-3 gap-4 pt-8 border-t border-primary/20">
-            <div className="text-center">
-              <p className="text-3xl font-mono font-bold text-primary neon-text-purple">$120K+</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Staked</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-mono font-bold text-secondary neon-text-cyan">10K+</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Active Users</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-mono font-bold text-crypto-gold neon-text-gold">97%</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Uptime</p>
-            </div>
+          {/* Right - Auth Form */}
+          <div id="auth" className="scroll-mt-24">
+            <Card className="w-full max-w-md mx-auto cyber-card animate-scale-in" style={{ animationDelay: '0.2s' }}>
+              <CardHeader className="text-center">
+                <CardTitle className="font-mono text-2xl gradient-text">Join Now</CardTitle>
+                <CardDescription>Start earning passive income today</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="signup" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 bg-muted/30 border border-primary/20">
+                    <TabsTrigger value="signin" className="font-mono data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+                      Sign In
+                    </TabsTrigger>
+                    <TabsTrigger value="signup" className="font-mono data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+                      Sign Up
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="signin" className="space-y-4 mt-6">
+                    <form onSubmit={handleSignIn} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signin-email" className="font-mono text-sm">Email</Label>
+                        <Input id="signin-email" name="email" type="email" placeholder="Enter your email" required className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signin-password" className="font-mono text-sm">Password</Label>
+                        <PasswordInput id="signin-password" name="password" placeholder="Enter your password" required className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50" />
+                      </div>
+                      
+                      <NeonButton type="submit" className="w-full" disabled={loading} pulse>
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <Zap className="h-4 w-4 animate-pulse" />
+                            Connecting...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <Lock className="h-4 w-4" />
+                            Sign In
+                          </span>
+                        )}
+                      </NeonButton>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="signup" className="space-y-4 mt-6">
+                    <form onSubmit={handleSignUp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-username" className="font-mono text-sm">Username</Label>
+                        <Input id="signup-username" name="username" type="text" placeholder="Choose a username" required className="bg-muted/30 border-primary/20 focus:border-primary" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email" className="font-mono text-sm">Email</Label>
+                        <Input id="signup-email" name="email" type="email" placeholder="Enter your email" required className="bg-muted/30 border-primary/20 focus:border-primary" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password" className="font-mono text-sm">Password</Label>
+                        <PasswordInput id="signup-password" name="password" placeholder="Create a password" required minLength={6} className="bg-muted/30 border-primary/20 focus:border-primary" />
+                        <p className="text-xs text-warning">⚠️ Password cannot be changed once set</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-referral" className="font-mono text-sm">
+                          Referral Code <span className="text-accent">*</span>
+                        </Label>
+                        <Input id="signup-referral" name="referralCode" type="text" placeholder="Enter referral code (required)" value={referralCode} onChange={e => setReferralCode(e.target.value)} required className="bg-muted/30 border-primary/20 focus:border-primary" />
+                      </div>
+                      
+                      <NeonButton type="submit" className="w-full" disabled={loading} glowColor="cyan">
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <Zap className="h-4 w-4 animate-pulse" />
+                            Creating...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Create Account
+                          </span>
+                        )}
+                      </NeonButton>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        {/* Right side - Auth forms */}
-        <Card className="w-full max-w-md mx-auto cyber-card animate-scale-in" style={{
-        animationDelay: '0.2s'
-      }}>
-          <CardHeader className="text-center">
-            <CardTitle className="font-mono text-2xl gradient-text">Welcome</CardTitle>
-            <CardDescription>Sign in to your account or create a new one</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="signup" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-muted/30 border border-primary/20">
-                <TabsTrigger value="signin" className="font-mono data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-                  Sign In
-                </TabsTrigger>
-                <TabsTrigger value="signup" className="font-mono data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-                  Sign Up
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="signin" className="space-y-4 mt-6">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email" className="font-mono text-sm">Email</Label>
-                    <Input id="signin-email" name="email" type="email" placeholder="Enter your email" required className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50" />
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <ChevronDown className="w-8 h-8 text-primary/50" />
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-24 px-4 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl font-mono font-bold gradient-text mb-4">About Stake Bright</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              We bridge the gap between stablecoin holders and professional crypto trading
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <div className="p-6 space-y-4">
+                <GlowingIcon icon={Wallet} color="purple" size="lg" />
+                <h3 className="text-xl font-mono font-semibold">Stake Your Stablecoins</h3>
+                <p className="text-muted-foreground">
+                  Deposit USDT, USDC, or other stablecoins. Your funds remain secure while our experts 
+                  put them to work in the crypto markets.
+                </p>
+              </div>
+            </CyberCard>
+
+            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div className="p-6 space-y-4">
+                <GlowingIcon icon={BarChart3} color="cyan" size="lg" />
+                <h3 className="text-xl font-mono font-semibold">Expert Trading</h3>
+                <p className="text-muted-foreground">
+                  Our team of seasoned traders with 7+ years of experience execute strategic trades 
+                  across multiple exchanges and markets.
+                </p>
+              </div>
+            </CyberCard>
+
+            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <div className="p-6 space-y-4">
+                <GlowingIcon icon={TrendingUp} color="gold" size="lg" />
+                <h3 className="text-xl font-mono font-semibold">Earn Daily Profits</h3>
+                <p className="text-muted-foreground">
+                  Receive daily returns on your staked amount. Watch your investment grow with 
+                  consistent, transparent profit distributions.
+                </p>
+              </div>
+            </CyberCard>
+
+            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <div className="p-6 space-y-4">
+                <GlowingIcon icon={Shield} color="cyan" size="lg" />
+                <h3 className="text-xl font-mono font-semibold">Secure & Transparent</h3>
+                <p className="text-muted-foreground">
+                  Your funds are protected with industry-leading security measures. Track every 
+                  transaction and earning in real-time.
+                </p>
+              </div>
+            </CyberCard>
+
+            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+              <div className="p-6 space-y-4">
+                <GlowingIcon icon={Users} color="purple" size="lg" />
+                <h3 className="text-xl font-mono font-semibold">Referral Rewards</h3>
+                <p className="text-muted-foreground">
+                  Earn 5% commission on every deposit made by users you refer. Build your network 
+                  and maximize your passive income.
+                </p>
+              </div>
+            </CyberCard>
+
+            <CyberCard hoverable className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+              <div className="p-6 space-y-4">
+                <GlowingIcon icon={Target} color="gold" size="lg" />
+                <h3 className="text-xl font-mono font-semibold">Flexible Plans</h3>
+                <p className="text-muted-foreground">
+                  Choose from multiple staking plans tailored to your investment goals. Higher 
+                  stakes unlock premium return rates.
+                </p>
+              </div>
+            </CyberCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Trading Performance Section */}
+      <section id="performance" className="py-24 px-4 relative z-10 bg-muted/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-mono font-bold gradient-text mb-4">Trading Performance</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Our expert traders consistently deliver outstanding results
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {tradingStats.map((stat, index) => (
+              <CyberCard key={stat.label} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div className="p-6 text-center">
+                  <p className={`text-3xl sm:text-4xl font-mono font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{stat.label}</p>
+                </div>
+              </CyberCard>
+            ))}
+          </div>
+
+          <CyberCard glowColor="cyan" className="animate-fade-in-up">
+            <div className="p-8">
+              <h3 className="text-2xl font-mono font-bold mb-6 text-center gradient-text">Why Trade With Us?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  'Algorithmic trading strategies backed by AI',
+                  'Risk management with strict stop-loss protocols',
+                  '24/7 market monitoring across all major exchanges',
+                  'Diversified portfolio across 50+ trading pairs',
+                  'Real-time profit distribution system',
+                  'Transparent performance reporting'
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-crypto-green flex-shrink-0" />
+                    <span className="text-muted-foreground">{item}</span>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="font-mono text-sm">Password</Label>
-                    <PasswordInput id="signin-password" name="password" placeholder="Enter your password" required className="bg-muted/30 border-primary/20 focus:border-primary focus:ring-primary/50" />
+                ))}
+              </div>
+            </div>
+          </CyberCard>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section id="partners" className="py-24 px-4 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-mono font-bold gradient-text mb-4">Blockchain Partners</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              We operate across multiple blockchain networks for maximum flexibility
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+            {partners.map((partner, index) => (
+              <CyberCard 
+                key={partner.name} 
+                hoverable 
+                className="animate-fade-in-up group cursor-pointer" 
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/30 group-hover:scale-110 transition-transform">
+                    <Globe className="w-8 h-8 text-primary" />
                   </div>
-                  
-                  <NeonButton type="submit" className="w-full" disabled={loading} pulse>
-                    {loading ? <span className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 animate-pulse" />
-                        Connecting...
-                      </span> : <span className="flex items-center gap-2">
-                        <Lock className="h-4 w-4" />
-                        Sign In
-                      </span>}
-                  </NeonButton>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup" className="space-y-4 mt-6">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                  <h4 className="font-mono font-semibold">{partner.name}</h4>
+                  <p className="text-sm text-muted-foreground">{partner.symbol}</p>
+                </div>
+              </CyberCard>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <CyberCard glowColor="purple" className="inline-block animate-fade-in-up">
+              <div className="px-8 py-6">
+                <p className="text-lg font-mono">
+                  <span className="text-muted-foreground">Primary Network:</span>{' '}
+                  <span className="gradient-text font-bold">Binance Smart Chain (BEP-20)</span>
+                </p>
+              </div>
+            </CyberCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Helpdesk Section */}
+      <section id="helpdesk" className="py-24 px-4 relative z-10 bg-muted/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-mono font-bold gradient-text mb-4">24/7 Support</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Our dedicated support team is always here to help you
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <CyberCard hoverable glowColor="cyan" className="animate-fade-in-up">
+              <a 
+                href="https://t.me/StakeBright" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block p-8 text-center group"
+              >
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-secondary/30 to-primary/30 flex items-center justify-center border border-secondary/50 group-hover:scale-110 transition-transform">
+                  <MessageCircle className="w-10 h-10 text-secondary" />
+                </div>
+                <h3 className="text-xl font-mono font-semibold mb-2">Telegram Support</h3>
+                <p className="text-muted-foreground mb-4">Get instant responses from our support team</p>
+                <span className="text-secondary font-mono">@StakeBright →</span>
+              </a>
+            </CyberCard>
+
+            <CyberCard hoverable glowColor="purple" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <a 
+                href="mailto:stakebright@proton.me" 
+                className="block p-8 text-center group"
+              >
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center border border-primary/50 group-hover:scale-110 transition-transform">
+                  <Headphones className="w-10 h-10 text-primary" />
+                </div>
+                <h3 className="text-xl font-mono font-semibold mb-2">Email Support</h3>
+                <p className="text-muted-foreground mb-4">Detailed inquiries and documentation</p>
+                <span className="text-primary font-mono">stakebright@proton.me →</span>
+              </a>
+            </CyberCard>
+          </div>
+
+          <div className="mt-16">
+            <CyberCard className="animate-fade-in-up">
+              <div className="p-8">
+                <h3 className="text-xl font-mono font-bold mb-6 text-center">Frequently Asked Questions</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-username" className="font-mono text-sm">Username</Label>
-                    <Input id="signup-username" name="username" type="text" placeholder="Choose a username" required className="bg-muted/30 border-primary/20 focus:border-primary" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="font-mono text-sm">Email</Label>
-                    <Input id="signup-email" name="email" type="email" placeholder="Enter your email" required className="bg-muted/30 border-primary/20 focus:border-primary" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="font-mono text-sm">Password</Label>
-                    <PasswordInput id="signup-password" name="password" placeholder="Create a password" required minLength={6} className="bg-muted/30 border-primary/20 focus:border-primary" />
-                    <p className="text-xs text-warning">
-                      ⚠️ Password cannot be changed once set
+                    <h4 className="font-mono text-primary">How do I start staking?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Simply create an account, deposit your stablecoins, and choose a staking plan that fits your goals.
                     </p>
                   </div>
-                  
                   <div className="space-y-2">
-                    <Label htmlFor="signup-referral" className="font-mono text-sm">
-                      Referral Code <span className="text-accent">*</span>
-                    </Label>
-                    <Input id="signup-referral" name="referralCode" type="text" placeholder="Enter referral code (required)" value={referralCode} onChange={e => setReferralCode(e.target.value)} required className="bg-muted/30 border-primary/20 focus:border-primary" />
+                    <h4 className="font-mono text-primary">When do I receive profits?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Profits are calculated and added to your account daily based on your active staking plans.
+                    </p>
                   </div>
-                  
-                  <NeonButton type="submit" className="w-full" disabled={loading} glowColor="cyan">
-                    {loading ? <span className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 animate-pulse" />
-                        Creating...
-                      </span> : <span className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        Create Account
-                      </span>}
-                  </NeonButton>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-    </div>;
+                  <div className="space-y-2">
+                    <h4 className="font-mono text-primary">Is my investment safe?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      We employ multiple security measures including cold storage and strict risk management protocols.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-mono text-primary">How do withdrawals work?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Request a withdrawal anytime. Earnings are processed within 24-48 hours after admin approval.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CyberCard>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-4 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
+          <CyberCard glowColor="purple" className="animate-fade-in-up">
+            <div className="p-12">
+              <h2 className="text-3xl sm:text-4xl font-mono font-bold gradient-text mb-4">
+                Ready to Start Earning?
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join thousands of investors who trust Stake Bright with their stablecoins. 
+                Your journey to passive crypto income starts here.
+              </p>
+              <NeonButton onClick={() => scrollToSection('auth')} size="lg" pulse className="group">
+                Create Free Account
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </NeonButton>
+            </div>
+          </CyberCard>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 border-t border-primary/20 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-neon-gradient flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-background" />
+              </div>
+              <span className="font-mono font-bold gradient-text">STAKE BRIGHT</span>
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              © 2024 Stake Bright. Your Funds - Your Profits.
+            </p>
+            <div className="flex items-center gap-4">
+              <a href="https://t.me/StakeBright" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary transition-colors">
+                <MessageCircle className="w-5 h-5" />
+              </a>
+              <a href="mailto:stakebright@proton.me" className="text-muted-foreground hover:text-primary transition-colors">
+                <Mail className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 };
+
 export default Auth;

@@ -6,6 +6,7 @@ interface CyberCardProps {
   className?: string;
   glowColor?: "purple" | "cyan" | "pink" | "gold" | "green";
   animated?: boolean;
+  hoverable?: boolean;
   style?: CSSProperties;
 }
 
@@ -14,6 +15,7 @@ export const CyberCard = ({
   className, 
   glowColor = "purple",
   animated = true,
+  hoverable = false,
   style 
 }: CyberCardProps) => {
   const glowClasses = {
@@ -30,6 +32,7 @@ export const CyberCard = ({
         "cyber-card rounded-xl p-6 transition-all duration-500",
         glowClasses[glowColor],
         animated && "hover-lift perspective-1000",
+        hoverable && "cursor-pointer hover:scale-[1.02] hover:border-primary/50",
         className
       )}
       style={style}
