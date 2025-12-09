@@ -11,6 +11,7 @@ import Deposit from "./pages/Deposit";
 import Staking from "./pages/Staking";
 import Referrals from "./pages/Referrals";
 import Withdraw from "./pages/Withdraw";
+import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/verify" element={<VerifyEmail />} />
             <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
             <Route path="/deposit" element={<Layout><Deposit /></Layout>} />
             <Route path="/staking" element={<Layout><Staking /></Layout>} />

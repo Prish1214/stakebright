@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return { error: { message: "Referral code required" } };
       }
 
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/verify`;
       
       const { error } = await supabase.auth.signUp({
         email,
