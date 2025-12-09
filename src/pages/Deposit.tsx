@@ -7,8 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { Copy, QrCode, CheckCircle, Clock, XCircle } from 'lucide-react';
-import depositQr from '@/assets/deposit-qr.jpg';
+import { Copy, QrCode, CheckCircle, Clock, XCircle, Wallet, ExternalLink } from 'lucide-react';
 
 interface DepositHistory {
   id: string;
@@ -16,13 +15,24 @@ interface DepositHistory {
   transaction_hash: string;
   status: string;
   created_at: string;
+  admin_notes?: string;
+}
+
+interface PaymentData {
+  payment_id: string;
+  pay_address: string;
+  pay_amount: number;
+  pay_currency: string;
+  expiration_estimate_date: string;
+  payment_status: string;
 }
 
 const Deposit = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [depositHistory, setDepositHistory] = useState<DepositHistory[]>([]);
-  const [depositAddress] = useState('0x652fdEab799Bd430038f010773CC340eAd9a6338');
+  const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
+  const [amount, setAmount] = useState('');
 
   useEffect(() => {
     fetchDepositHistory();
@@ -61,10 +71,11 @@ const Deposit = () => {
 
       if (error) throw error;
       setDepositHistory(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({
         title: "Error loading deposits",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -78,15 +89,13 @@ const Deposit = () => {
     });
   };
 
-  const handleSubmitDeposit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreatePayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const amount = parseFloat(formData.get('amount') as string);
-    const transactionHash = formData.get('transaction_hash') as string;
+    const depositAmount = parseFloat(amount);
 
-    if (amount < 25) {
+    if (depositAmount < 25) {
       toast({
         title: "Invalid amount",
         description: "Minimum deposit is 25 USDT",
@@ -97,28 +106,30 @@ const Deposit = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('deposits')
-        .insert({
-          user_id: user?.id,
-          amount,
-          transaction_hash: transactionHash
-        });
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { amount: depositAmount }
+      });
 
       if (error) throw error;
 
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setPaymentData(data);
       toast({
-        title: "Deposit submitted!",
-        description: "Your deposit request has been submitted for review"
+        title: "Payment created!",
+        description: "Send USDT to the address shown below"
       });
 
-      // Reset form
-      (e.target as HTMLFormElement).reset();
+      // Reset amount
+      setAmount('');
       fetchDepositHistory();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({
-        title: "Error submitting deposit",
-        description: error.message,
+        title: "Error creating payment",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -130,10 +141,15 @@ const Deposit = () => {
     switch (status) {
       case 'approved':
       case 'confirmed':
+      case 'finished':
         return <CheckCircle className="h-4 w-4 text-success" />;
       case 'pending':
+      case 'waiting':
+      case 'confirming':
         return <Clock className="h-4 w-4 text-warning" />;
       case 'rejected':
+      case 'failed':
+      case 'expired':
         return <XCircle className="h-4 w-4 text-destructive" />;
       default:
         return <Clock className="h-4 w-4 text-muted-foreground" />;
@@ -144,10 +160,15 @@ const Deposit = () => {
     switch (status) {
       case 'approved':
       case 'confirmed':
+      case 'finished':
         return 'bg-success/10 text-success border-success/20';
       case 'pending':
+      case 'waiting':
+      case 'confirming':
         return 'bg-warning/10 text-warning border-warning/20';
       case 'rejected':
+      case 'failed':
+      case 'expired':
         return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted/10 text-muted-foreground border-muted/20';
@@ -166,74 +187,85 @@ const Deposit = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <QrCode className="h-5 w-5" />
+              <Wallet className="h-5 w-5" />
               Make a Deposit
             </CardTitle>
             <CardDescription>
-              Send USDT (BEP20) to the address below and submit the transaction details
+              Enter the amount and we'll generate a payment address for you
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* QR Code for Deposit */}
-            <div className="bg-muted rounded-lg p-6 text-center space-y-4">
-              <div className="w-48 h-48 mx-auto">
-                <img 
-                  src={depositQr} 
-                  alt="USDT Deposit QR Code" 
-                  className="w-full h-full object-contain rounded-lg"
-                />
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">USDT BEP20 Address</p>
-                <div className="flex items-center gap-2 bg-background p-2 rounded border">
-                  <code className="text-xs flex-1 break-all">{depositAddress}</code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => copyToClipboard(depositAddress)}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
+            {/* Payment Address Display */}
+            {paymentData && (
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 space-y-4">
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg mb-2">Send Payment</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Send exactly <span className="font-bold text-primary">{paymentData.pay_amount} {paymentData.pay_currency.toUpperCase()}</span> to:
+                  </p>
                 </div>
-                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
-                  Only USDT BEP20 supported
-                </Badge>
-              </div>
-            </div>
+                
+                <div className="bg-background p-3 rounded border">
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs flex-1 break-all">{paymentData.pay_address}</code>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => copyToClipboard(paymentData.pay_address)}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
 
-            <form onSubmit={handleSubmitDeposit} className="space-y-4">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                    USDT BEP20 Only
+                  </Badge>
+                  <Badge variant="outline">
+                    ID: {paymentData.payment_id}
+                  </Badge>
+                </div>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  Payment will be automatically confirmed once transaction is detected
+                </p>
+              </div>
+            )}
+
+            <form onSubmit={handleCreatePayment} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="amount">Deposit Amount (USDT)</Label>
                 <Input
                   id="amount"
-                  name="amount"
                   type="number"
                   placeholder="25.00"
                   min="25"
                   step="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
                   required
                 />
                 <p className="text-xs text-muted-foreground">Minimum deposit: 25 USDT</p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="transaction_hash">Transaction Hash</Label>
-                <Input
-                  id="transaction_hash"
-                  name="transaction_hash"
-                  type="text"
-                  placeholder="0x..."
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  Enter the transaction hash from your wallet
-                </p>
-              </div>
-
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Submitting...' : 'Submit Deposit'}
+                {loading ? 'Creating Payment...' : 'Generate Payment Address'}
               </Button>
             </form>
+
+            <div className="bg-muted/50 rounded-lg p-4 space-y-2 text-sm">
+              <h4 className="font-medium flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                How it works
+              </h4>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                <li>Enter the amount you want to deposit</li>
+                <li>A unique payment address will be generated</li>
+                <li>Send USDT (BEP20) to the address</li>
+                <li>Your deposit will be automatically confirmed</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
 
@@ -250,7 +282,7 @@ const Deposit = () => {
                 <p>No deposits yet</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[500px] overflow-y-auto">
                 {depositHistory.map((deposit) => (
                   <div key={deposit.id} className="border rounded-lg p-4 space-y-2">
                     <div className="flex items-center justify-between">
@@ -264,7 +296,7 @@ const Deposit = () => {
                     </div>
                     
                     <div className="text-xs text-muted-foreground space-y-1">
-                      <p>TX: {deposit.transaction_hash.substring(0, 20)}...</p>
+                      <p>Payment ID: {deposit.transaction_hash}</p>
                       <p>{new Date(deposit.created_at).toLocaleString()}</p>
                     </div>
                   </div>
