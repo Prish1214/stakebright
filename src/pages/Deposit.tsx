@@ -41,27 +41,40 @@ const Deposit = () => {
 
   const cancelDeposit = useCallback(async (depositId: string) => {
     try {
-      const { error } = await supabase
+      console.log('Canceling deposit:', depositId);
+      const { data, error } = await supabase
         .from('deposits')
         .update({ status: 'canceled', admin_notes: 'Payment expired - 3 minute timer ran out' })
         .eq('id', depositId)
-        .eq('status', 'pending');
+        .eq('status', 'pending')
+        .select();
 
       if (error) {
         console.error('Error canceling deposit:', error);
+        toast({
+          title: "Error",
+          description: "Failed to cancel expired deposit",
+          variant: "destructive"
+        });
       } else {
+        console.log('Deposit canceled successfully:', data);
         toast({
           title: "Payment Expired",
           description: "The 3-minute payment window has expired. Please try again.",
           variant: "destructive"
         });
-        setPaymentData(null);
-        setTimeLeft(null);
-        setCurrentDepositId(null);
-        fetchDepositHistory();
       }
+      
+      // Always reset state and refresh history
+      setPaymentData(null);
+      setTimeLeft(null);
+      setCurrentDepositId(null);
+      fetchDepositHistory();
     } catch (error) {
       console.error('Error canceling deposit:', error);
+      setPaymentData(null);
+      setTimeLeft(null);
+      setCurrentDepositId(null);
     }
   }, []);
 

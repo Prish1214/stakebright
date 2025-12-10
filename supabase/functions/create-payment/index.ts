@@ -113,8 +113,8 @@ serve(async (req) => {
       success: true,
       payment_id: paymentData.payment_id,
       pay_address: paymentData.pay_address,
-      pay_amount: paymentData.pay_amount,
-      pay_currency: paymentData.pay_currency,
+      pay_amount: amount, // Return the exact amount user entered, not NOWPayments calculated amount
+      pay_currency: 'USDT',
       expiration_estimate_date: paymentData.expiration_estimate_date,
       payment_status: paymentData.payment_status,
       deposit_id: depositData?.id,
