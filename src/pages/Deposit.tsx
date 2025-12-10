@@ -299,6 +299,20 @@ const Deposit = () => {
                     Send exactly <span className="font-bold text-primary">{paymentData.pay_amount} {paymentData.pay_currency.toUpperCase()}</span> to:
                   </p>
                 </div>
+
+                {/* QR Code */}
+                <div className="flex justify-center">
+                  <div className="bg-white p-3 rounded-lg shadow-sm">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(paymentData.pay_address)}`}
+                      alt="Deposit Address QR Code"
+                      className="w-[180px] h-[180px]"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-center text-muted-foreground">
+                  Scan QR code or copy address below
+                </p>
                 
                 <div className="bg-background p-3 rounded border">
                   <div className="flex items-center gap-2">
