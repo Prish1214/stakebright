@@ -48,8 +48,8 @@ serve(async (req) => {
 
     const { amount } = await req.json();
 
-    if (!amount || amount < 25) {
-      return new Response(JSON.stringify({ error: 'Minimum deposit amount is 25 USDT' }), {
+    if (!amount || amount < 1) {
+      return new Response(JSON.stringify({ error: 'Minimum deposit amount is 1 USDT' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -93,15 +93,17 @@ serve(async (req) => {
     }
 
     // Create pending deposit record with payment_id as transaction_hash
-    const { error: depositError } = await supabase
+    const { data: depositData, error: depositError } = await supabase
       .from('deposits')
       .insert({
         user_id: user.id,
         amount: amount,
         transaction_hash: paymentData.payment_id.toString(),
         status: 'pending',
-        admin_notes: `NOWPayments payment created. Pay address: ${paymentData.pay_address}`,
-      });
+        admin_notes: `NOWPayments payment created. Pay address: ${paymentData.pay_address}. Expected amount: ${paymentData.pay_amount} ${paymentData.pay_currency}`,
+      })
+      .select('id')
+      .single();
 
     if (depositError) {
       console.error('Error creating deposit record:', depositError);
@@ -115,6 +117,7 @@ serve(async (req) => {
       pay_currency: paymentData.pay_currency,
       expiration_estimate_date: paymentData.expiration_estimate_date,
       payment_status: paymentData.payment_status,
+      deposit_id: depositData?.id,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

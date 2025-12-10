@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { Copy, QrCode, CheckCircle, Clock, XCircle, Wallet, ExternalLink } from 'lucide-react';
+import { Copy, QrCode, CheckCircle, Clock, XCircle, Wallet, ExternalLink, Timer } from 'lucide-react';
 
 interface DepositHistory {
   id: string;
@@ -25,7 +25,10 @@ interface PaymentData {
   pay_currency: string;
   expiration_estimate_date: string;
   payment_status: string;
+  deposit_id?: string;
 }
+
+const TIMER_DURATION = 180; // 3 minutes in seconds
 
 const Deposit = () => {
   const { user } = useAuth();
@@ -33,31 +36,54 @@ const Deposit = () => {
   const [depositHistory, setDepositHistory] = useState<DepositHistory[]>([]);
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [amount, setAmount] = useState('');
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [currentDepositId, setCurrentDepositId] = useState<string | null>(null);
 
+  const cancelDeposit = useCallback(async (depositId: string) => {
+    try {
+      const { error } = await supabase
+        .from('deposits')
+        .update({ status: 'canceled', admin_notes: 'Payment expired - 3 minute timer ran out' })
+        .eq('id', depositId)
+        .eq('status', 'pending');
+
+      if (error) {
+        console.error('Error canceling deposit:', error);
+      } else {
+        toast({
+          title: "Payment Expired",
+          description: "The 3-minute payment window has expired. Please try again.",
+          variant: "destructive"
+        });
+        setPaymentData(null);
+        setTimeLeft(null);
+        setCurrentDepositId(null);
+        fetchDepositHistory();
+      }
+    } catch (error) {
+      console.error('Error canceling deposit:', error);
+    }
+  }, []);
+
+  // Timer countdown effect
   useEffect(() => {
-    fetchDepositHistory();
-    
-    // Set up real-time subscription for deposit changes
-    const channel = supabase
-      .channel('deposit-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'deposits',
-          filter: `user_id=eq.${user?.id}`
-        },
-        () => {
-          fetchDepositHistory();
-        }
-      )
-      .subscribe();
+    if (timeLeft === null || timeLeft <= 0) return;
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timer);
+          if (currentDepositId) {
+            cancelDeposit(currentDepositId);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, currentDepositId, cancelDeposit]);
 
   const fetchDepositHistory = async () => {
     if (!user) return;
@@ -81,6 +107,41 @@ const Deposit = () => {
     }
   };
 
+  useEffect(() => {
+    fetchDepositHistory();
+    
+    // Set up real-time subscription for deposit changes
+    const channel = supabase
+      .channel('deposit-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'deposits',
+          filter: `user_id=eq.${user?.id}`
+        },
+        (payload) => {
+          fetchDepositHistory();
+          // If deposit is approved, clear the payment data and timer
+          if (payload.new && (payload.new as DepositHistory).status === 'approved') {
+            setPaymentData(null);
+            setTimeLeft(null);
+            setCurrentDepositId(null);
+            toast({
+              title: "Deposit Confirmed!",
+              description: "Your deposit has been successfully confirmed.",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -95,10 +156,10 @@ const Deposit = () => {
 
     const depositAmount = parseFloat(amount);
 
-    if (depositAmount < 25) {
+    if (depositAmount < 1) {
       toast({
         title: "Invalid amount",
-        description: "Minimum deposit is 25 USDT",
+        description: "Minimum deposit is 1 USDT",
         variant: "destructive"
       });
       setLoading(false);
@@ -117,12 +178,14 @@ const Deposit = () => {
       }
 
       setPaymentData(data);
+      setCurrentDepositId(data.deposit_id);
+      setTimeLeft(TIMER_DURATION);
+      
       toast({
         title: "Payment created!",
-        description: "Send USDT to the address shown below"
+        description: "Send the exact amount within 3 minutes"
       });
 
-      // Reset amount
       setAmount('');
       fetchDepositHistory();
     } catch (error: unknown) {
@@ -135,6 +198,12 @@ const Deposit = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const getStatusIcon = (status: string) => {
@@ -150,6 +219,7 @@ const Deposit = () => {
       case 'rejected':
       case 'failed':
       case 'expired':
+      case 'canceled':
         return <XCircle className="h-4 w-4 text-destructive" />;
       default:
         return <Clock className="h-4 w-4 text-muted-foreground" />;
@@ -169,6 +239,7 @@ const Deposit = () => {
       case 'rejected':
       case 'failed':
       case 'expired':
+      case 'canceled':
         return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted/10 text-muted-foreground border-muted/20';
@@ -198,6 +269,17 @@ const Deposit = () => {
             {/* Payment Address Display */}
             {paymentData && (
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 space-y-4">
+                {/* Timer Display */}
+                {timeLeft !== null && timeLeft > 0 && (
+                  <div className={`flex items-center justify-center gap-2 p-3 rounded-lg ${
+                    timeLeft <= 60 ? 'bg-destructive/10 text-destructive' : 'bg-warning/10 text-warning'
+                  }`}>
+                    <Timer className="h-5 w-5" />
+                    <span className="font-bold text-xl">{formatTime(timeLeft)}</span>
+                    <span className="text-sm">remaining</span>
+                  </div>
+                )}
+
                 <div className="text-center">
                   <h3 className="font-semibold text-lg mb-2">Send Payment</h3>
                   <p className="text-sm text-muted-foreground">
@@ -228,7 +310,7 @@ const Deposit = () => {
                 </div>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  Payment will be automatically confirmed once transaction is detected
+                  Payment will be automatically confirmed once transaction is detected within the time limit
                 </p>
               </div>
             )}
@@ -239,17 +321,22 @@ const Deposit = () => {
                 <Input
                   id="amount"
                   type="number"
-                  placeholder="25.00"
-                  min="25"
+                  placeholder="1.00"
+                  min="1"
                   step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
+                  disabled={paymentData !== null && timeLeft !== null && timeLeft > 0}
                 />
-                <p className="text-xs text-muted-foreground">Minimum deposit: 25 USDT</p>
+                <p className="text-xs text-muted-foreground">Minimum deposit: 1 USDT</p>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={loading || (paymentData !== null && timeLeft !== null && timeLeft > 0)}
+              >
                 {loading ? 'Creating Payment...' : 'Generate Payment Address'}
               </Button>
             </form>
@@ -262,7 +349,7 @@ const Deposit = () => {
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                 <li>Enter the amount you want to deposit</li>
                 <li>A unique payment address will be generated</li>
-                <li>Send USDT (BEP20) to the address</li>
+                <li>Send the exact USDT amount (BEP20) within 3 minutes</li>
                 <li>Your deposit will be automatically confirmed</li>
               </ul>
             </div>
