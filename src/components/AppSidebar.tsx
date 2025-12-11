@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { LayoutDashboard, Wallet, TrendingUp, ArrowUpCircle, Users, History, Calculator, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, Wallet, TrendingUp, ArrowUpCircle, Users, Settings, Shield, HelpCircle, CheckCircle, BarChart3, Info, Megaphone, ExternalLink } from 'lucide-react';
+
 const menuItems = [{
   title: 'Dashboard',
   url: '/dashboard',
@@ -22,6 +23,29 @@ const menuItems = [{
   url: '/referrals',
   icon: Users
 }];
+
+const proofItems = [{
+  title: 'FAQ',
+  url: '/faq',
+  icon: HelpCircle,
+  external: false
+}, {
+  title: 'Withdraw Proof',
+  url: 'https://t.me/+0Jj0_GyXh5RlMGJl',
+  icon: CheckCircle,
+  external: true
+}, {
+  title: 'Trading-Profits Proof',
+  url: 'https://t.me/+0Jj0_GyXh5RlMGJl',
+  icon: BarChart3,
+  external: true
+}, {
+  title: 'About',
+  url: '/about',
+  icon: Info,
+  external: false
+}];
+
 const adminItems = [{
   title: 'Admin Panel',
   url: '/admin',
@@ -73,6 +97,42 @@ export function AppSidebar() {
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Proof of Work</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {proofItems.map(item => <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    {item.external ? (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:bg-accent/50 flex items-center" onClick={handleMenuClick}>
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {state !== 'collapsed' && (
+                          <>
+                            <span className="text-[#fcfcfc]">{item.title}</span>
+                            <ExternalLink className="w-3 h-3 ml-auto text-muted-foreground" />
+                          </>
+                        )}
+                      </a>
+                    ) : (
+                      <NavLink to={item.url} className={getNavCls} onClick={handleMenuClick}>
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {state !== 'collapsed' && <span className="text-[#fcfcfc]">{item.title}</span>}
+                      </NavLink>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>)}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/latest-updates" className={getNavCls} onClick={handleMenuClick}>
+                    <Megaphone className="w-4 h-4 mr-2" />
+                    {state !== 'collapsed' && <span className="text-[#fcfcfc]">Latest Updates/Offers</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

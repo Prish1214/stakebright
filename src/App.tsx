@@ -12,6 +12,9 @@ import Staking from "./pages/Staking";
 import Referrals from "./pages/Referrals";
 import Withdraw from "./pages/Withdraw";
 import VerifyEmail from "./pages/VerifyEmail";
+import FAQ from "./pages/FAQ";
+import About from "./pages/About";
+import LatestUpdates from "./pages/LatestUpdates";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +35,9 @@ const App = () => (
             <Route path="/staking" element={<Layout><Staking /></Layout>} />
             <Route path="/referrals" element={<Layout><Referrals /></Layout>} />
             <Route path="/withdraw" element={<Layout><Withdraw /></Layout>} />
+            <Route path="/faq" element={<Layout><FAQ /></Layout>} />
+            <Route path="/about" element={<Layout><About /></Layout>} />
+            <Route path="/latest-updates" element={<Layout><LatestUpdates /></Layout>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
