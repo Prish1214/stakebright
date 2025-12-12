@@ -58,6 +58,10 @@ const Auth = () => {
                 <li>After verification, return to this page</li>
                 <li>Login with your email and password</li>
               </ol>
+              <p className="text-xs text-warning mt-3 flex items-center gap-1.5">
+                <Mail className="h-3.5 w-3.5" />
+                Also check your spam/junk folder if you don't receive the email
+              </p>
             </div>
             <NeonButton onClick={() => setShowVerificationMessage(false)} className="w-full" variant="outline" glowColor="cyan">
               Back to Login
