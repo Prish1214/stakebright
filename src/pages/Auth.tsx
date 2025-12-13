@@ -63,9 +63,6 @@ const Auth = () => {
                 Also check your spam/junk folder if you don't receive the email
               </p>
             </div>
-            <NeonButton onClick={() => setShowVerificationMessage(false)} className="w-full" variant="outline" glowColor="cyan">
-              Back to Login
-            </NeonButton>
           </CardContent>
         </Card>
       </div>;
