@@ -14,64 +14,25 @@ const VerifyEmail = () => {
   useEffect(() => {
     const handleVerification = async () => {
       try {
+        // Get full URL for debugging
+        const fullUrl = window.location.href;
+        
         // Check for hash fragments (Supabase uses hash-based tokens)
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
         const type = hashParams.get('type');
+        
+        // Also check URL search params (some email clients modify URLs)
+        const tokenHash = searchParams.get('token_hash');
+        const tokenType = searchParams.get('type');
+        const token = searchParams.get('token');
 
-        if (type === 'signup' || type === 'email_change' || type === 'recovery') {
-          if (accessToken && refreshToken) {
-            const { error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-
-            if (error) {
-              setStatus('error');
-              setErrorMessage(error.message);
-              return;
-            }
-
-            // Sign out after verification so user can log in fresh
-            await supabase.auth.signOut();
-            setStatus('success');
-          } else {
-            // Check URL params for token_hash (alternative flow)
-            const tokenHash = searchParams.get('token_hash');
-            const verifyType = searchParams.get('type');
-
-            if (tokenHash && verifyType) {
-              const { error } = await supabase.auth.verifyOtp({
-                token_hash: tokenHash,
-                type: verifyType as any,
-              });
-
-              if (error) {
-                setStatus('error');
-                setErrorMessage(error.message);
-                return;
-              }
-
-              await supabase.auth.signOut();
-              setStatus('success');
-            } else {
-              // No tokens found, check if already verified
-              const { data: { session } } = await supabase.auth.getSession();
-              if (session) {
-                await supabase.auth.signOut();
-                setStatus('success');
-              } else {
-                setStatus('error');
-                setErrorMessage('Invalid or expired verification link');
-              }
-            }
-          }
-        } else if (accessToken) {
-          // Direct token verification
+        // Method 1: Hash-based tokens (most common)
+        if (accessToken && refreshToken) {
           const { error } = await supabase.auth.setSession({
             access_token: accessToken,
-            refresh_token: refreshToken || '',
+            refresh_token: refreshToken,
           });
 
           if (error) {
@@ -82,24 +43,80 @@ const VerifyEmail = () => {
 
           await supabase.auth.signOut();
           setStatus('success');
-        } else {
-          // Fallback: check for existing session
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            setStatus('success');
-          } else {
-            setStatus('error');
-            setErrorMessage('No verification token found');
-          }
+          return;
         }
+
+        // Method 2: Token hash verification (PKCE flow)
+        if (tokenHash && tokenType) {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: tokenType as 'signup' | 'email' | 'recovery' | 'invite' | 'email_change',
+          });
+
+          if (error) {
+            setStatus('error');
+            setErrorMessage(error.message);
+            return;
+          }
+
+          await supabase.auth.signOut();
+          setStatus('success');
+          return;
+        }
+
+        // Method 3: Direct token verification
+        if (token && tokenType) {
+          const { error } = await supabase.auth.verifyOtp({
+            token: token,
+            type: tokenType as 'signup' | 'email' | 'recovery' | 'invite' | 'email_change',
+            email: searchParams.get('email') || '',
+          });
+
+          if (error) {
+            setStatus('error');
+            setErrorMessage(error.message);
+            return;
+          }
+
+          await supabase.auth.signOut();
+          setStatus('success');
+          return;
+        }
+
+        // Method 4: Check if there's a code parameter (authorization code flow)
+        const code = searchParams.get('code');
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (error) {
+            setStatus('error');
+            setErrorMessage(error.message);
+            return;
+          }
+
+          await supabase.auth.signOut();
+          setStatus('success');
+          return;
+        }
+
+        // Method 5: Check if session already exists (user already verified)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setStatus('success');
+          return;
+        }
+
+        // No valid verification method found
+        setStatus('error');
+        setErrorMessage('Invalid or expired verification link. Please request a new verification email.');
       } catch (err: any) {
         setStatus('error');
-        setErrorMessage(err.message || 'Verification failed');
+        setErrorMessage(err.message || 'Verification failed. Please try again.');
       }
     };
 
-    // Small delay to ensure hash is available
-    setTimeout(handleVerification, 500);
+    // Small delay to ensure URL params are available
+    setTimeout(handleVerification, 300);
   }, [searchParams]);
 
   const handleLoginClick = () => {
