@@ -19,8 +19,8 @@ serve(async (req) => {
 
     if (!apiKey) {
       console.error('NOWPAYMENTS_API_KEY not configured');
-      return new Response(JSON.stringify({ error: 'API key not configured' }), {
-        status: 500,
+      return new Response(JSON.stringify({ error: 'Payment service temporarily unavailable' }), {
+        status: 503,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -28,7 +28,7 @@ serve(async (req) => {
     // Get user from auth header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'No authorization header' }), {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -40,7 +40,7 @@ serve(async (req) => {
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -84,10 +84,11 @@ serve(async (req) => {
 
     if (!paymentResponse.ok) {
       console.error('NOWPayments error:', paymentData);
+      // Return generic error to client, log details server-side
       return new Response(JSON.stringify({ 
-        error: paymentData.message || 'Failed to create payment' 
+        error: 'Failed to create payment. Please try again later.' 
       }), {
-        status: paymentResponse.status,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -125,7 +126,8 @@ serve(async (req) => {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Create payment error:', error);
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    // Return generic error to client
+    return new Response(JSON.stringify({ error: 'An unexpected error occurred. Please try again.' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
