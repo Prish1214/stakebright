@@ -188,11 +188,6 @@ const Withdraw = () => {
     return amount - calculateFee(amount);
   };
 
-  // BEP20 address validation (0x followed by 40 hex characters)
-  const isValidBEP20Address = (address: string): boolean => {
-    return /^0x[a-fA-F0-9]{40}$/.test(address);
-  };
-
   const handleWithdraw = async () => {
     if (!withdrawalAmount || Number(withdrawalAmount) <= 0) {
       toast({
@@ -203,21 +198,10 @@ const Withdraw = () => {
       return;
     }
 
-    const trimmedAddress = withdrawalAddress.trim();
-    if (!trimmedAddress) {
+    if (!withdrawalAddress.trim()) {
       toast({
         title: "Address Required",
         description: "Please enter your USDT BEP20 withdrawal address",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate BEP20 address format
-    if (!isValidBEP20Address(trimmedAddress)) {
-      toast({
-        title: "Invalid Address Format",
-        description: "Please enter a valid BEP20 address (0x followed by 40 hexadecimal characters)",
         variant: "destructive"
       });
       return;

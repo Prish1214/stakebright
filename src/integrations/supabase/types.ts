@@ -388,7 +388,6 @@ export type Database = {
         Returns: boolean
       }
       process_daily_staking_returns: { Args: never; Returns: undefined }
-      validate_referral_code: { Args: { code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"

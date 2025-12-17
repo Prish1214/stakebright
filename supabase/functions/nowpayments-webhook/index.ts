@@ -20,52 +20,44 @@ serve(async (req) => {
 
     if (!ipnSecret) {
       console.error('NOWPAYMENTS_IPN_KEY not configured');
-      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
-        status: 503,
+      return new Response(JSON.stringify({ error: 'IPN key not configured' }), {
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Get the signature from headers - MANDATORY
+    // Get the signature from headers
     const signature = req.headers.get('x-nowpayments-sig');
-    
-    // Signature is REQUIRED - reject requests without signature
-    if (!signature) {
-      console.error('Missing webhook signature - rejecting request');
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
     const body = await req.text();
     
-    console.log('Received webhook payload');
-    console.log('Has signature:', !!signature);
+    console.log('Received webhook payload:', body);
+    console.log('Signature:', signature);
 
     // Verify signature
-    const payload = JSON.parse(body);
-    // Sort keys alphabetically for signature verification
-    const sortedPayload = Object.keys(payload)
-      .sort()
-      .reduce((acc: Record<string, unknown>, key) => {
-        acc[key] = payload[key];
-        return acc;
-      }, {});
-    
-    const hmac = createHmac('sha512', ipnSecret);
-    hmac.update(JSON.stringify(sortedPayload));
-    const expectedSignature = hmac.digest('hex');
+    if (signature) {
+      const payload = JSON.parse(body);
+      // Sort keys alphabetically for signature verification
+      const sortedPayload = Object.keys(payload)
+        .sort()
+        .reduce((acc: Record<string, unknown>, key) => {
+          acc[key] = payload[key];
+          return acc;
+        }, {});
+      
+      const hmac = createHmac('sha512', ipnSecret);
+      hmac.update(JSON.stringify(sortedPayload));
+      const expectedSignature = hmac.digest('hex');
 
-    if (signature !== expectedSignature) {
-      console.error('Invalid signature - rejecting request');
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      if (signature !== expectedSignature) {
+        console.error('Invalid signature. Expected:', expectedSignature, 'Got:', signature);
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
-    console.log('Signature verified successfully');
+    const payload = JSON.parse(body);
     console.log('NOWPayments webhook payload:', JSON.stringify(payload, null, 2));
 
     const {
@@ -100,7 +92,7 @@ serve(async (req) => {
 
       if (fetchError) {
         console.error('Error fetching deposit:', fetchError);
-        return new Response(JSON.stringify({ error: 'Processing error' }), {
+        return new Response(JSON.stringify({ error: 'Database error' }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -128,7 +120,7 @@ serve(async (req) => {
 
           if (insertError) {
             console.error('Error creating deposit:', insertError);
-            return new Response(JSON.stringify({ error: 'Processing error' }), {
+            return new Response(JSON.stringify({ error: 'Failed to create deposit' }), {
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             });
@@ -183,7 +175,7 @@ serve(async (req) => {
 
         if (updateError) {
           console.error('Error updating deposit:', updateError);
-          return new Response(JSON.stringify({ error: 'Processing error' }), {
+          return new Response(JSON.stringify({ error: 'Failed to update deposit' }), {
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
@@ -202,7 +194,7 @@ serve(async (req) => {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Webhook error:', error);
-    return new Response(JSON.stringify({ error: 'Processing error' }), {
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

@@ -231,7 +231,7 @@ const Dashboard = () => {
           <div className="text-2xl font-mono font-bold text-crypto-gold">
             <AnimatedNumber value={referralEarnings} glowColor="gold" suffix=" USDT" />
           </div>
-          <p className="text-xs text-muted-foreground mt-2">5% on every referral deposit</p>
+          <p className="text-xs text-muted-foreground mt-2">5% commission</p>
         </CyberCard>
       </div>
 
@@ -386,7 +386,7 @@ const Dashboard = () => {
               <GlowingIcon icon={Award} color="gold" className="group-hover:scale-110 transition-transform" />
               <div>
                 <h3 className="font-mono font-semibold text-lg">Refer & Earn</h3>
-                <p className="text-sm text-muted-foreground">5% lifetime commission</p>
+                <p className="text-sm text-muted-foreground">Earn 5% commission</p>
               </div>
             </div>
           </CyberCard>
