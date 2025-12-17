@@ -132,7 +132,7 @@ const Referrals = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Referral Program</h1>
         <p className="text-muted-foreground mt-2">
-          Earn 5% commission on every deposit made by users you refer
+          Earn 5% lifetime commission on every deposit your referrals make
         </p>
       </div>
 
@@ -194,7 +194,7 @@ const Referrals = () => {
               {totalEarnings.toFixed(2)} USDT
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              From {referralEarnings.length} referral{referralEarnings.length !== 1 ? 's' : ''}
+              From {referralEarnings.length} commission{referralEarnings.length !== 1 ? 's' : ''} earned
             </p>
           </CardContent>
         </Card>
@@ -277,15 +277,15 @@ const Referrals = () => {
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">1</div>
-              <p>Share your unique referral code with friends and family</p>
+              <p>Share your unique referral code or link with friends and family</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">2</div>
-              <p>When they sign up and make their first deposit, you earn 5% commission</p>
+              <p>Earn 5% commission on <strong>every deposit</strong> they make — not just the first!</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">3</div>
-              <p>Commissions are added to your withdrawable balance immediately</p>
+              <p>Commissions are instantly added to your withdrawable balance</p>
             </div>
           </div>
         </CardContent>

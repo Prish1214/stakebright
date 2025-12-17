@@ -20,7 +20,7 @@ const updates = [
   {
     icon: Star,
     title: "Referral Program",
-    description: "Earn 5% commission on your referrals' first deposits. Share your referral link and grow your earnings!",
+    description: "Earn 5% lifetime commission on every deposit your referrals make — not just the first! Share your link and grow passive income.",
     color: "purple" as const,
     date: "Active"
   },
