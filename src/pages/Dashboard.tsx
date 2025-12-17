@@ -27,13 +27,14 @@ interface UserProfile {
   referral_code: string;
 }
 
-interface ActiveStake {
+interface StakeData {
   id: string;
   amount: number;
   daily_return: number;
   total_earned: number;
   start_date: string;
   end_date: string;
+  is_active: boolean;
   staking_plans: {
     name: string;
     duration_days: number;
@@ -43,7 +44,8 @@ interface ActiveStake {
 const Dashboard = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [activeStakes, setActiveStakes] = useState<ActiveStake[]>([]);
+  const [activeStakes, setActiveStakes] = useState<StakeData[]>([]);
+  const [completedStakes, setCompletedStakes] = useState<StakeData[]>([]);
   const [referralEarnings, setReferralEarnings] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [dailyEarnings, setDailyEarnings] = useState(0);
@@ -66,7 +68,8 @@ const Dashboard = () => {
       if (profileError) throw profileError;
       setProfile(profileData);
 
-      const { data: stakesData, error: stakesError } = await supabase
+      // Fetch active stakes
+      const { data: activeStakesData, error: activeStakesError } = await supabase
         .from('stakes')
         .select(`
           id,
@@ -75,6 +78,7 @@ const Dashboard = () => {
           total_earned,
           start_date,
           end_date,
+          is_active,
           staking_plans (
             name,
             duration_days
@@ -83,10 +87,35 @@ const Dashboard = () => {
         .eq('user_id', user.id)
         .eq('is_active', true);
 
-      if (stakesError) throw stakesError;
-      setActiveStakes(stakesData || []);
+      if (activeStakesError) throw activeStakesError;
+      setActiveStakes(activeStakesData || []);
 
-      const stakesEarnings = stakesData?.reduce((sum, stake) => {
+      // Fetch completed stakes
+      const { data: completedStakesData, error: completedStakesError } = await supabase
+        .from('stakes')
+        .select(`
+          id,
+          amount,
+          daily_return,
+          total_earned,
+          start_date,
+          end_date,
+          is_active,
+          staking_plans (
+            name,
+            duration_days
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('is_active', false)
+        .order('end_date', { ascending: false });
+
+      if (completedStakesError) throw completedStakesError;
+      setCompletedStakes(completedStakesData || []);
+
+      // Calculate earnings from both active and completed stakes
+      const allStakes = [...(activeStakesData || []), ...(completedStakesData || [])];
+      const stakesEarnings = allStakes.reduce((sum, stake) => {
         const startDate = new Date(stake.start_date);
         const now = new Date();
         const endDate = new Date(stake.end_date);
@@ -94,9 +123,9 @@ const Dashboard = () => {
         const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
         const accumulatedEarnings = Number(stake.total_earned) + (daysPassed * Number(stake.daily_return));
         return sum + accumulatedEarnings;
-      }, 0) || 0;
+      }, 0);
 
-      const totalDailyEarnings = stakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
+      const totalDailyEarnings = activeStakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
       setDailyEarnings(totalDailyEarnings);
 
       const { data: referralData, error: referralError } = await supabase
@@ -277,6 +306,53 @@ const Dashboard = () => {
           </div>
         )}
       </CyberCard>
+
+      {/* Completed Stakes */}
+      {completedStakes.length > 0 && (
+        <CyberCard glowColor="green" className="animate-fade-in-up" style={{ animationDelay: '0.55s' }}>
+          <div className="flex items-center gap-3 mb-6">
+            <GlowingIcon icon={Award} size="md" color="green" />
+            <div>
+              <h2 className="text-xl font-mono font-bold">Completed Stakes</h2>
+              <p className="text-sm text-muted-foreground">Your staking history</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {completedStakes.map((stake, index) => {
+              const totalDays = stake.staking_plans.duration_days;
+              
+              return (
+                <div 
+                  key={stake.id} 
+                  className="border border-success/20 rounded-xl p-5 bg-success/5 hover:bg-success/10 transition-all duration-300 hover:border-success/40 animate-fade-in-up"
+                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-success/20 text-success border-success/30 font-mono">
+                        {stake.staking_plans.name}
+                      </Badge>
+                      <Badge variant="outline" className="text-success border-success/30">
+                        Completed
+                      </Badge>
+                      <span className="font-mono font-semibold text-lg">{Number(stake.amount).toFixed(2)} USDT</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-mono text-muted-foreground">
+                        Duration: {totalDays} days
+                      </div>
+                      <div className="text-sm text-success font-semibold">
+                        Total earned: {Number(stake.total_earned).toFixed(2)} USDT
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CyberCard>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
