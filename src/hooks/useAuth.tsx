@@ -53,38 +53,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = async (email: string, password: string, username?: string, referralCode?: string) => {
     try {
-      // Validate referral code if provided
-      if (referralCode) {
-        const { data: referrerProfile, error: referrerError } = await supabase
-          .from('profiles')
-          .select('user_id, referral_code')
-          .eq('referral_code', referralCode)
-          .maybeSingle();
-
-        if (referrerError) {
-          toast({
-            title: "Database error",
-            description: "There was an error validating the referral code. Please try again.",
-            variant: "destructive"
-          });
-          return { error: referrerError };
-        }
-
-        if (!referrerProfile) {
-          toast({
-            title: "Invalid referral code",
-            description: "The referral code you entered is not valid. Please check and try again.",
-            variant: "destructive"
-          });
-          return { error: { message: "Invalid referral code" } };
-        }
-      } else {
+      // Validate referral code is provided
+      if (!referralCode) {
         toast({
           title: "Referral code required",
           description: "You must enter a valid referral code to sign up.",
           variant: "destructive"
         });
         return { error: { message: "Referral code required" } };
+      }
+
+      // Validate referral code using secure RPC function (no profile data exposed)
+      const { data: isValid, error: validationError } = await supabase
+        .rpc('validate_referral_code', { code: referralCode });
+
+      if (validationError) {
+        toast({
+          title: "Validation error",
+          description: "There was an error validating the referral code. Please try again.",
+          variant: "destructive"
+        });
+        return { error: validationError };
+      }
+
+      if (!isValid) {
+        toast({
+          title: "Invalid referral code",
+          description: "The referral code you entered is not valid. Please check and try again.",
+          variant: "destructive"
+        });
+        return { error: { message: "Invalid referral code" } };
       }
 
       const redirectUrl = `${window.location.origin}/verify`;
