@@ -281,7 +281,7 @@ const Referrals = () => {
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">2</div>
-              <p>When they sign up and make their first deposit, you earn 5% commission</p>
+              <p>Earn <span className="font-bold text-crypto-gold">5% commission on EVERY deposit</span> your referrals make - not just the first one!</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">3</div>
