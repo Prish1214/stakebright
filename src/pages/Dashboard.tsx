@@ -193,7 +193,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <CyberCard glowColor="cyan" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Wallet Balance</span>
@@ -203,6 +203,21 @@ const Dashboard = () => {
             <AnimatedNumber value={Number(profile?.wallet_balance || 0)} glowColor="cyan" suffix=" USDT" />
           </div>
           <p className="text-xs text-muted-foreground mt-2">Available for staking</p>
+        </CyberCard>
+
+        <CyberCard glowColor="pink" className="animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Total Staked</span>
+            <GlowingIcon icon={Target} size="sm" color="pink" animated={false} />
+          </div>
+          <div className="text-2xl font-mono font-bold text-accent">
+            <AnimatedNumber
+              value={activeStakes.reduce((sum, s) => sum + Number(s.amount), 0)}
+              glowColor="pink"
+              suffix=" USDT"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Across {activeStakes.length} active stake{activeStakes.length === 1 ? '' : 's'}</p>
         </CyberCard>
 
         <CyberCard glowColor="green" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -224,7 +239,7 @@ const Dashboard = () => {
           <div className="text-2xl font-mono font-bold text-primary">
             {activeStakes.length}
           </div>
-          <p className="text-xs text-muted-foreground mt-2">Currently earning</p>
+          <p className="text-xs text-muted-foreground mt-2">Daily +{dailyEarnings.toFixed(2)} USDT</p>
         </CyberCard>
 
         <CyberCard glowColor="gold" className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
