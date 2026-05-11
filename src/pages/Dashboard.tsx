@@ -429,37 +429,6 @@ const Dashboard = () => {
               </div>
             );
           })()}
-              const totalDays = stake.staking_plans.duration_days;
-              
-              return (
-                <div 
-                  key={stake.id} 
-                  className="border border-success/20 rounded-xl p-5 bg-success/5 hover:bg-success/10 transition-all duration-300 hover:border-success/40 animate-fade-in-up"
-                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
-                >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <Badge className="bg-success/20 text-success border-success/30 font-mono">
-                        {stake.staking_plans.name}
-                      </Badge>
-                      <Badge variant="outline" className="text-success border-success/30">
-                        Completed
-                      </Badge>
-                      <span className="font-mono font-semibold text-lg">{Number(stake.amount).toFixed(2)} USDT</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-mono text-muted-foreground">
-                        Duration: {totalDays} days
-                      </div>
-                      <div className="text-sm text-success font-semibold">
-                        Total earned: {Number(stake.total_earned).toFixed(2)} USDT
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </CyberCard>
       )}
 
