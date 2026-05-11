@@ -432,7 +432,8 @@ const Withdraw = () => {
           <h3 className="font-semibold mb-4 text-amber-800 dark:text-amber-200">Important Notes</h3>
           <div className="space-y-2 text-sm text-amber-700 dark:text-amber-300">
             <p>• A {feePercentage}% fee is applied to all withdrawals</p>
-            <p>• Principal amounts can only be withdrawn after the staking period ends</p>
+            <p>• Daily staking earnings and 5% referral commissions can be withdrawn anytime</p>
+            <p>• Your staked principal is <strong>locked</strong> during the plan duration and is automatically <strong>released for withdrawal</strong> when the staking period ends</p>
             <p>• Processing time is typically 24-48 hours</p>
           </div>
         </CardContent>
