@@ -52,6 +52,8 @@ const Dashboard = () => {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [dailyEarnings, setDailyEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [completedSortBy, setCompletedSortBy] = useState<'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc' | 'earned_desc'>('date_desc');
+  const [completedFilter, setCompletedFilter] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
