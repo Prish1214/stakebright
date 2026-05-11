@@ -380,6 +380,7 @@ export type Database = {
     }
     Functions: {
       add_daily_staking_earnings: { Args: never; Returns: undefined }
+      complete_expired_stakes: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
