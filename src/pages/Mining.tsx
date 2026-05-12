@@ -243,7 +243,7 @@ const Mining = () => {
                     <NeonButton 
                       onClick={claimRewards} 
                       disabled={actionLoading}
-                      glowColor="green"
+                      glowColor="cyan"
                       className="px-8 py-6 text-lg"
                     >
                       {actionLoading ? <RefreshCw className="mr-2 h-5 w-5 animate-spin" /> : <Award className="mr-2 h-5 w-5" />}
