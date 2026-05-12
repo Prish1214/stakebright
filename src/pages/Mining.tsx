@@ -213,7 +213,7 @@ const Mining = () => {
         
         {/* Visual Rig Section */}
         <div className="lg:col-span-8">
-          <CyberCard glowColor={isMiningActive ? "primary" : "muted"} className="h-full relative overflow-hidden flex flex-col items-center justify-center p-12">
+          <CyberCard glowColor={isMiningActive ? "cyan" : "purple"} className="h-full relative overflow-hidden flex flex-col items-center justify-center p-12">
             {/* Background effects */}
             {isMiningActive && (
               <>
