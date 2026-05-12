@@ -502,6 +502,18 @@ const Dashboard = () => {
             </div>
           </CyberCard>
         </Link>
+
+        <Link to="/mining" className="block">
+          <CyberCard glowColor="purple" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '1.0s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={Pickaxe} color="purple" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">Cloud Mining</h3>
+                <p className="text-sm text-muted-foreground">Mine daily USDT</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
       </div>
     </div>
   );
