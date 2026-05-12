@@ -23,7 +23,8 @@ import {
   Clock,
   Award,
   Zap,
-  Target
+  Target,
+  Pickaxe
 } from 'lucide-react';
 
 interface UserProfile {
@@ -465,7 +466,7 @@ const Dashboard = () => {
       </Tabs>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link to="/deposit" className="block">
           <CyberCard glowColor="cyan" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
             <div className="flex items-center gap-4">

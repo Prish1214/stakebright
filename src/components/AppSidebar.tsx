@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { LayoutDashboard, Wallet, TrendingUp, ArrowUpCircle, Users, Settings, Shield, HelpCircle, CheckCircle, BarChart3, Info, Megaphone, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Wallet, TrendingUp, ArrowUpCircle, Users, Settings, Shield, HelpCircle, CheckCircle, BarChart3, Info, Megaphone, ExternalLink, Pickaxe } from 'lucide-react';
 
 const menuItems = [{
   title: 'Dashboard',
@@ -22,6 +22,10 @@ const menuItems = [{
   title: 'Referrals',
   url: '/referrals',
   icon: Users
+}, {
+  title: 'Cloud Mining',
+  url: '/mining',
+  icon: Pickaxe
 }];
 
 const proofItems = [{
