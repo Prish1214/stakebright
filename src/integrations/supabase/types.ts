@@ -70,8 +70,14 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          is_mining: boolean | null
+          last_mining_start: string | null
+          mining_ends_at: string | null
+          mining_power_multiplier: number | null
+          mining_streak: number | null
           referral_code: string
           referred_by: string | null
+          total_mined: number | null
           updated_at: string | null
           user_id: string
           username: string | null
@@ -81,8 +87,14 @@ export type Database = {
           created_at?: string | null
           email: string
           id?: string
+          is_mining?: boolean | null
+          last_mining_start?: string | null
+          mining_ends_at?: string | null
+          mining_power_multiplier?: number | null
+          mining_streak?: number | null
           referral_code?: string
           referred_by?: string | null
+          total_mined?: number | null
           updated_at?: string | null
           user_id: string
           username?: string | null
@@ -92,8 +104,14 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          is_mining?: boolean | null
+          last_mining_start?: string | null
+          mining_ends_at?: string | null
+          mining_power_multiplier?: number | null
+          mining_streak?: number | null
           referral_code?: string
           referred_by?: string | null
+          total_mined?: number | null
           updated_at?: string | null
           user_id?: string
           username?: string | null
@@ -380,6 +398,7 @@ export type Database = {
     }
     Functions: {
       add_daily_staking_earnings: { Args: never; Returns: undefined }
+      claim_mining_rewards: { Args: never; Returns: Json }
       complete_expired_stakes: { Args: never; Returns: number }
       has_role: {
         Args: {
@@ -389,6 +408,7 @@ export type Database = {
         Returns: boolean
       }
       process_daily_staking_returns: { Args: never; Returns: undefined }
+      start_cloud_mining: { Args: never; Returns: Json }
       validate_referral_code: { Args: { code: string }; Returns: boolean }
     }
     Enums: {

@@ -23,7 +23,8 @@ import {
   Clock,
   Award,
   Zap,
-  Target
+  Target,
+  Pickaxe
 } from 'lucide-react';
 
 interface UserProfile {
@@ -465,7 +466,7 @@ const Dashboard = () => {
       </Tabs>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link to="/deposit" className="block">
           <CyberCard glowColor="cyan" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
             <div className="flex items-center gap-4">
@@ -497,6 +498,18 @@ const Dashboard = () => {
               <div>
                 <h3 className="font-mono font-semibold text-lg">Refer & Earn</h3>
                 <p className="text-sm text-muted-foreground">Earn 5% commission</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
+
+        <Link to="/mining" className="block">
+          <CyberCard glowColor="purple" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '1.0s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={Pickaxe} color="purple" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">Cloud Mining</h3>
+                <p className="text-sm text-muted-foreground">Mine daily USDT</p>
               </div>
             </div>
           </CyberCard>
