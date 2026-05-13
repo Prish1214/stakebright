@@ -75,9 +75,9 @@ const Dashboard = () => {
     if (!user) return;
 
     try {
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await (supabase as any)
         .from('profiles')
-        .select('wallet_balance, referral_code')
+        .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet, referral_code')
         .eq('user_id', user.id)
         .single();
 
