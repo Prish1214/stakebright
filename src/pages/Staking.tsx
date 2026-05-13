@@ -108,10 +108,10 @@ const Staking = () => {
       return;
     }
 
-    if (amount > userProfile.wallet_balance) {
+    if (amount > userProfile.staking_wallet) {
       toast({
-        title: "Insufficient balance",
-        description: "You don't have enough USDT in your wallet",
+        title: "Insufficient Staking Wallet",
+        description: "Transfer USDT from Main Wallet to Staking Wallet first.",
         variant: "destructive"
       });
       return;
@@ -137,11 +137,11 @@ const Staking = () => {
 
       if (stakeError) throw stakeError;
 
-      // Update wallet balance
-      const { error: updateError } = await supabase
+      // Deduct from staking_wallet
+      const { error: updateError } = await (supabase as any)
         .from('profiles')
         .update({
-          wallet_balance: userProfile.wallet_balance - amount
+          staking_wallet: userProfile.staking_wallet - amount
         })
         .eq('user_id', user.id);
 
