@@ -26,6 +26,10 @@ const menuItems = [{
   title: 'Cloud Mining',
   url: '/mining',
   icon: Pickaxe
+}, {
+  title: 'AI Trading',
+  url: '/trading',
+  icon: LineChart
 }];
 
 const proofItems = [{
