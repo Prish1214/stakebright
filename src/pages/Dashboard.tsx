@@ -204,6 +204,51 @@ const Dashboard = () => {
         </Link>
       </div>
 
+      {/* 4-Wallet System */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-mono font-bold flex items-center gap-2">
+            <Wallet className="h-5 w-5 text-primary" /> Your Wallets
+          </h2>
+          <NeonButton
+            glowColor="cyan"
+            onClick={() => { setTransferFrom('main'); setTransferTo('staking'); setTransferOpen(true); }}
+            className="text-sm"
+          >
+            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
+          </NeonButton>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { key: 'main' as WalletKey, label: 'Main Wallet', value: profile?.wallet_balance || 0, glow: 'cyan' as const, icon: Wallet, hint: 'From deposits & withdrawals' },
+            { key: 'staking' as WalletKey, label: 'Staking Wallet', value: (profile as any)?.staking_wallet || 0, glow: 'purple' as const, icon: TrendingUp, hint: 'Used for staking plans' },
+            { key: 'mining' as WalletKey, label: 'Mining Wallet', value: (profile as any)?.mining_wallet || 0, glow: 'gold' as const, icon: Pickaxe, hint: 'Buy & run miners' },
+            { key: 'trading' as WalletKey, label: 'Trading Wallet', value: (profile as any)?.trading_wallet || 0, glow: 'pink' as const, icon: LineChart, hint: 'AI auto-trading capital' },
+          ].map((w, i) => (
+            <CyberCard key={w.key} glowColor={w.glow} className="animate-fade-in-up" style={{ animationDelay: `${0.05 + i * 0.05}s` }}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{w.label}</span>
+                <GlowingIcon icon={w.icon} size="sm" color={w.glow} animated={false} />
+              </div>
+              <div className="text-xl font-mono font-bold mb-1">
+                <AnimatedNumber value={Number(w.value)} glowColor={w.glow} suffix=" USDT" />
+              </div>
+              <p className="text-[11px] text-muted-foreground mb-3">{w.hint}</p>
+              <button
+                onClick={() => {
+                  setTransferFrom(w.key === 'main' ? 'main' : 'main');
+                  setTransferTo(w.key === 'main' ? 'staking' : w.key);
+                  setTransferOpen(true);
+                }}
+                className="w-full text-xs font-mono py-1.5 rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+              >
+                <ArrowDownUp className="h-3 w-3 inline mr-1" /> Transfer
+              </button>
+            </CyberCard>
+          ))}
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <CyberCard glowColor="cyan" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
