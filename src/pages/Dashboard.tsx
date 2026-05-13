@@ -24,11 +24,17 @@ import {
   Award,
   Zap,
   Target,
-  Pickaxe
+  Pickaxe,
+  LineChart,
+  ArrowDownUp
 } from 'lucide-react';
+import WalletTransferModal, { WalletKey } from '@/components/WalletTransferModal';
 
 interface UserProfile {
   wallet_balance: number;
+  staking_wallet: number;
+  mining_wallet: number;
+  trading_wallet: number;
   referral_code: string;
 }
 
