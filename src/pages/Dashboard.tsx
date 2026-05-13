@@ -24,11 +24,17 @@ import {
   Award,
   Zap,
   Target,
-  Pickaxe
+  Pickaxe,
+  LineChart,
+  ArrowDownUp
 } from 'lucide-react';
+import WalletTransferModal, { WalletKey } from '@/components/WalletTransferModal';
 
 interface UserProfile {
   wallet_balance: number;
+  staking_wallet: number;
+  mining_wallet: number;
+  trading_wallet: number;
   referral_code: string;
 }
 
@@ -57,6 +63,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [completedSortBy, setCompletedSortBy] = useState<'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc' | 'earned_desc'>('date_desc');
   const [completedFilter, setCompletedFilter] = useState('');
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [transferFrom, setTransferFrom] = useState<WalletKey>('main');
+  const [transferTo, setTransferTo] = useState<WalletKey>('staking');
 
   useEffect(() => {
     fetchDashboardData();
@@ -66,9 +75,9 @@ const Dashboard = () => {
     if (!user) return;
 
     try {
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await (supabase as any)
         .from('profiles')
-        .select('wallet_balance, referral_code')
+        .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet, referral_code')
         .eq('user_id', user.id)
         .single();
 
@@ -193,6 +202,51 @@ const Dashboard = () => {
             Stake More
           </NeonButton>
         </Link>
+      </div>
+
+      {/* 4-Wallet System */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-mono font-bold flex items-center gap-2">
+            <Wallet className="h-5 w-5 text-primary" /> Your Wallets
+          </h2>
+          <NeonButton
+            glowColor="cyan"
+            onClick={() => { setTransferFrom('main'); setTransferTo('staking'); setTransferOpen(true); }}
+            className="text-sm"
+          >
+            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
+          </NeonButton>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { key: 'main' as WalletKey, label: 'Main Wallet', value: profile?.wallet_balance || 0, glow: 'cyan' as const, icon: Wallet, hint: 'From deposits & withdrawals' },
+            { key: 'staking' as WalletKey, label: 'Staking Wallet', value: (profile as any)?.staking_wallet || 0, glow: 'purple' as const, icon: TrendingUp, hint: 'Used for staking plans' },
+            { key: 'mining' as WalletKey, label: 'Mining Wallet', value: (profile as any)?.mining_wallet || 0, glow: 'gold' as const, icon: Pickaxe, hint: 'Buy & run miners' },
+            { key: 'trading' as WalletKey, label: 'Trading Wallet', value: (profile as any)?.trading_wallet || 0, glow: 'pink' as const, icon: LineChart, hint: 'AI auto-trading capital' },
+          ].map((w, i) => (
+            <CyberCard key={w.key} glowColor={w.glow} className="animate-fade-in-up" style={{ animationDelay: `${0.05 + i * 0.05}s` }}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{w.label}</span>
+                <GlowingIcon icon={w.icon} size="sm" color={w.glow} animated={false} />
+              </div>
+              <div className="text-xl font-mono font-bold mb-1">
+                <AnimatedNumber value={Number(w.value)} glowColor={w.glow} suffix=" USDT" />
+              </div>
+              <p className="text-[11px] text-muted-foreground mb-3">{w.hint}</p>
+              <button
+                onClick={() => {
+                  setTransferFrom(w.key === 'main' ? 'main' : 'main');
+                  setTransferTo(w.key === 'main' ? 'staking' : w.key);
+                  setTransferOpen(true);
+                }}
+                className="w-full text-xs font-mono py-1.5 rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+              >
+                <ArrowDownUp className="h-3 w-3 inline mr-1" /> Transfer
+              </button>
+            </CyberCard>
+          ))}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -514,7 +568,33 @@ const Dashboard = () => {
             </div>
           </CyberCard>
         </Link>
+
+        <Link to="/trading" className="block">
+          <CyberCard glowColor="pink" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={LineChart} color="pink" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">AI Trading Bot</h3>
+                <p className="text-sm text-muted-foreground">Auto-trade BTC/ETH/SOL</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
       </div>
+
+      <WalletTransferModal
+        open={transferOpen}
+        onOpenChange={setTransferOpen}
+        balances={{
+          main: Number(profile?.wallet_balance || 0),
+          staking: Number((profile as any)?.staking_wallet || 0),
+          mining: Number((profile as any)?.mining_wallet || 0),
+          trading: Number((profile as any)?.trading_wallet || 0),
+        }}
+        defaultFrom={transferFrom}
+        defaultTo={transferTo}
+        onTransferred={fetchDashboardData}
+      />
     </div>
   );
 };

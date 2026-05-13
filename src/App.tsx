@@ -11,6 +11,7 @@ import Deposit from "./pages/Deposit";
 import Staking from "./pages/Staking";
 import Referrals from "./pages/Referrals";
 import Mining from "./pages/Mining";
+import Trading from "./pages/Trading";
 import Withdraw from "./pages/Withdraw";
 import VerifyEmail from "./pages/VerifyEmail";
 import FAQ from "./pages/FAQ";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/staking" element={<Layout><Staking /></Layout>} />
             <Route path="/referrals" element={<Layout><Referrals /></Layout>} />
             <Route path="/mining" element={<Layout><Mining /></Layout>} />
+            <Route path="/trading" element={<Layout><Trading /></Layout>} />
             <Route path="/withdraw" element={<Layout><Withdraw /></Layout>} />
             <Route path="/faq" element={<Layout><FAQ /></Layout>} />
             <Route path="/about" element={<Layout><About /></Layout>} />

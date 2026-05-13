@@ -15,7 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { TrendingUp, Clock, DollarSign, Target } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, Target, ArrowDownUp } from 'lucide-react';
+import WalletTransferModal from '@/components/WalletTransferModal';
 
 interface StakingPlan {
   id: string;
@@ -27,6 +28,9 @@ interface StakingPlan {
 
 interface UserProfile {
   wallet_balance: number;
+  staking_wallet: number;
+  mining_wallet: number;
+  trading_wallet: number;
 }
 
 const Staking = () => {
@@ -37,6 +41,7 @@ const Staking = () => {
   const [stakeAmount, setStakeAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
 
   useEffect(() => {
     fetchStakingPlans();
@@ -66,9 +71,9 @@ const Staking = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
-        .select('wallet_balance')
+        .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet')
         .eq('user_id', user.id)
         .single();
 
@@ -103,10 +108,10 @@ const Staking = () => {
       return;
     }
 
-    if (amount > userProfile.wallet_balance) {
+    if (amount > userProfile.staking_wallet) {
       toast({
-        title: "Insufficient balance",
-        description: "You don't have enough USDT in your wallet",
+        title: "Insufficient Staking Wallet",
+        description: "Transfer USDT from Main Wallet to Staking Wallet first.",
         variant: "destructive"
       });
       return;
@@ -132,11 +137,11 @@ const Staking = () => {
 
       if (stakeError) throw stakeError;
 
-      // Update wallet balance
-      const { error: updateError } = await supabase
+      // Deduct from staking_wallet
+      const { error: updateError } = await (supabase as any)
         .from('profiles')
         .update({
-          wallet_balance: userProfile.wallet_balance - amount
+          staking_wallet: userProfile.staking_wallet - amount
         })
         .eq('user_id', user.id);
 
@@ -178,11 +183,17 @@ const Staking = () => {
           <h1 className="text-3xl font-bold">Staking Plans</h1>
           <p className="text-muted-foreground">Choose a plan and start earning daily returns</p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-muted-foreground">Available Balance</p>
-          <p className="text-2xl font-bold text-success">
-            {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Staking Wallet</p>
+            <p className="text-2xl font-bold text-success">
+              {userProfile ? Number(userProfile.staking_wallet).toFixed(2) : '0.00'} USDT
+            </p>
+            <p className="text-xs text-muted-foreground">Main Wallet: {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT</p>
+          </div>
+          <Button variant="outline" onClick={() => setTransferOpen(true)}>
+            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
+          </Button>
         </div>
       </div>
 
@@ -357,6 +368,22 @@ const Staking = () => {
           </div>
         </CardContent>
       </Card>
+
+      {userProfile && (
+        <WalletTransferModal
+          open={transferOpen}
+          onOpenChange={setTransferOpen}
+          balances={{
+            main: Number(userProfile.wallet_balance),
+            staking: Number(userProfile.staking_wallet),
+            mining: Number(userProfile.mining_wallet),
+            trading: Number(userProfile.trading_wallet),
+          }}
+          defaultFrom="main"
+          defaultTo="staking"
+          onTransferred={fetchUserProfile}
+        />
+      )}
     </div>
   );
 };

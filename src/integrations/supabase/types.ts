@@ -75,9 +75,12 @@ export type Database = {
           mining_ends_at: string | null
           mining_power_multiplier: number | null
           mining_streak: number | null
+          mining_wallet: number
           referral_code: string
           referred_by: string | null
+          staking_wallet: number
           total_mined: number | null
+          trading_wallet: number
           updated_at: string | null
           user_id: string
           username: string | null
@@ -92,9 +95,12 @@ export type Database = {
           mining_ends_at?: string | null
           mining_power_multiplier?: number | null
           mining_streak?: number | null
+          mining_wallet?: number
           referral_code?: string
           referred_by?: string | null
+          staking_wallet?: number
           total_mined?: number | null
+          trading_wallet?: number
           updated_at?: string | null
           user_id: string
           username?: string | null
@@ -109,9 +115,12 @@ export type Database = {
           mining_ends_at?: string | null
           mining_power_multiplier?: number | null
           mining_streak?: number | null
+          mining_wallet?: number
           referral_code?: string
           referred_by?: string | null
+          staking_wallet?: number
           total_mined?: number | null
+          trading_wallet?: number
           updated_at?: string | null
           user_id?: string
           username?: string | null
@@ -301,6 +310,105 @@ export type Database = {
           },
         ]
       }
+      trading_sessions: {
+        Row: {
+          capital: number
+          created_at: string
+          ends_at: string
+          id: string
+          profit: number
+          started_at: string
+          status: string
+          trades_json: Json
+          user_id: string
+          win_rate: number
+        }
+        Insert: {
+          capital: number
+          created_at?: string
+          ends_at: string
+          id?: string
+          profit?: number
+          started_at?: string
+          status?: string
+          trades_json?: Json
+          user_id: string
+          win_rate?: number
+        }
+        Update: {
+          capital?: number
+          created_at?: string
+          ends_at?: string
+          id?: string
+          profit?: number
+          started_at?: string
+          status?: string
+          trades_json?: Json
+          user_id?: string
+          win_rate?: number
+        }
+        Relationships: []
+      }
+      user_miners: {
+        Row: {
+          created_at: string
+          efficiency: number
+          expires_at: string
+          hashrate: number
+          id: string
+          is_mining: boolean
+          last_started_at: string | null
+          lifespan_days: number
+          max_daily_return: number
+          min_daily_return: number
+          miner_tier: string
+          miner_type: string
+          mining_ends_at: string | null
+          price: number
+          purchased_at: string
+          total_mined: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          efficiency: number
+          expires_at: string
+          hashrate: number
+          id?: string
+          is_mining?: boolean
+          last_started_at?: string | null
+          lifespan_days: number
+          max_daily_return: number
+          min_daily_return: number
+          miner_tier: string
+          miner_type: string
+          mining_ends_at?: string | null
+          price: number
+          purchased_at?: string
+          total_mined?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          efficiency?: number
+          expires_at?: string
+          hashrate?: number
+          id?: string
+          is_mining?: boolean
+          last_started_at?: string | null
+          lifespan_days?: number
+          max_daily_return?: number
+          min_daily_return?: number
+          miner_tier?: string
+          miner_type?: string
+          mining_ends_at?: string | null
+          price?: number
+          purchased_at?: string
+          total_mined?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -318,6 +426,33 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_transfers: {
+        Row: {
+          amount: number
+          created_at: string
+          from_wallet: string
+          id: string
+          to_wallet: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          from_wallet: string
+          id?: string
+          to_wallet: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          from_wallet?: string
+          id?: string
+          to_wallet?: string
           user_id?: string
         }
         Relationships: []
@@ -398,7 +533,9 @@ export type Database = {
     }
     Functions: {
       add_daily_staking_earnings: { Args: never; Returns: undefined }
+      claim_miner_rewards: { Args: { p_miner_id: string }; Returns: Json }
       claim_mining_rewards: { Args: never; Returns: Json }
+      claim_trading_session: { Args: never; Returns: Json }
       complete_expired_stakes: { Args: never; Returns: number }
       has_role: {
         Args: {
@@ -408,7 +545,17 @@ export type Database = {
         Returns: boolean
       }
       process_daily_staking_returns: { Args: never; Returns: undefined }
+      purchase_miner: {
+        Args: { p_tier: string; p_type: string }
+        Returns: Json
+      }
       start_cloud_mining: { Args: never; Returns: Json }
+      start_miner: { Args: { p_miner_id: string }; Returns: Json }
+      start_trading_session: { Args: never; Returns: Json }
+      transfer_between_wallets: {
+        Args: { p_amount: number; p_from: string; p_to: string }
+        Returns: Json
+      }
       validate_referral_code: { Args: { code: string }; Returns: boolean }
     }
     Enums: {
