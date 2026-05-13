@@ -568,7 +568,33 @@ const Dashboard = () => {
             </div>
           </CyberCard>
         </Link>
+
+        <Link to="/trading" className="block">
+          <CyberCard glowColor="pink" className="h-full cursor-pointer group animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
+            <div className="flex items-center gap-4">
+              <GlowingIcon icon={LineChart} color="pink" className="group-hover:scale-110 transition-transform" />
+              <div>
+                <h3 className="font-mono font-semibold text-lg">AI Trading Bot</h3>
+                <p className="text-sm text-muted-foreground">Auto-trade BTC/ETH/SOL</p>
+              </div>
+            </div>
+          </CyberCard>
+        </Link>
       </div>
+
+      <WalletTransferModal
+        open={transferOpen}
+        onOpenChange={setTransferOpen}
+        balances={{
+          main: Number(profile?.wallet_balance || 0),
+          staking: Number((profile as any)?.staking_wallet || 0),
+          mining: Number((profile as any)?.mining_wallet || 0),
+          trading: Number((profile as any)?.trading_wallet || 0),
+        }}
+        defaultFrom={transferFrom}
+        defaultTo={transferTo}
+        onTransferred={fetchDashboardData}
+      />
     </div>
   );
 };
