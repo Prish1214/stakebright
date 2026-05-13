@@ -41,6 +41,7 @@ const Staking = () => {
   const [stakeAmount, setStakeAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
 
   useEffect(() => {
     fetchStakingPlans();
