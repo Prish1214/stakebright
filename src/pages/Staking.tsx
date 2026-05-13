@@ -27,6 +27,9 @@ interface StakingPlan {
 
 interface UserProfile {
   wallet_balance: number;
+  staking_wallet: number;
+  mining_wallet: number;
+  trading_wallet: number;
 }
 
 const Staking = () => {
