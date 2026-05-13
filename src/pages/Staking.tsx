@@ -183,11 +183,17 @@ const Staking = () => {
           <h1 className="text-3xl font-bold">Staking Plans</h1>
           <p className="text-muted-foreground">Choose a plan and start earning daily returns</p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-muted-foreground">Available Balance</p>
-          <p className="text-2xl font-bold text-success">
-            {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Staking Wallet</p>
+            <p className="text-2xl font-bold text-success">
+              {userProfile ? Number(userProfile.staking_wallet).toFixed(2) : '0.00'} USDT
+            </p>
+            <p className="text-xs text-muted-foreground">Main Wallet: {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT</p>
+          </div>
+          <Button variant="outline" onClick={() => setTransferOpen(true)}>
+            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
+          </Button>
         </div>
       </div>
 
