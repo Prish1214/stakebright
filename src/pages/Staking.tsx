@@ -15,7 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { TrendingUp, Clock, DollarSign, Target } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, Target, ArrowDownUp } from 'lucide-react';
+import WalletTransferModal from '@/components/WalletTransferModal';
 
 interface StakingPlan {
   id: string;
