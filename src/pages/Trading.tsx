@@ -131,7 +131,7 @@ const Trading = () => {
     setProfile(p);
     const list: Session[] = sessions || [];
     setActiveSession(list.find(s => s.status === 'active') || null);
-    setPastSessions(list.filter(s => s.status === 'claimed'));
+    setPastSessions(list.filter(s => s.status === 'claimed' || s.status === 'manual'));
     setLoading(false);
   };
 
