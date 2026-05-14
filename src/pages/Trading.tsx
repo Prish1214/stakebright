@@ -118,6 +118,7 @@ const Trading = () => {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
+  const [tradeOpen, setTradeOpen] = useState(false);
   const [trades, setTrades] = useState<FakeTrade[]>([]);
   const [livePnl, setLivePnl] = useState(0);
   const [now, setNow] = useState(Date.now());
