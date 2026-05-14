@@ -23,7 +23,8 @@ interface Session {
   ends_at: string;
   profit: number;
   win_rate: number;
-  status: 'active' | 'claimed';
+  status: 'active' | 'claimed' | 'manual';
+  trades_json?: any;
 }
 
 const SYMS: { sym: Sym; base: number; vol: number; color: string }[] = [
