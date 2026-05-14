@@ -544,6 +544,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      place_manual_trade: {
+        Args: { p_amount: number; p_side: string; p_symbol: string }
+        Returns: Json
+      }
       process_daily_staking_returns: { Args: never; Returns: undefined }
       purchase_miner: {
         Args: { p_tier: string; p_type: string }

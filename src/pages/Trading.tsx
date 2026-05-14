@@ -7,8 +7,9 @@ import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
 import WalletTransferModal from '@/components/WalletTransferModal';
+import ManualTradeModal from '@/components/ManualTradeModal';
 import { Badge } from '@/components/ui/badge';
-import { LineChart, ArrowDownUp, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3 } from 'lucide-react';
+import { LineChart, ArrowDownUp, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3, Rocket } from 'lucide-react';
 
 type Sym = 'BTC' | 'ETH' | 'SOL';
 
@@ -23,7 +24,8 @@ interface Session {
   ends_at: string;
   profit: number;
   win_rate: number;
-  status: 'active' | 'claimed';
+  status: 'active' | 'claimed' | 'manual';
+  trades_json?: any;
 }
 
 const SYMS: { sym: Sym; base: number; vol: number; color: string }[] = [
@@ -116,6 +118,7 @@ const Trading = () => {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
+  const [tradeOpen, setTradeOpen] = useState(false);
   const [trades, setTrades] = useState<FakeTrade[]>([]);
   const [livePnl, setLivePnl] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -130,7 +133,7 @@ const Trading = () => {
     setProfile(p);
     const list: Session[] = sessions || [];
     setActiveSession(list.find(s => s.status === 'active') || null);
-    setPastSessions(list.filter(s => s.status === 'claimed'));
+    setPastSessions(list.filter(s => s.status === 'claimed' || s.status === 'manual'));
     setLoading(false);
   };
 
@@ -222,6 +225,9 @@ const Trading = () => {
           </div>
           <NeonButton glowColor="pink" onClick={() => setTransferOpen(true)}>
             <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
+          </NeonButton>
+          <NeonButton onClick={() => setTradeOpen(true)} disabled={!profile?.trading_wallet}>
+            <Rocket className="h-4 w-4 mr-2" /> Place Trade
           </NeonButton>
         </div>
       </div>
@@ -331,32 +337,52 @@ const Trading = () => {
           <p className="text-sm text-muted-foreground">No completed sessions yet.</p>
         ) : (
           <div className="space-y-2">
-            {pastSessions.map(s => (
-              <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg border border-primary/10 bg-muted/10">
-                <div className="text-xs font-mono text-muted-foreground">
-                  {new Date(s.started_at).toLocaleString()} · capital {Number(s.capital).toFixed(2)} USDT
+            {pastSessions.map(s => {
+              const isManual = s.status === 'manual';
+              const meta = isManual && Array.isArray(s.trades_json) ? s.trades_json[0] : null;
+              return (
+                <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg border border-primary/10 bg-muted/10">
+                  <div className="text-xs font-mono text-muted-foreground flex items-center gap-2 flex-wrap">
+                    <Badge variant="outline" className={isManual ? 'border-accent text-accent' : 'border-primary text-primary'}>
+                      {isManual ? 'MANUAL' : 'AI 24H'}
+                    </Badge>
+                    {meta && (
+                      <Badge variant="outline" className={meta.side === 'BUY' ? 'border-success text-success' : 'border-destructive text-destructive'}>
+                        {meta.side} {meta.symbol}
+                      </Badge>
+                    )}
+                    <span>{new Date(s.started_at).toLocaleString()} · size {Number(s.capital).toFixed(2)} USDT</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm font-mono">
+                    {!isManual && <span className="text-muted-foreground">Win {Number(s.win_rate).toFixed(1)}%</span>}
+                    <span className={Number(s.profit) >= 0 ? 'text-success font-bold' : 'text-destructive font-bold'}>
+                      {Number(s.profit) >= 0 ? '+' : ''}{Number(s.profit).toFixed(2)} USDT
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-sm font-mono">
-                  <span className="text-muted-foreground">Win {Number(s.win_rate).toFixed(1)}%</span>
-                  <span className={Number(s.profit) >= 0 ? 'text-success font-bold' : 'text-destructive font-bold'}>
-                    {Number(s.profit) >= 0 ? '+' : ''}{Number(s.profit).toFixed(2)} USDT
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CyberCard>
 
       {profile && (
-        <WalletTransferModal
-          open={transferOpen}
-          onOpenChange={setTransferOpen}
-          balances={{ main: profile.wallet_balance, staking: profile.staking_wallet, mining: profile.mining_wallet, trading: profile.trading_wallet }}
-          defaultFrom="main"
-          defaultTo="trading"
-          onTransferred={fetchAll}
-        />
+        <>
+          <WalletTransferModal
+            open={transferOpen}
+            onOpenChange={setTransferOpen}
+            balances={{ main: profile.wallet_balance, staking: profile.staking_wallet, mining: profile.mining_wallet, trading: profile.trading_wallet }}
+            defaultFrom="main"
+            defaultTo="trading"
+            onTransferred={fetchAll}
+          />
+          <ManualTradeModal
+            open={tradeOpen}
+            onOpenChange={setTradeOpen}
+            tradingWallet={Number(profile.trading_wallet || 0)}
+            onCompleted={fetchAll}
+          />
+        </>
       )}
     </div>
   );
