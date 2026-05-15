@@ -6,7 +6,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, Target, Headphones, BarChart3, Wallet, ArrowRight, CheckCircle2, MessageCircle, ChevronDown, Globe } from 'lucide-react';
+import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, Target, Headphones, BarChart3, Wallet, ArrowRight, CheckCircle2, MessageCircle, ChevronDown, Globe, Coins, Brain, Cpu, Gift, Repeat, Layers } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
