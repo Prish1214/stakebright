@@ -170,6 +170,7 @@ const Auth = () => {
           </div>
           <div className="hidden lg:flex items-center gap-6">
             <button onClick={() => scrollToSection('about')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">About</button>
+            <button onClick={() => scrollToSection('plans')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Earning Plans</button>
             <button onClick={() => scrollToSection('performance')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Performance</button>
             <button onClick={() => scrollToSection('partners')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Partners</button>
             <button onClick={() => scrollToSection('helpdesk')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Support</button>
