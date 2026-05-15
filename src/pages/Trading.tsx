@@ -34,9 +34,11 @@ const SYMS: { sym: Sym; base: number; vol: number; color: string }[] = [
   { sym: 'SOL', base: 178, vol: 2.5, color: 'text-accent' },
 ];
 
-// --- Live Candlestick (SVG) ---
+// --- Live Candlestick (SVG) — pulls real klines + price stream from Binance ---
 const Chart = ({ sym, base, vol, color }: { sym: Sym; base: number; vol: number; color: string }) => {
+  const pair = `${sym}USDT`;
   const [candles, setCandles] = useState<{ o: number; h: number; l: number; c: number }[]>(() => {
+    // optimistic fallback while real data loads
     let p = base;
     return Array.from({ length: 30 }, () => {
       const o = p;
@@ -47,20 +49,42 @@ const Chart = ({ sym, base, vol, color }: { sym: Sym; base: number; vol: number;
       return { o, h, l, c };
     });
   });
+  const [live, setLive] = useState(false);
 
+  // Seed real klines (1m, last 30) and connect WS for live updates
   useEffect(() => {
-    const i = setInterval(() => {
-      setCandles(prev => {
-        const last = prev[prev.length - 1];
-        const o = last.c;
-        const c = o + (Math.random() - 0.5) * vol;
-        const h = Math.max(o, c) + Math.random() * vol * 0.5;
-        const l = Math.min(o, c) - Math.random() * vol * 0.5;
-        return [...prev.slice(1), { o, h, l, c }];
-      });
-    }, 1500);
-    return () => clearInterval(i);
-  }, [vol]);
+    let ws: WebSocket | null = null;
+    let cancelled = false;
+    const seed = async () => {
+      try {
+        const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${pair}&interval=1m&limit=30`);
+        const data = await r.json();
+        if (!Array.isArray(data) || cancelled) return;
+        setCandles(data.map((k: any) => ({ o: +k[1], h: +k[2], l: +k[3], c: +k[4] })));
+        setLive(true);
+      } catch {/* keep fallback */}
+    };
+    seed();
+    try {
+      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${pair.toLowerCase()}@kline_1m`);
+      ws.onmessage = ev => {
+        try {
+          const msg = JSON.parse(ev.data);
+          const k = msg.k;
+          if (!k) return;
+          const candle = { o: +k.o, h: +k.h, l: +k.l, c: +k.c };
+          setCandles(prev => {
+            const next = [...prev];
+            if (k.x) { next.shift(); next.push(candle); }
+            else { next[next.length - 1] = candle; }
+            return next;
+          });
+          setLive(true);
+        } catch {/* ignore */}
+      };
+    } catch {/* ignore */}
+    return () => { cancelled = true; ws?.close(); };
+  }, [pair]);
 
   const min = Math.min(...candles.map(c => c.l));
   const max = Math.max(...candles.map(c => c.h));
