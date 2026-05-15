@@ -6,7 +6,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, Target, Headphones, BarChart3, Wallet, ArrowRight, CheckCircle2, MessageCircle, ChevronDown, Globe } from 'lucide-react';
+import { DollarSign, Shield, TrendingUp, Mail, Zap, Lock, Users, Target, Headphones, BarChart3, Wallet, ArrowRight, CheckCircle2, MessageCircle, ChevronDown, Globe, Coins, Brain, Cpu, Gift, Repeat, Layers } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
@@ -170,6 +170,7 @@ const Auth = () => {
           </div>
           <div className="hidden lg:flex items-center gap-6">
             <button onClick={() => scrollToSection('about')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">About</button>
+            <button onClick={() => scrollToSection('plans')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Earning Plans</button>
             <button onClick={() => scrollToSection('performance')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Performance</button>
             <button onClick={() => scrollToSection('partners')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Partners</button>
             <button onClick={() => scrollToSection('helpdesk')} className="text-muted-foreground hover:text-primary transition-colors font-mono text-sm">Support</button>
@@ -190,13 +191,13 @@ const Auth = () => {
                 <span className="text-xs sm:text-sm font-mono text-primary">🚀 Trusted by 10,000+ Investors</span>
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-mono font-bold leading-tight">
-                <span className="gradient-text">Your Funds</span>
+                <span className="gradient-text">Stake. Trade.</span>
                 <br />
-                <span className="text-foreground">Your Profits</span>
+                <span className="text-foreground">Mine. Refer.</span>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
-                Stake your stablecoins and let our expert traders generate consistent profits for you. 
-                Secure, transparent, and highly rewarding.
+                One USDT account, four ways to grow it — fixed-rate Staking, AI-powered Trading,
+                Cloud Mining, and a 5% Referral program. Your funds, your profits.
               </p>
             </div>
             
@@ -417,7 +418,182 @@ const Auth = () => {
         </div>
       </section>
 
-      {/* Trading Performance Section */}
+      {/* Earning Plans Section — describes ALL 4 working programs */}
+      <section id="plans" className="py-12 sm:py-16 md:py-24 px-3 sm:px-4 relative z-10 bg-muted/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16 animate-fade-in-up">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold gradient-text mb-3 sm:mb-4">Four Ways To Earn</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base md:text-lg px-2">
+              A complete USDT earning ecosystem — pick one program or combine all four. Funds move freely between
+              your Main, Staking, Mining and Trading wallets.
+            </p>
+          </div>
+
+          {/* 1. Staking */}
+          <CyberCard glowColor="purple" className="mb-6 animate-fade-in-up">
+            <div className="p-5 sm:p-7 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1 space-y-3">
+                <GlowingIcon icon={Coins} color="purple" size="lg" />
+                <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">USDT Staking</h3>
+                <p className="text-sm text-muted-foreground">
+                  Lock USDT into a fixed-rate plan and earn a guaranteed daily return paid every midnight UTC,
+                  up to your plan's maximum cap. Principal returns to your Main wallet on maturity.
+                </p>
+                <ul className="text-xs text-muted-foreground space-y-1 pt-2">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Daily auto-payouts</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Transparent on-chain accounting</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Principal back at end of term</li>
+                </ul>
+              </div>
+              <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { name: 'Bronze', rate: '1.0%', dur: '30d', min: '$10' },
+                  { name: 'Silver', rate: '1.5%', dur: '45d', min: '$100' },
+                  { name: 'Gold', rate: '2.0%', dur: '60d', min: '$500' },
+                  { name: 'Platinum', rate: '2.5%', dur: '90d', min: '$2,000' },
+                ].map(p => (
+                  <div key={p.name} className="rounded-lg border border-primary/20 bg-background/50 p-3 text-center hover:border-primary/40 transition-colors">
+                    <p className="font-mono text-xs text-muted-foreground uppercase">{p.name}</p>
+                    <p className="text-2xl font-mono font-bold text-primary mt-1">{p.rate}</p>
+                    <p className="text-[10px] text-muted-foreground">daily · {p.dur}</p>
+                    <p className="text-[10px] text-success mt-1">min {p.min}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CyberCard>
+
+          {/* 2. AI Trading */}
+          <CyberCard glowColor="cyan" className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <div className="p-5 sm:p-7 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1 space-y-3">
+                <GlowingIcon icon={Brain} color="cyan" size="lg" />
+                <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">AI Trading Bot</h3>
+                <p className="text-sm text-muted-foreground">
+                  Activate a 24-hour AI scalper that trades BTC / ETH / SOL pairs with live market data
+                  and adaptive strategy — or place instant manual trades from your Trading Wallet.
+                </p>
+                <ul className="text-xs text-muted-foreground space-y-1 pt-2">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Live Binance price feed</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Manual scalp trades (BUY/SELL)</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Win-rate &amp; PnL tracking</li>
+                </ul>
+              </div>
+              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
+                  <p className="text-xs uppercase text-muted-foreground">Cycle</p>
+                  <p className="text-2xl font-mono font-bold text-secondary mt-1">24h</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Auto-trade session length</p>
+                </div>
+                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
+                  <p className="text-xs uppercase text-muted-foreground">Manual fee</p>
+                  <p className="text-2xl font-mono font-bold text-secondary mt-1">0.1%</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Per scalp trade</p>
+                </div>
+                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
+                  <p className="text-xs uppercase text-muted-foreground">P/L range</p>
+                  <p className="text-2xl font-mono font-bold text-secondary mt-1">-2% / +5%</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Per manual trade</p>
+                </div>
+              </div>
+            </div>
+          </CyberCard>
+
+          {/* 3. Cloud Mining */}
+          <CyberCard glowColor="gold" className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="p-5 sm:p-7 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1 space-y-3">
+                <GlowingIcon icon={Cpu} color="gold" size="lg" />
+                <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Cloud Mining</h3>
+                <p className="text-sm text-muted-foreground">
+                  Rent virtual hashpower and earn USDT mining rewards without buying hardware.
+                  Rewards stream into your Mining Wallet and can be transferred or withdrawn.
+                </p>
+                <ul className="text-xs text-muted-foreground space-y-1 pt-2">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No hardware, no setup</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Continuous reward accrual</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Multiple contract sizes</li>
+                </ul>
+              </div>
+              <div className="lg:col-span-2 grid grid-cols-3 gap-3">
+                {[
+                  { name: 'Starter', power: '1 TH/s', daily: '~0.8%' },
+                  { name: 'Pro', power: '5 TH/s', daily: '~1.2%' },
+                  { name: 'Enterprise', power: '20 TH/s', daily: '~1.8%' },
+                ].map(p => (
+                  <div key={p.name} className="rounded-lg border border-crypto-gold/30 bg-background/50 p-4 text-center">
+                    <p className="font-mono text-xs text-muted-foreground uppercase">{p.name}</p>
+                    <p className="text-lg font-mono font-bold text-crypto-gold mt-1">{p.power}</p>
+                    <p className="text-[11px] text-success mt-1">{p.daily} daily est.</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CyberCard>
+
+          {/* 4. Referrals */}
+          <CyberCard glowColor="pink" className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <div className="p-5 sm:p-7 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1 space-y-3">
+                <GlowingIcon icon={Gift} color="pink" size="lg" />
+                <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Referral Program</h3>
+                <p className="text-sm text-muted-foreground">
+                  Share your unique referral link and earn <span className="text-accent font-bold">5% commission</span> on
+                  every approved deposit your referrals make — paid instantly into your Main wallet.
+                </p>
+                <ul className="text-xs text-muted-foreground space-y-1 pt-2">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Lifetime commission</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Instant credit on deposit</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No cap on referrals</li>
+                </ul>
+              </div>
+              <div className="lg:col-span-2 flex flex-col justify-center">
+                <div className="rounded-lg border border-accent/30 bg-background/50 p-6 text-center">
+                  <p className="text-5xl font-mono font-bold text-accent neon-text-pink">5%</p>
+                  <p className="text-sm text-muted-foreground mt-2">commission on every deposit, forever</p>
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Active stake required to qualify. Track conversions in real-time from the Referrals dashboard.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CyberCard>
+
+          {/* Wallet system */}
+          <div className="mt-8 sm:mt-12">
+            <CyberCard className="animate-fade-in-up">
+              <div className="p-5 sm:p-7 md:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Layers className="w-6 h-6 text-primary" />
+                  <h3 className="text-lg sm:text-xl font-mono font-bold gradient-text">Multi-Wallet System</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Every account ships with four isolated USDT wallets. Move funds instantly between them with
+                  zero fee — and withdraw earnings &amp; matured principal anytime (10% network fee on withdrawals).
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { name: 'Main', desc: 'Deposits & referral commissions', icon: Wallet, color: 'text-primary' },
+                    { name: 'Staking', desc: 'Active stakes & daily payouts', icon: Coins, color: 'text-secondary' },
+                    { name: 'Mining', desc: 'Cloud mining rewards', icon: Cpu, color: 'text-crypto-gold' },
+                    { name: 'Trading', desc: 'AI bot & manual trades', icon: Brain, color: 'text-accent' },
+                  ].map(w => (
+                    <div key={w.name} className="rounded-lg border border-primary/20 bg-background/50 p-4 text-center">
+                      <w.icon className={`w-6 h-6 mx-auto mb-2 ${w.color}`} />
+                      <p className="font-mono text-sm font-bold">{w.name}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{w.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <Repeat className="w-4 h-4 text-primary" />
+                  <span>Instant transfers · BEP-20 USDT deposits via NOWPayments · 10% withdrawal fee</span>
+                </div>
+              </div>
+            </CyberCard>
+          </div>
+        </div>
+      </section>
       <section id="performance" className="py-12 sm:py-16 md:py-24 px-3 sm:px-4 relative z-10 bg-muted/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
