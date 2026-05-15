@@ -190,13 +190,13 @@ const Auth = () => {
                 <span className="text-xs sm:text-sm font-mono text-primary">🚀 Trusted by 10,000+ Investors</span>
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-mono font-bold leading-tight">
-                <span className="gradient-text">Your Funds</span>
+                <span className="gradient-text">Stake. Trade.</span>
                 <br />
-                <span className="text-foreground">Your Profits</span>
+                <span className="text-foreground">Mine. Refer.</span>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
-                Stake your stablecoins and let our expert traders generate consistent profits for you. 
-                Secure, transparent, and highly rewarding.
+                One USDT account, four ways to grow it — fixed-rate Staking, AI-powered Trading,
+                Cloud Mining, and a 5% Referral program. Your funds, your profits.
               </p>
             </div>
             
