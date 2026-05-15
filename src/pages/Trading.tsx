@@ -104,8 +104,9 @@ const Chart = ({ sym, base, vol, color }: { sym: Sym; base: number; vol: number;
             {up ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
             {(((last - first) / first) * 100).toFixed(2)}%
           </Badge>
+          {live && <span className="text-[9px] font-mono uppercase text-success flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />LIVE</span>}
         </div>
-        <span className="font-mono text-sm">${last.toFixed(2)}</span>
+        <span className="font-mono text-sm">${last.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-24">
         {candles.map((k, i) => {
