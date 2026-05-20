@@ -9,7 +9,7 @@ import AnimatedNumber from '@/components/ui/AnimatedNumber';
 
 import ManualTradeModal from '@/components/ManualTradeModal';
 import { Badge } from '@/components/ui/badge';
-import { LineChart, ArrowDownUp, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3, Rocket } from 'lucide-react';
+import { LineChart, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3, Rocket } from 'lucide-react';
 
 type Sym = 'BTC' | 'ETH' | 'SOL';
 
