@@ -63,9 +63,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [completedSortBy, setCompletedSortBy] = useState<'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc' | 'earned_desc'>('date_desc');
   const [completedFilter, setCompletedFilter] = useState('');
-  const [transferOpen, setTransferOpen] = useState(false);
-  const [transferFrom, setTransferFrom] = useState<WalletKey>('main');
-  const [transferTo, setTransferTo] = useState<WalletKey>('staking');
+
+
 
   useEffect(() => {
     fetchDashboardData();
