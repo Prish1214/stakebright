@@ -76,7 +76,7 @@ serve(async (req) => {
       body: JSON.stringify({
         price_amount: amount,
         price_currency: 'usd',
-        pay_currency: 'usdtbsc', // USDT on BEP20
+        pay_currency: payCurrency,
         order_id: `${user.id}_${Date.now()}`,
         order_description: `Deposit of ${amount} USDT`,
         ipn_callback_url: webhookUrl,
