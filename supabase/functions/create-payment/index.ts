@@ -46,7 +46,7 @@ serve(async (req) => {
       });
     }
 
-    const { amount } = await req.json();
+    const { amount, target_wallet, network } = await req.json();
 
     if (!amount || amount < 1) {
       return new Response(JSON.stringify({ error: 'Minimum deposit amount is 1 USDT' }), {
@@ -54,6 +54,12 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const validWallets = ['staking', 'trading', 'mining', 'main'];
+    const validNetworks = ['bep20', 'trc20'];
+    const wallet = validWallets.includes(target_wallet) ? target_wallet : 'staking';
+    const net = validNetworks.includes(network) ? network : 'bep20';
+    const payCurrency = net === 'trc20' ? 'usdttrc20' : 'usdtbsc';
 
     console.log('Creating payment for user:', user.id, 'amount:', amount);
 
@@ -70,7 +76,7 @@ serve(async (req) => {
       body: JSON.stringify({
         price_amount: amount,
         price_currency: 'usd',
-        pay_currency: 'usdtbsc', // USDT on BEP20
+        pay_currency: payCurrency,
         order_id: `${user.id}_${Date.now()}`,
         order_description: `Deposit of ${amount} USDT`,
         ipn_callback_url: webhookUrl,
@@ -100,7 +106,9 @@ serve(async (req) => {
         amount: amount,
         transaction_hash: paymentData.payment_id.toString(),
         status: 'pending',
-        admin_notes: `NOWPayments payment created. Pay address: ${paymentData.pay_address}. Expected amount: ${paymentData.pay_amount} ${paymentData.pay_currency}`,
+        target_wallet: wallet,
+        network: net,
+        admin_notes: `NOWPayments [${net.toUpperCase()}] -> ${wallet} wallet. Pay address: ${paymentData.pay_address}. Expected: ${paymentData.pay_amount} ${paymentData.pay_currency}`,
       })
       .select('id')
       .single();
@@ -113,8 +121,10 @@ serve(async (req) => {
       success: true,
       payment_id: paymentData.payment_id,
       pay_address: paymentData.pay_address,
-      pay_amount: amount, // Return the exact amount user entered, not NOWPayments calculated amount
-      pay_currency: 'USDT',
+      pay_amount: amount,
+      pay_currency: net === 'trc20' ? 'USDT (TRC20)' : 'USDT (BEP20)',
+      network: net,
+      target_wallet: wallet,
       expiration_estimate_date: paymentData.expiration_estimate_date,
       payment_status: paymentData.payment_status,
       deposit_id: depositData?.id,

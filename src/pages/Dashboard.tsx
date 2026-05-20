@@ -25,10 +25,10 @@ import {
   Zap,
   Target,
   Pickaxe,
-  LineChart,
-  ArrowDownUp
+  LineChart
 } from 'lucide-react';
-import WalletTransferModal, { WalletKey } from '@/components/WalletTransferModal';
+
+type WalletKey = 'main' | 'staking' | 'mining' | 'trading';
 
 interface UserProfile {
   wallet_balance: number;
@@ -63,9 +63,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [completedSortBy, setCompletedSortBy] = useState<'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc' | 'earned_desc'>('date_desc');
   const [completedFilter, setCompletedFilter] = useState('');
-  const [transferOpen, setTransferOpen] = useState(false);
-  const [transferFrom, setTransferFrom] = useState<WalletKey>('main');
-  const [transferTo, setTransferTo] = useState<WalletKey>('staking');
+
+
 
   useEffect(() => {
     fetchDashboardData();
@@ -210,14 +209,8 @@ const Dashboard = () => {
           <h2 className="text-lg font-mono font-bold flex items-center gap-2">
             <Wallet className="h-5 w-5 text-primary" /> Your Wallets
           </h2>
-          <NeonButton
-            glowColor="cyan"
-            onClick={() => { setTransferFrom('main'); setTransferTo('staking'); setTransferOpen(true); }}
-            className="text-sm"
-          >
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </NeonButton>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { key: 'main' as WalletKey, label: 'Main Wallet', value: profile?.wallet_balance || 0, glow: 'cyan' as const, icon: Wallet, hint: 'From deposits & withdrawals' },
@@ -233,17 +226,8 @@ const Dashboard = () => {
               <div className="text-xl font-mono font-bold mb-1">
                 <AnimatedNumber value={Number(w.value)} glowColor={w.glow} suffix=" USDT" />
               </div>
-              <p className="text-[11px] text-muted-foreground mb-3">{w.hint}</p>
-              <button
-                onClick={() => {
-                  setTransferFrom(w.key === 'main' ? 'main' : 'main');
-                  setTransferTo(w.key === 'main' ? 'staking' : w.key);
-                  setTransferOpen(true);
-                }}
-                className="w-full text-xs font-mono py-1.5 rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
-              >
-                <ArrowDownUp className="h-3 w-3 inline mr-1" /> Transfer
-              </button>
+              <p className="text-[11px] text-muted-foreground">{w.hint}</p>
+
             </CyberCard>
           ))}
         </div>
@@ -585,19 +569,8 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      <WalletTransferModal
-        open={transferOpen}
-        onOpenChange={setTransferOpen}
-        balances={{
-          main: Number(profile?.wallet_balance || 0),
-          staking: Number((profile as any)?.staking_wallet || 0),
-          mining: Number((profile as any)?.mining_wallet || 0),
-          trading: Number((profile as any)?.trading_wallet || 0),
-        }}
-        defaultFrom={transferFrom}
-        defaultTo={transferTo}
-        onTransferred={fetchDashboardData}
-      />
+
+
     </div>
   );
 };

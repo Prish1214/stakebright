@@ -21,7 +21,7 @@ import {
   Clock,
   DollarSign,
   Target,
-  ArrowDownUp,
+  
   Lock,
   Users,
   Sparkles,
@@ -30,7 +30,7 @@ import {
   Zap,
   Radar,
 } from 'lucide-react';
-import WalletTransferModal from '@/components/WalletTransferModal';
+
 
 interface StakingPlan {
   id: string;
@@ -88,7 +88,7 @@ const Staking = () => {
   const [stakeAmount, setStakeAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [transferOpen, setTransferOpen] = useState(false);
+  
 
   // Search Exchange state
   const [searchingStakeId, setSearchingStakeId] = useState<string | null>(null);
@@ -277,9 +277,6 @@ const Staking = () => {
             </p>
             <p className="text-xs text-muted-foreground">Main: {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT</p>
           </div>
-          <Button variant="outline" onClick={() => setTransferOpen(true)}>
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </Button>
         </div>
       </div>
 
@@ -565,21 +562,6 @@ const Staking = () => {
         </DialogContent>
       </Dialog>
 
-      {userProfile && (
-        <WalletTransferModal
-          open={transferOpen}
-          onOpenChange={setTransferOpen}
-          balances={{
-            main: Number(userProfile.wallet_balance),
-            staking: Number(userProfile.staking_wallet),
-            mining: Number(userProfile.mining_wallet),
-            trading: Number(userProfile.trading_wallet),
-          }}
-          defaultFrom="main"
-          defaultTo="staking"
-          onTransferred={fetchUserProfile}
-        />
-      )}
     </div>
   );
 };

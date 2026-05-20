@@ -22,7 +22,9 @@ export type Database = {
           approved_by: string | null
           created_at: string | null
           id: string
+          network: string
           status: string | null
+          target_wallet: string
           transaction_hash: string
           user_id: string
         }
@@ -33,7 +35,9 @@ export type Database = {
           approved_by?: string | null
           created_at?: string | null
           id?: string
+          network?: string
           status?: string | null
+          target_wallet?: string
           transaction_hash: string
           user_id: string
         }
@@ -44,7 +48,9 @@ export type Database = {
           approved_by?: string | null
           created_at?: string | null
           id?: string
+          network?: string
           status?: string | null
+          target_wallet?: string
           transaction_hash?: string
           user_id?: string
         }
@@ -573,6 +579,10 @@ export type Database = {
       transfer_between_wallets: {
         Args: { p_amount: number; p_from: string; p_to: string }
         Returns: Json
+      }
+      update_wallet_balance: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: undefined
       }
       validate_referral_code: { Args: { code: string }; Returns: boolean }
     }

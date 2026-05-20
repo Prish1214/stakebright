@@ -6,9 +6,8 @@ import CyberCard from '@/components/ui/CyberCard';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
-import WalletTransferModal from '@/components/WalletTransferModal';
 import { Badge } from '@/components/ui/badge';
-import { Pickaxe, Zap, Cpu, Activity, RefreshCw, Award, Server, Bitcoin, ArrowDownUp, Clock, Flame } from 'lucide-react';
+import { Pickaxe, Zap, Cpu, Activity, RefreshCw, Award, Server, Bitcoin, Clock, Flame } from 'lucide-react';
 
 type Coin = 'BTC' | 'LTC' | 'DOGE';
 type Tier = 'Basic' | 'Pro' | 'Elite';
@@ -68,7 +67,7 @@ const Mining = () => {
   const [miners, setMiners] = useState<Miner[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
-  const [transferOpen, setTransferOpen] = useState(false);
+  
   const [selectedCoin, setSelectedCoin] = useState<Coin>('BTC');
 
   const fetchAll = async () => {
@@ -147,9 +146,6 @@ const Mining = () => {
               <AnimatedNumber value={Number(profile?.mining_wallet || 0)} glowColor="gold" suffix=" USDT" />
             </p>
           </div>
-          <NeonButton glowColor="gold" onClick={() => setTransferOpen(true)}>
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </NeonButton>
         </div>
       </div>
 
@@ -284,16 +280,6 @@ const Mining = () => {
         )}
       </CyberCard>
 
-      {profile && (
-        <WalletTransferModal
-          open={transferOpen}
-          onOpenChange={setTransferOpen}
-          balances={{ main: profile.wallet_balance, staking: profile.staking_wallet, mining: profile.mining_wallet, trading: profile.trading_wallet }}
-          defaultFrom="main"
-          defaultTo="mining"
-          onTransferred={fetchAll}
-        />
-      )}
     </div>
   );
 };

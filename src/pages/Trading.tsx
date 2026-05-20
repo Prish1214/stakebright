@@ -6,10 +6,10 @@ import CyberCard from '@/components/ui/CyberCard';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
-import WalletTransferModal from '@/components/WalletTransferModal';
+
 import ManualTradeModal from '@/components/ManualTradeModal';
 import { Badge } from '@/components/ui/badge';
-import { LineChart, ArrowDownUp, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3, Rocket } from 'lucide-react';
+import { LineChart, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3, Rocket } from 'lucide-react';
 
 type Sym = 'BTC' | 'ETH' | 'SOL';
 
@@ -142,7 +142,7 @@ const Trading = () => {
   const [pastSessions, setPastSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [transferOpen, setTransferOpen] = useState(false);
+  
   const [tradeOpen, setTradeOpen] = useState(false);
   const [trades, setTrades] = useState<FakeTrade[]>([]);
   const [livePnl, setLivePnl] = useState(0);
@@ -248,9 +248,6 @@ const Trading = () => {
               <AnimatedNumber value={Number(profile?.trading_wallet || 0)} glowColor="pink" suffix=" USDT" />
             </p>
           </div>
-          <NeonButton glowColor="pink" onClick={() => setTransferOpen(true)}>
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </NeonButton>
           <NeonButton onClick={() => setTradeOpen(true)} disabled={!profile?.trading_wallet}>
             <Rocket className="h-4 w-4 mr-2" /> Place Trade
           </NeonButton>
@@ -392,22 +389,12 @@ const Trading = () => {
       </CyberCard>
 
       {profile && (
-        <>
-          <WalletTransferModal
-            open={transferOpen}
-            onOpenChange={setTransferOpen}
-            balances={{ main: profile.wallet_balance, staking: profile.staking_wallet, mining: profile.mining_wallet, trading: profile.trading_wallet }}
-            defaultFrom="main"
-            defaultTo="trading"
-            onTransferred={fetchAll}
-          />
-          <ManualTradeModal
-            open={tradeOpen}
-            onOpenChange={setTradeOpen}
-            tradingWallet={Number(profile.trading_wallet || 0)}
-            onCompleted={fetchAll}
-          />
-        </>
+        <ManualTradeModal
+          open={tradeOpen}
+          onOpenChange={setTradeOpen}
+          tradingWallet={Number(profile.trading_wallet || 0)}
+          onCompleted={fetchAll}
+        />
       )}
     </div>
   );

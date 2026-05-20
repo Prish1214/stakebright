@@ -126,30 +126,9 @@ serve(async (req) => {
             });
           }
 
-          // Update user's wallet balance
-          const { error: balanceError } = await supabase.rpc('update_wallet_balance', {
-            p_user_id: userId,
-            p_amount: parseFloat(actualAmount)
-          });
-
-          if (balanceError) {
-            console.error('Error updating balance via RPC:', balanceError);
-            // Fallback: direct update
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('wallet_balance')
-              .eq('user_id', userId)
-              .single();
-            
-            if (profile) {
-              await supabase
-                .from('profiles')
-                .update({ wallet_balance: (profile.wallet_balance || 0) + parseFloat(actualAmount) })
-                .eq('user_id', userId);
-            }
-          }
-
-          console.log('Deposit created and wallet updated successfully');
+          // Wallet credit is handled automatically by trg_deposits_credit_wallet
+          // based on the deposit's target_wallet column.
+          console.log('Deposit created — credit handled by DB trigger');
         }
         
         return new Response(JSON.stringify({ success: true }), {
