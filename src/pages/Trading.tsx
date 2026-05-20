@@ -389,16 +389,12 @@ const Trading = () => {
       </CyberCard>
 
       {profile && (
-        <>
-      {profile && (
-        <>
-          <ManualTradeModal
-            open={tradeOpen}
-            onOpenChange={setTradeOpen}
-            tradingWallet={Number(profile.trading_wallet || 0)}
-            onCompleted={fetchAll}
-          />
-        </>
+        <ManualTradeModal
+          open={tradeOpen}
+          onOpenChange={setTradeOpen}
+          tradingWallet={Number(profile.trading_wallet || 0)}
+          onCompleted={fetchAll}
+        />
       )}
     </div>
   );
