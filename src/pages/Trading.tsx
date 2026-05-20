@@ -142,7 +142,7 @@ const Trading = () => {
   const [pastSessions, setPastSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [transferOpen, setTransferOpen] = useState(false);
+  const [transferOpen] = useState(false); // deprecated
   const [tradeOpen, setTradeOpen] = useState(false);
   const [trades, setTrades] = useState<FakeTrade[]>([]);
   const [livePnl, setLivePnl] = useState(0);
