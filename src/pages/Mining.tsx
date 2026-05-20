@@ -67,7 +67,7 @@ const Mining = () => {
   const [miners, setMiners] = useState<Miner[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
-  const [transferOpen, setTransferOpen] = useState(false);
+  
   const [selectedCoin, setSelectedCoin] = useState<Coin>('BTC');
 
   const fetchAll = async () => {
