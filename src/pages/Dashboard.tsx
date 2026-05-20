@@ -210,14 +210,8 @@ const Dashboard = () => {
           <h2 className="text-lg font-mono font-bold flex items-center gap-2">
             <Wallet className="h-5 w-5 text-primary" /> Your Wallets
           </h2>
-          <NeonButton
-            glowColor="cyan"
-            onClick={() => { setTransferFrom('main'); setTransferTo('staking'); setTransferOpen(true); }}
-            className="text-sm"
-          >
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </NeonButton>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { key: 'main' as WalletKey, label: 'Main Wallet', value: profile?.wallet_balance || 0, glow: 'cyan' as const, icon: Wallet, hint: 'From deposits & withdrawals' },
