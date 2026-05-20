@@ -347,8 +347,9 @@ const Dashboard = () => {
               <div className="space-y-4">
                 {activeStakes.map((stake, index) => {
                   const daysRemaining = getDaysRemaining(stake.end_date);
-                  const totalDays = stake.staking_plans.duration_days;
+                  const totalDays = stake.staking_plans?.duration_days || 1;
                   const progress = ((totalDays - daysRemaining) / totalDays) * 100;
+
 
                   return (
                     <div
