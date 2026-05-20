@@ -569,19 +569,8 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      <WalletTransferModal
-        open={transferOpen}
-        onOpenChange={setTransferOpen}
-        balances={{
-          main: Number(profile?.wallet_balance || 0),
-          staking: Number((profile as any)?.staking_wallet || 0),
-          mining: Number((profile as any)?.mining_wallet || 0),
-          trading: Number((profile as any)?.trading_wallet || 0),
-        }}
-        defaultFrom={transferFrom}
-        defaultTo={transferTo}
-        onTransferred={fetchDashboardData}
-      />
+
+
     </div>
   );
 };
