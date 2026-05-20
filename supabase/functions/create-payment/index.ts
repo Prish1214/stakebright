@@ -121,8 +121,10 @@ serve(async (req) => {
       success: true,
       payment_id: paymentData.payment_id,
       pay_address: paymentData.pay_address,
-      pay_amount: amount, // Return the exact amount user entered, not NOWPayments calculated amount
-      pay_currency: 'USDT',
+      pay_amount: amount,
+      pay_currency: net === 'trc20' ? 'USDT (TRC20)' : 'USDT (BEP20)',
+      network: net,
+      target_wallet: wallet,
       expiration_estimate_date: paymentData.expiration_estimate_date,
       payment_status: paymentData.payment_status,
       deposit_id: depositData?.id,
