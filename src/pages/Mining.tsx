@@ -6,9 +6,8 @@ import CyberCard from '@/components/ui/CyberCard';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
-import WalletTransferModal from '@/components/WalletTransferModal';
 import { Badge } from '@/components/ui/badge';
-import { Pickaxe, Zap, Cpu, Activity, RefreshCw, Award, Server, Bitcoin, ArrowDownUp, Clock, Flame } from 'lucide-react';
+import { Pickaxe, Zap, Cpu, Activity, RefreshCw, Award, Server, Bitcoin, Clock, Flame } from 'lucide-react';
 
 type Coin = 'BTC' | 'LTC' | 'DOGE';
 type Tier = 'Basic' | 'Pro' | 'Elite';
