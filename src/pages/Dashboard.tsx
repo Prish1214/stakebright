@@ -25,10 +25,10 @@ import {
   Zap,
   Target,
   Pickaxe,
-  LineChart,
-  ArrowDownUp
+  LineChart
 } from 'lucide-react';
-import WalletTransferModal, { WalletKey } from '@/components/WalletTransferModal';
+
+type WalletKey = 'main' | 'staking' | 'mining' | 'trading';
 
 interface UserProfile {
   wallet_balance: number;
