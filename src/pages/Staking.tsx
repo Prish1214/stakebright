@@ -30,7 +30,7 @@ import {
   Zap,
   Radar,
 } from 'lucide-react';
-import WalletTransferModal from '@/components/WalletTransferModal';
+
 
 interface StakingPlan {
   id: string;
