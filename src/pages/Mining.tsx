@@ -280,16 +280,6 @@ const Mining = () => {
         )}
       </CyberCard>
 
-      {profile && (
-        <WalletTransferModal
-          open={transferOpen}
-          onOpenChange={setTransferOpen}
-          balances={{ main: profile.wallet_balance, staking: profile.staking_wallet, mining: profile.mining_wallet, trading: profile.trading_wallet }}
-          defaultFrom="main"
-          defaultTo="mining"
-          onTransferred={fetchAll}
-        />
-      )}
     </div>
   );
 };
