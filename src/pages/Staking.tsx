@@ -21,7 +21,7 @@ import {
   Clock,
   DollarSign,
   Target,
-  ArrowDownUp,
+  
   Lock,
   Users,
   Sparkles,
