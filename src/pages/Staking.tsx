@@ -562,21 +562,6 @@ const Staking = () => {
         </DialogContent>
       </Dialog>
 
-      {userProfile && (
-        <WalletTransferModal
-          open={transferOpen}
-          onOpenChange={setTransferOpen}
-          balances={{
-            main: Number(userProfile.wallet_balance),
-            staking: Number(userProfile.staking_wallet),
-            mining: Number(userProfile.mining_wallet),
-            trading: Number(userProfile.trading_wallet),
-          }}
-          defaultFrom="main"
-          defaultTo="staking"
-          onTransferred={fetchUserProfile}
-        />
-      )}
     </div>
   );
 };
