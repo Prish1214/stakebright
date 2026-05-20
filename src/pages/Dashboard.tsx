@@ -477,7 +477,7 @@ const Dashboard = () => {
               return (
                 <div className="space-y-4">
                   {filtered.map((stake, index) => {
-                    const totalDays = stake.staking_plans.duration_days;
+                    const totalDays = stake.staking_plans?.duration_days || 0;
                     return (
                       <div
                         key={stake.id}
@@ -487,8 +487,9 @@ const Dashboard = () => {
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-2 flex-wrap">
                             <Badge className="bg-success/20 text-success border-success/30 font-mono">
-                              {stake.staking_plans.name}
+                              {stake.staking_plans?.name || 'Plan'}
                             </Badge>
+
                             <Badge variant="outline" className="text-success border-success/40 font-mono">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               Completed
