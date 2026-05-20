@@ -227,17 +227,8 @@ const Dashboard = () => {
               <div className="text-xl font-mono font-bold mb-1">
                 <AnimatedNumber value={Number(w.value)} glowColor={w.glow} suffix=" USDT" />
               </div>
-              <p className="text-[11px] text-muted-foreground mb-3">{w.hint}</p>
-              <button
-                onClick={() => {
-                  setTransferFrom(w.key === 'main' ? 'main' : 'main');
-                  setTransferTo(w.key === 'main' ? 'staking' : w.key);
-                  setTransferOpen(true);
-                }}
-                className="w-full text-xs font-mono py-1.5 rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
-              >
-                <ArrowDownUp className="h-3 w-3 inline mr-1" /> Transfer
-              </button>
+              <p className="text-[11px] text-muted-foreground">{w.hint}</p>
+
             </CyberCard>
           ))}
         </div>
