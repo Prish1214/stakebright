@@ -277,9 +277,6 @@ const Staking = () => {
             </p>
             <p className="text-xs text-muted-foreground">Main: {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT</p>
           </div>
-          <Button variant="outline" onClick={() => setTransferOpen(true)}>
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </Button>
         </div>
       </div>
 
