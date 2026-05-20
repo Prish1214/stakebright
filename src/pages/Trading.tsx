@@ -390,14 +390,8 @@ const Trading = () => {
 
       {profile && (
         <>
-          <WalletTransferModal
-            open={transferOpen}
-            onOpenChange={setTransferOpen}
-            balances={{ main: profile.wallet_balance, staking: profile.staking_wallet, mining: profile.mining_wallet, trading: profile.trading_wallet }}
-            defaultFrom="main"
-            defaultTo="trading"
-            onTransferred={fetchAll}
-          />
+      {profile && (
+        <>
           <ManualTradeModal
             open={tradeOpen}
             onOpenChange={setTradeOpen}
