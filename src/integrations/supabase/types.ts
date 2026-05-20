@@ -196,6 +196,7 @@ export type Database = {
           end_date: string
           id: string
           is_active: boolean | null
+          last_search_at: string | null
           plan_id: string
           principal_withdrawn: boolean | null
           start_date: string | null
@@ -209,6 +210,7 @@ export type Database = {
           end_date: string
           id?: string
           is_active?: boolean | null
+          last_search_at?: string | null
           plan_id: string
           principal_withdrawn?: boolean | null
           start_date?: string | null
@@ -222,6 +224,7 @@ export type Database = {
           end_date?: string
           id?: string
           is_active?: boolean | null
+          last_search_at?: string | null
           plan_id?: string
           principal_withdrawn?: boolean | null
           start_date?: string | null
@@ -252,8 +255,11 @@ export type Database = {
           duration_days: number
           id: string
           is_active: boolean | null
+          max_daily_rate: number | null
+          min_daily_rate: number | null
           minimum_amount: number
           name: string
+          required_referrals: number
         }
         Insert: {
           created_at?: string | null
@@ -261,8 +267,11 @@ export type Database = {
           duration_days: number
           id?: string
           is_active?: boolean | null
+          max_daily_rate?: number | null
+          min_daily_rate?: number | null
           minimum_amount?: number
           name: string
+          required_referrals?: number
         }
         Update: {
           created_at?: string | null
@@ -270,8 +279,11 @@ export type Database = {
           duration_days?: number
           id?: string
           is_active?: boolean | null
+          max_daily_rate?: number | null
+          min_daily_rate?: number | null
           minimum_amount?: number
           name?: string
+          required_referrals?: number
         }
         Relationships: []
       }
@@ -553,6 +565,8 @@ export type Database = {
         Args: { p_tier: string; p_type: string }
         Returns: Json
       }
+      qualified_referrals_count: { Args: { _user_id: string }; Returns: number }
+      search_exchange: { Args: { p_stake_id: string }; Returns: Json }
       start_cloud_mining: { Args: never; Returns: Json }
       start_miner: { Args: { p_miner_id: string }; Returns: Json }
       start_trading_session: { Args: never; Returns: Json }
