@@ -106,7 +106,9 @@ serve(async (req) => {
         amount: amount,
         transaction_hash: paymentData.payment_id.toString(),
         status: 'pending',
-        admin_notes: `NOWPayments payment created. Pay address: ${paymentData.pay_address}. Expected amount: ${paymentData.pay_amount} ${paymentData.pay_currency}`,
+        target_wallet: wallet,
+        network: net,
+        admin_notes: `NOWPayments [${net.toUpperCase()}] -> ${wallet} wallet. Pay address: ${paymentData.pay_address}. Expected: ${paymentData.pay_amount} ${paymentData.pay_currency}`,
       })
       .select('id')
       .single();
