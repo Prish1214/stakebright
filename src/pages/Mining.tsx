@@ -146,9 +146,6 @@ const Mining = () => {
               <AnimatedNumber value={Number(profile?.mining_wallet || 0)} glowColor="gold" suffix=" USDT" />
             </p>
           </div>
-          <NeonButton glowColor="gold" onClick={() => setTransferOpen(true)}>
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </NeonButton>
         </div>
       </div>
 
