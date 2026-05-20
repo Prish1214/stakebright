@@ -248,9 +248,6 @@ const Trading = () => {
               <AnimatedNumber value={Number(profile?.trading_wallet || 0)} glowColor="pink" suffix=" USDT" />
             </p>
           </div>
-          <NeonButton glowColor="pink" onClick={() => setTransferOpen(true)}>
-            <ArrowDownUp className="h-4 w-4 mr-2" /> Transfer
-          </NeonButton>
           <NeonButton onClick={() => setTradeOpen(true)} disabled={!profile?.trading_wallet}>
             <Rocket className="h-4 w-4 mr-2" /> Place Trade
           </NeonButton>
