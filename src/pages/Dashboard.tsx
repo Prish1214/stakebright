@@ -360,8 +360,9 @@ const Dashboard = () => {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge className="bg-primary/20 text-primary border-primary/30 font-mono">
-                            {stake.staking_plans.name}
+                            {stake.staking_plans?.name || 'Plan'}
                           </Badge>
+
                           <Badge variant="outline" className="text-primary border-primary/30 font-mono">
                             <Lock className="h-3 w-3 mr-1" />
                             Principal Locked
