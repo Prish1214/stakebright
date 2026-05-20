@@ -46,7 +46,7 @@ serve(async (req) => {
       });
     }
 
-    const { amount } = await req.json();
+    const { amount, target_wallet, network } = await req.json();
 
     if (!amount || amount < 1) {
       return new Response(JSON.stringify({ error: 'Minimum deposit amount is 1 USDT' }), {
@@ -54,6 +54,12 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const validWallets = ['staking', 'trading', 'mining', 'main'];
+    const validNetworks = ['bep20', 'trc20'];
+    const wallet = validWallets.includes(target_wallet) ? target_wallet : 'staking';
+    const net = validNetworks.includes(network) ? network : 'bep20';
+    const payCurrency = net === 'trc20' ? 'usdttrc20' : 'usdtbsc';
 
     console.log('Creating payment for user:', user.id, 'amount:', amount);
 
