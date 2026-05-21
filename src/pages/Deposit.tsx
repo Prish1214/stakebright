@@ -78,6 +78,8 @@ const Deposit = () => {
   const [wallet, setWallet] = useState<WalletType | null>(null);
   const [network, setNetwork] = useState<NetworkType | null>(null);
   const [amount, setAmount] = useState('');
+  const [minDeposit, setMinDeposit] = useState<number | null>(null);
+  const [minLoading, setMinLoading] = useState(false);
 
   const cancelDeposit = useCallback(async (depositId: string) => {
     try {
