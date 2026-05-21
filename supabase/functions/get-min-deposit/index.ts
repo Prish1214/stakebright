@@ -35,8 +35,10 @@ serve(async (req) => {
     }
 
     // Add a small buffer (NOWPayments converts USD -> crypto and rejects if equiv drops below min)
+    // Add generous buffer — NOWPayments converts USD->crypto at request time
+    // and rates fluctuate, so a small buffer prevents AMOUNT_MINIMAL_ERROR.
     const raw = Number(minData.min_amount) || 0;
-    const minUsd = Math.ceil((raw + Math.max(raw * 0.05, 0.5)) * 100) / 100;
+    const minUsd = Math.ceil(raw + Math.max(raw * 0.15, 2));
 
     return new Response(JSON.stringify({
       network: net,
