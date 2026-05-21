@@ -109,9 +109,12 @@ const Deposit = () => {
 
   const fetchDepositHistory = async () => {
     if (!user) return;
-    const { data, error } = await supabase
-      .from('deposits').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-    if (!error) setDepositHistory(data || []);
+    const [{ data: dep }, { data: cred }] = await Promise.all([
+      supabase.from('deposits').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('deposit_credits').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+    ]);
+    setDepositHistory(dep || []);
+    setAuditLog((cred as DepositCredit[]) || []);
   };
 
   useEffect(() => {
