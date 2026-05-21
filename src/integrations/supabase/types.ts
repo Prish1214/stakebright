@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      deposit_credits: {
+        Row: {
+          amount_credited: number
+          amount_received: number
+          created_at: string
+          deposit_id: string
+          id: string
+          notes: string | null
+          source: string
+          target_wallet: string
+          user_id: string
+        }
+        Insert: {
+          amount_credited: number
+          amount_received: number
+          created_at?: string
+          deposit_id: string
+          id?: string
+          notes?: string | null
+          source: string
+          target_wallet: string
+          user_id: string
+        }
+        Update: {
+          amount_credited?: number
+          amount_received?: number
+          created_at?: string
+          deposit_id?: string
+          id?: string
+          notes?: string | null
+          source?: string
+          target_wallet?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           admin_notes: string | null
