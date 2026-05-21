@@ -140,11 +140,27 @@ const Deposit = () => {
     toast({ title: 'Copied!', description: 'Address copied to clipboard' });
   };
 
+  // Fetch live minimum when entering step 3 or changing network
+  useEffect(() => {
+    if (step !== 3 || !network || network === 'upi') { setMinDeposit(null); return; }
+    let cancelled = false;
+    setMinLoading(true);
+    setMinDeposit(null);
+    supabase.functions.invoke('get-min-deposit', { body: { network } })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.min_usd) setMinDeposit(Number(data.min_usd));
+      })
+      .finally(() => { if (!cancelled) setMinLoading(false); });
+    return () => { cancelled = true; };
+  }, [step, network]);
+
   const handleCreatePayment = async () => {
     if (!wallet || !network) return;
     const depositAmount = parseFloat(amount);
-    if (!depositAmount || depositAmount < 1) {
-      toast({ title: 'Invalid amount', description: 'Minimum deposit is 1 USDT', variant: 'destructive' });
+    const effectiveMin = minDeposit ?? 1;
+    if (!depositAmount || depositAmount < effectiveMin) {
+      toast({ title: 'Amount too low', description: `Minimum deposit for USDT (${network.toUpperCase()}) is ${effectiveMin} USDT`, variant: 'destructive' });
       return;
     }
     setLoading(true);
