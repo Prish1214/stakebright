@@ -24,6 +24,17 @@ interface DepositHistory {
   network?: string;
 }
 
+interface DepositCredit {
+  id: string;
+  deposit_id: string;
+  target_wallet: string;
+  amount_received: number;
+  amount_credited: number;
+  source: string;
+  notes: string | null;
+  created_at: string;
+}
+
 interface PaymentData {
   payment_id: string;
   pay_address: string;
@@ -57,6 +68,7 @@ const Deposit = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [depositHistory, setDepositHistory] = useState<DepositHistory[]>([]);
+  const [auditLog, setAuditLog] = useState<DepositCredit[]>([]);
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [currentDepositId, setCurrentDepositId] = useState<string | null>(null);
@@ -97,9 +109,12 @@ const Deposit = () => {
 
   const fetchDepositHistory = async () => {
     if (!user) return;
-    const { data, error } = await supabase
-      .from('deposits').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-    if (!error) setDepositHistory(data || []);
+    const [{ data: dep }, { data: cred }] = await Promise.all([
+      supabase.from('deposits').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('deposit_credits').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+    ]);
+    setDepositHistory(dep || []);
+    setAuditLog((cred as DepositCredit[]) || []);
   };
 
   useEffect(() => {
@@ -438,6 +453,48 @@ const Deposit = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="border-success/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-success" /> Deposit Credit Audit Log
+          </CardTitle>
+          <CardDescription>
+            Tamper-proof record of every approved deposit credited to your wallets. Each deposit can be credited only once.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {auditLog.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">No credited deposits yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-xs text-muted-foreground border-b">
+                  <tr>
+                    <th className="text-left py-2 pr-3">Date</th>
+                    <th className="text-left py-2 pr-3">Wallet</th>
+                    <th className="text-right py-2 pr-3">Received</th>
+                    <th className="text-right py-2 pr-3">Credited</th>
+                    <th className="text-left py-2">Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditLog.map((c) => (
+                    <tr key={c.id} className="border-b border-border/40">
+                      <td className="py-2 pr-3 whitespace-nowrap text-xs">{new Date(c.created_at).toLocaleString()}</td>
+                      <td className="py-2 pr-3"><Badge variant="outline" className="text-[10px]">{walletLabel(c.target_wallet)}</Badge></td>
+                      <td className="py-2 pr-3 text-right font-mono">{Number(c.amount_received).toFixed(2)}</td>
+                      <td className="py-2 pr-3 text-right font-mono text-success">{Number(c.amount_credited).toFixed(2)}</td>
+                      <td className="py-2 text-xs text-muted-foreground break-all">{c.source}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       <Card className="bg-muted/30">
         <CardContent className="pt-6">
