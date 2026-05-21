@@ -89,10 +89,12 @@ serve(async (req) => {
     console.log('NOWPayments response:', JSON.stringify(paymentData, null, 2));
 
     if (!paymentResponse.ok) {
-      console.error('NOWPayments error:', paymentData);
-      return new Response(JSON.stringify({ 
-        error: paymentData.message || 'Failed to create payment' 
-      }), {
+      console.error('Payment provider error:', paymentData);
+      let friendly = paymentData.message || 'Failed to create payment';
+      if (paymentData.code === 'AMOUNT_MINIMAL_ERROR') {
+        friendly = `Amount is below the minimum required for USDT (${net.toUpperCase()}). Please increase your deposit amount and try again.`;
+      }
+      return new Response(JSON.stringify({ error: friendly }), {
         status: paymentResponse.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
