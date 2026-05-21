@@ -92,10 +92,15 @@ serve(async (req) => {
       console.error('Payment provider error:', paymentData);
       let friendly = paymentData.message || 'Failed to create payment';
       if (paymentData.code === 'AMOUNT_MINIMAL_ERROR') {
-        friendly = `Amount is below the minimum required for USDT (${net.toUpperCase()}). Please increase your deposit amount and try again.`;
+        const m = String(paymentData.message || '').match(/([\d.]+)/);
+        const cryptoMin = m ? Math.ceil(parseFloat(m[1]) + 2) : null;
+        friendly = cryptoMin
+          ? `Amount is below the minimum required for USDT (${net.toUpperCase()}). Please deposit at least ${cryptoMin} USDT.`
+          : `Amount is below the minimum required for USDT (${net.toUpperCase()}). Please increase your deposit amount.`;
       }
+      // Return 200 so the friendly message reaches the client (invoke() hides bodies on non-2xx)
       return new Response(JSON.stringify({ error: friendly }), {
-        status: paymentResponse.status,
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
