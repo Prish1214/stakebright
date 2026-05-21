@@ -353,7 +353,13 @@ const Deposit = () => {
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">Enter Deposit Amount</h3>
-                  <p className="text-sm text-muted-foreground">Minimum 1 USDT • Funds credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span></p>
+                  <p className="text-sm text-muted-foreground">
+                    {minLoading
+                      ? 'Checking minimum amount…'
+                      : minDeposit
+                        ? <>Minimum <span className="text-primary font-semibold">{minDeposit} USDT</span> for {network?.toUpperCase()} • Credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span></>
+                        : <>Funds credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span></>}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="amount">Amount (USDT)</Label>
