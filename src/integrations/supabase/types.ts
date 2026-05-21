@@ -107,6 +107,63 @@ export type Database = {
           },
         ]
       }
+      mining_rentals: {
+        Row: {
+          coin: string
+          created_at: string
+          daily_max_pct: number
+          daily_min_pct: number
+          efficiency: number
+          ends_at: string
+          hashrate: number
+          id: string
+          last_yield_at: string
+          locked_amount: number
+          runtime_days: number
+          started_at: string
+          status: string
+          tier: string
+          total_yield: number
+          user_id: string
+        }
+        Insert: {
+          coin: string
+          created_at?: string
+          daily_max_pct: number
+          daily_min_pct: number
+          efficiency?: number
+          ends_at: string
+          hashrate?: number
+          id?: string
+          last_yield_at?: string
+          locked_amount: number
+          runtime_days: number
+          started_at?: string
+          status?: string
+          tier: string
+          total_yield?: number
+          user_id: string
+        }
+        Update: {
+          coin?: string
+          created_at?: string
+          daily_max_pct?: number
+          daily_min_pct?: number
+          efficiency?: number
+          ends_at?: string
+          hashrate?: number
+          id?: string
+          last_yield_at?: string
+          locked_amount?: number
+          runtime_days?: number
+          started_at?: string
+          status?: string
+          tier?: string
+          total_yield?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -586,6 +643,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accrue_mining_yields: { Args: never; Returns: Json }
       add_daily_staking_earnings: { Args: never; Returns: undefined }
       claim_miner_rewards: { Args: { p_miner_id: string }; Returns: Json }
       claim_mining_rewards: { Args: never; Returns: Json }
@@ -611,6 +669,10 @@ export type Database = {
       search_exchange: { Args: { p_stake_id: string }; Returns: Json }
       start_cloud_mining: { Args: never; Returns: Json }
       start_miner: { Args: { p_miner_id: string }; Returns: Json }
+      start_mining_rental: {
+        Args: { p_coin: string; p_tier: string }
+        Returns: Json
+      }
       start_trading_session: { Args: never; Returns: Json }
       transfer_between_wallets: {
         Args: { p_amount: number; p_from: string; p_to: string }
