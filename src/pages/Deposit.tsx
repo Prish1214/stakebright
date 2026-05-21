@@ -68,6 +68,7 @@ const Deposit = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [depositHistory, setDepositHistory] = useState<DepositHistory[]>([]);
+  const [auditLog, setAuditLog] = useState<DepositCredit[]>([]);
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [currentDepositId, setCurrentDepositId] = useState<string | null>(null);
