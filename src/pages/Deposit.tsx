@@ -379,10 +379,17 @@ const Deposit = () => {
                   <div className="flex justify-between"><span>Network</span><span className="font-medium">{network?.toUpperCase()}</span></div>
                   <div className="flex justify-between"><span>Amount</span><span className="font-medium">{amount || '0'} USDT</span></div>
                 </div>
+                {minDeposit && amount && parseFloat(amount) < minDeposit && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-xs p-3">
+                    Amount is below the minimum. Please enter at least <span className="font-bold">{minDeposit} USDT</span> for {network?.toUpperCase()}.
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(2)}><ChevronLeft className="h-4 w-4" /></Button>
-                  <Button className="flex-1" disabled={loading || !amount} onClick={handleCreatePayment}>
-                    {loading ? 'Generating…' : 'Generate Payment Address'}
+                  <Button className="flex-1"
+                    disabled={loading || !amount || minLoading || (minDeposit !== null && parseFloat(amount) < minDeposit)}
+                    onClick={handleCreatePayment}>
+                    {loading ? 'Generating…' : minLoading ? 'Checking minimum…' : 'Generate Payment Address'}
                   </Button>
                 </div>
               </div>
