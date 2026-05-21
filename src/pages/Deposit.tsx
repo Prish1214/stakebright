@@ -24,6 +24,17 @@ interface DepositHistory {
   network?: string;
 }
 
+interface DepositCredit {
+  id: string;
+  deposit_id: string;
+  target_wallet: string;
+  amount_received: number;
+  amount_credited: number;
+  source: string;
+  notes: string | null;
+  created_at: string;
+}
+
 interface PaymentData {
   payment_id: string;
   pay_address: string;
