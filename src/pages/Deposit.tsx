@@ -78,6 +78,8 @@ const Deposit = () => {
   const [wallet, setWallet] = useState<WalletType | null>(null);
   const [network, setNetwork] = useState<NetworkType | null>(null);
   const [amount, setAmount] = useState('');
+  const [minDeposit, setMinDeposit] = useState<number | null>(null);
+  const [minLoading, setMinLoading] = useState(false);
 
   const cancelDeposit = useCallback(async (depositId: string) => {
     try {
@@ -138,11 +140,27 @@ const Deposit = () => {
     toast({ title: 'Copied!', description: 'Address copied to clipboard' });
   };
 
+  // Fetch live minimum when entering step 3 or changing network
+  useEffect(() => {
+    if (step !== 3 || !network || network === 'upi') { setMinDeposit(null); return; }
+    let cancelled = false;
+    setMinLoading(true);
+    setMinDeposit(null);
+    supabase.functions.invoke('get-min-deposit', { body: { network } })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.min_usd) setMinDeposit(Number(data.min_usd));
+      })
+      .finally(() => { if (!cancelled) setMinLoading(false); });
+    return () => { cancelled = true; };
+  }, [step, network]);
+
   const handleCreatePayment = async () => {
     if (!wallet || !network) return;
     const depositAmount = parseFloat(amount);
-    if (!depositAmount || depositAmount < 1) {
-      toast({ title: 'Invalid amount', description: 'Minimum deposit is 1 USDT', variant: 'destructive' });
+    const effectiveMin = minDeposit ?? 1;
+    if (!depositAmount || depositAmount < effectiveMin) {
+      toast({ title: 'Amount too low', description: `Minimum deposit for USDT (${network.toUpperCase()}) is ${effectiveMin} USDT`, variant: 'destructive' });
       return;
     }
     setLoading(true);
@@ -335,7 +353,13 @@ const Deposit = () => {
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">Enter Deposit Amount</h3>
-                  <p className="text-sm text-muted-foreground">Minimum 1 USDT • Funds credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span></p>
+                  <p className="text-sm text-muted-foreground">
+                    {minLoading
+                      ? 'Checking minimum amount…'
+                      : minDeposit
+                        ? <>Minimum <span className="text-primary font-semibold">{minDeposit} USDT</span> for {network?.toUpperCase()} • Credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span></>
+                        : <>Funds credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span></>}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="amount">Amount (USDT)</Label>
@@ -355,10 +379,17 @@ const Deposit = () => {
                   <div className="flex justify-between"><span>Network</span><span className="font-medium">{network?.toUpperCase()}</span></div>
                   <div className="flex justify-between"><span>Amount</span><span className="font-medium">{amount || '0'} USDT</span></div>
                 </div>
+                {minDeposit && amount && parseFloat(amount) < minDeposit && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-xs p-3">
+                    Amount is below the minimum. Please enter at least <span className="font-bold">{minDeposit} USDT</span> for {network?.toUpperCase()}.
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(2)}><ChevronLeft className="h-4 w-4" /></Button>
-                  <Button className="flex-1" disabled={loading || !amount} onClick={handleCreatePayment}>
-                    {loading ? 'Generating…' : 'Generate Payment Address'}
+                  <Button className="flex-1"
+                    disabled={loading || !amount || minLoading || (minDeposit !== null && parseFloat(amount) < minDeposit)}
+                    onClick={handleCreatePayment}>
+                    {loading ? 'Generating…' : minLoading ? 'Checking minimum…' : 'Generate Payment Address'}
                   </Button>
                 </div>
               </div>
