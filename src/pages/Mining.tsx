@@ -107,16 +107,20 @@ const Mining = () => {
   const [selectedCoin, setSelectedCoin] = useState<Coin>('BTC');
 
   const fetchAll = async () => {
-    if (!user) return;
-    // Accrue yields server-side, then fetch fresh data
-    await (supabase as any).rpc('accrue_mining_yields').catch(() => {});
-    const [{ data: p }, { data: r }] = await Promise.all([
-      (supabase as any).from('profiles').select('wallet_balance, mining_wallet').eq('user_id', user.id).single(),
-      (supabase as any).from('mining_rentals').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-    ]);
-    setProfile(p);
-    setRentals(r || []);
-    setLoading(false);
+    if (!user) { setLoading(false); return; }
+    try {
+      await (supabase as any).rpc('accrue_mining_yields').catch(() => {});
+      const [pRes, rRes] = await Promise.all([
+        (supabase as any).from('profiles').select('wallet_balance, mining_wallet').eq('user_id', user.id).maybeSingle(),
+        (supabase as any).from('mining_rentals').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      ]);
+      if (pRes?.data) setProfile(pRes.data);
+      setRentals(rRes?.data || []);
+    } catch (e: any) {
+      toast({ title: 'Failed to load mining', description: e?.message || String(e), variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchAll(); }, [user]);
