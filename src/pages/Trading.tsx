@@ -185,8 +185,12 @@ const Trading = () => {
         </div>
       </div>
 
+      {/* Live market charts */}
+      <LiveMarketCharts />
+
       {/* Rank + Engine */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
         {/* Rank badge */}
         <CyberCard glowColor={(currentLevel?.color as any) || 'cyan'} className="relative overflow-hidden">
           <div className="absolute inset-0 bg-neon-gradient opacity-5" />
