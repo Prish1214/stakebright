@@ -656,16 +656,17 @@ export type Database = {
         }
         Returns: boolean
       }
-      place_manual_trade: {
-        Args: { p_amount: number; p_side: string; p_symbol: string }
-        Returns: Json
-      }
       process_daily_staking_returns: { Args: never; Returns: undefined }
       purchase_miner: {
         Args: { p_tier: string; p_type: string }
         Returns: Json
       }
       qualified_referrals_count: { Args: { _user_id: string }; Returns: number }
+      qualified_trading_referrals_count: {
+        Args: { _user_id: string }
+        Returns: number
+      }
+      run_ai_scalping: { Args: never; Returns: Json }
       search_exchange: { Args: { p_stake_id: string }; Returns: Json }
       start_cloud_mining: { Args: never; Returns: Json }
       start_miner: { Args: { p_miner_id: string }; Returns: Json }

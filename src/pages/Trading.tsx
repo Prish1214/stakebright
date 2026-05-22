@@ -4,382 +4,403 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import CyberCard from '@/components/ui/CyberCard';
 import NeonButton from '@/components/ui/NeonButton';
-import GlowingIcon from '@/components/ui/GlowingIcon';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
-
-import ManualTradeModal from '@/components/ManualTradeModal';
 import { Badge } from '@/components/ui/badge';
-import { LineChart, Activity, TrendingUp, TrendingDown, Cpu, Brain, Zap, RefreshCw, Award, BarChart3, Rocket } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import {
+  Activity, Brain, Cpu, Zap, RefreshCw, Award, TrendingUp, TrendingDown,
+  Shield, Crown, Sparkles, Radar, Target, Gauge, Users, Lock, CheckCircle2, Timer,
+} from 'lucide-react';
 
-type Sym = 'BTC' | 'ETH' | 'SOL';
+type Sym = 'BTC' | 'ETH' | 'SOL' | 'BNB';
+type Phase = 'idle' | 'scanning' | 'analyzing' | 'executing' | 'complete';
 
 interface Profile {
   wallet_balance: number; staking_wallet: number; mining_wallet: number; trading_wallet: number;
 }
 
 interface Session {
-  id: string;
-  capital: number;
-  started_at: string;
-  ends_at: string;
-  profit: number;
-  win_rate: number;
-  status: 'active' | 'claimed' | 'manual';
-  trades_json?: any;
+  id: string; capital: number; started_at: string; profit: number; win_rate: number;
+  status: string; trades_json?: any;
 }
 
-const SYMS: { sym: Sym; base: number; vol: number; color: string }[] = [
-  { sym: 'BTC', base: 67800, vol: 350, color: 'text-crypto-gold' },
-  { sym: 'ETH', base: 3450, vol: 28, color: 'text-secondary' },
-  { sym: 'SOL', base: 178, vol: 2.5, color: 'text-accent' },
-];
+const LEVELS = [
+  { lvl: 1, bal: 100,   refs: 0,   min: 0.8,  max: 1.0,  name: 'Recruit',   color: 'cyan',   icon: Shield },
+  { lvl: 2, bal: 500,   refs: 3,   min: 1.05, max: 1.2,  name: 'Operator',  color: 'purple', icon: Target },
+  { lvl: 3, bal: 1500,  refs: 8,   min: 1.5,  max: 1.7,  name: 'Strategist',color: 'pink',   icon: Radar },
+  { lvl: 4, bal: 5000,  refs: 20,  min: 1.85, max: 2.0,  name: 'Commander', color: 'gold',   icon: Gauge },
+  { lvl: 5, bal: 12000, refs: 50,  min: 2.2,  max: 2.6,  name: 'Architect', color: 'pink',   icon: Sparkles },
+  { lvl: 6, bal: 30000, refs: 100, min: 3.2,  max: 3.5,  name: 'Sovereign', color: 'gold',   icon: Crown },
+] as const;
 
-// --- Live Candlestick (SVG) — pulls real klines + price stream from Binance ---
-const Chart = ({ sym, base, vol, color }: { sym: Sym; base: number; vol: number; color: string }) => {
-  const pair = `${sym}USDT`;
-  const [candles, setCandles] = useState<{ o: number; h: number; l: number; c: number }[]>(() => {
-    // optimistic fallback while real data loads
-    let p = base;
-    return Array.from({ length: 30 }, () => {
-      const o = p;
-      const c = p + (Math.random() - 0.5) * vol;
-      const h = Math.max(o, c) + Math.random() * vol * 0.5;
-      const l = Math.min(o, c) - Math.random() * vol * 0.5;
-      p = c;
-      return { o, h, l, c };
-    });
-  });
-  const [live, setLive] = useState(false);
+const SYMS: Sym[] = ['BTC', 'ETH', 'SOL', 'BNB'];
 
-  // Seed real klines (1m, last 30) and connect WS for live updates
-  useEffect(() => {
-    let ws: WebSocket | null = null;
-    let cancelled = false;
-    const seed = async () => {
-      try {
-        const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${pair}&interval=1m&limit=30`);
-        const data = await r.json();
-        if (!Array.isArray(data) || cancelled) return;
-        setCandles(data.map((k: any) => ({ o: +k[1], h: +k[2], l: +k[3], c: +k[4] })));
-        setLive(true);
-      } catch {/* keep fallback */}
-    };
-    seed();
-    try {
-      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${pair.toLowerCase()}@kline_1m`);
-      ws.onmessage = ev => {
-        try {
-          const msg = JSON.parse(ev.data);
-          const k = msg.k;
-          if (!k) return;
-          const candle = { o: +k.o, h: +k.h, l: +k.l, c: +k.c };
-          setCandles(prev => {
-            const next = [...prev];
-            if (k.x) { next.shift(); next.push(candle); }
-            else { next[next.length - 1] = candle; }
-            return next;
-          });
-          setLive(true);
-        } catch {/* ignore */}
-      };
-    } catch {/* ignore */}
-    return () => { cancelled = true; ws?.close(); };
-  }, [pair]);
+interface ScalpTrade { id: number; sym: Sym; side: 'BUY' | 'SELL'; pnl: number; }
 
-  const min = Math.min(...candles.map(c => c.l));
-  const max = Math.max(...candles.map(c => c.h));
-  const range = max - min || 1;
-  const W = 280, H = 110, cw = W / candles.length;
-  const y = (v: number) => H - ((v - min) / range) * (H - 10) - 5;
-  const last = candles[candles.length - 1].c;
-  const first = candles[0].o;
-  const up = last >= first;
-
-  return (
-    <div className="rounded-xl border border-primary/20 bg-background/50 p-4 hover:border-primary/40 transition-colors">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className={`font-mono font-bold ${color}`}>{sym}/USDT</span>
-          <Badge variant="outline" className={up ? 'border-success text-success' : 'border-destructive text-destructive'}>
-            {up ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-            {(((last - first) / first) * 100).toFixed(2)}%
-          </Badge>
-          {live && <span className="text-[9px] font-mono uppercase text-success flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />LIVE</span>}
-        </div>
-        <span className="font-mono text-sm">${last.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-      </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-24">
-        {candles.map((k, i) => {
-          const x = i * cw + cw / 2;
-          const isUp = k.c >= k.o;
-          const fill = isUp ? 'hsl(var(--success))' : 'hsl(var(--destructive))';
-          return (
-            <g key={i}>
-              <line x1={x} x2={x} y1={y(k.h)} y2={y(k.l)} stroke={fill} strokeWidth="1" />
-              <rect
-                x={x - cw * 0.35}
-                y={y(Math.max(k.o, k.c))}
-                width={cw * 0.7}
-                height={Math.max(1, Math.abs(y(k.o) - y(k.c)))}
-                fill={fill}
-                opacity="0.85"
-              />
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
+const computeLevel = (bal: number, refs: number) => {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    const L = LEVELS[i];
+    if (bal >= L.bal && refs >= L.refs) return L;
+  }
+  return null;
 };
-
-// --- Trade ticker ---
-interface FakeTrade { id: number; sym: Sym; side: 'BUY' | 'SELL'; pnl: number; ts: number; }
 
 const Trading = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [activeSession, setActiveSession] = useState<Session | null>(null);
-  const [pastSessions, setPastSessions] = useState<Session[]>([]);
+  const [refsCount, setRefsCount] = useState(0);
+  const [lastSession, setLastSession] = useState<Session | null>(null);
+  const [history, setHistory] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  
-  const [tradeOpen, setTradeOpen] = useState(false);
-  const [trades, setTrades] = useState<FakeTrade[]>([]);
+
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [scanTrades, setScanTrades] = useState<ScalpTrade[]>([]);
   const [livePnl, setLivePnl] = useState(0);
-  const [now, setNow] = useState(Date.now());
+  const [scanProgress, setScanProgress] = useState(0);
+  const [finalProfit, setFinalProfit] = useState<number | null>(null);
   const tradeIdRef = useRef(0);
+  const [now, setNow] = useState(Date.now());
 
   const fetchAll = async () => {
     if (!user) return;
-    const [{ data: p }, { data: sessions }] = await Promise.all([
+    const [{ data: p }, { data: sessions }, { count }] = await Promise.all([
       (supabase as any).from('profiles').select('wallet_balance, staking_wallet, mining_wallet, trading_wallet').eq('user_id', user.id).single(),
-      (supabase as any).from('trading_sessions').select('*').eq('user_id', user.id).order('started_at', { ascending: false }).limit(20),
+      (supabase as any).from('trading_sessions').select('*').eq('user_id', user.id).eq('status', 'scalp').order('started_at', { ascending: false }).limit(15),
+      (supabase as any).from('profiles').select('user_id', { count: 'exact', head: true }).eq('referred_by', user.id).gte('trading_wallet', 100),
     ]);
     setProfile(p);
+    setRefsCount(count || 0);
     const list: Session[] = sessions || [];
-    setActiveSession(list.find(s => s.status === 'active') || null);
-    setPastSessions(list.filter(s => s.status === 'claimed' || s.status === 'manual'));
+    setLastSession(list[0] || null);
+    setHistory(list);
     setLoading(false);
   };
 
   useEffect(() => { fetchAll(); }, [user]);
+  useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
 
-  // Live ticker
-  useEffect(() => {
-    const i = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(i);
-  }, []);
+  const currentLevel = useMemo(
+    () => computeLevel(Number(profile?.trading_wallet || 0), refsCount),
+    [profile, refsCount],
+  );
+  const nextLevel = currentLevel ? LEVELS.find(l => l.lvl === currentLevel.lvl + 1) : LEVELS[0];
 
-  // Generate fake trades + live pnl while session active
-  useEffect(() => {
-    if (!activeSession || new Date(activeSession.ends_at).getTime() <= Date.now()) return;
-    const i = setInterval(() => {
-      const sym = (['BTC', 'ETH', 'SOL'] as Sym[])[Math.floor(Math.random() * 3)];
-      const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
-      const pnl = (Math.random() - 0.42) * activeSession.capital * 0.003;
-      const t: FakeTrade = { id: ++tradeIdRef.current, sym, side, pnl, ts: Date.now() };
-      setTrades(prev => [t, ...prev].slice(0, 12));
+  const cooldownMs = lastSession ? Math.max(0, new Date(lastSession.started_at).getTime() + 24 * 3600_000 - now) : 0;
+  const onCooldown = cooldownMs > 0;
+  const hh = Math.floor(cooldownMs / 3600_000);
+  const mm = Math.floor((cooldownMs % 3600_000) / 60_000);
+  const ss = Math.floor((cooldownMs % 60_000) / 1000);
+
+  const canRun = !!profile && Number(profile.trading_wallet) >= 100 && !onCooldown && phase === 'idle';
+
+  const runScalp = async () => {
+    if (!canRun) return;
+    setBusy(true);
+    setPhase('scanning');
+    setScanTrades([]);
+    setLivePnl(0);
+    setScanProgress(0);
+    setFinalProfit(null);
+
+    const totalMs = 10000 + Math.floor(Math.random() * 15000); // 10-25s
+    const start = Date.now();
+    const capital = Number(profile!.trading_wallet);
+
+    // phase transitions
+    const phaseTimer1 = setTimeout(() => setPhase('analyzing'), Math.floor(totalMs * 0.25));
+    const phaseTimer2 = setTimeout(() => setPhase('executing'), Math.floor(totalMs * 0.5));
+
+    // animated scan trades
+    const tradeInterval = setInterval(() => {
+      const sym = SYMS[Math.floor(Math.random() * SYMS.length)];
+      const side: 'BUY' | 'SELL' = Math.random() > 0.5 ? 'BUY' : 'SELL';
+      const pnl = (Math.random() - 0.35) * capital * 0.0025;
+      const t: ScalpTrade = { id: ++tradeIdRef.current, sym, side, pnl };
+      setScanTrades(prev => [t, ...prev].slice(0, 14));
       setLivePnl(prev => prev + pnl);
-    }, 2200);
-    return () => clearInterval(i);
-  }, [activeSession]);
+    }, 600);
 
-  const start = async () => {
-    setBusy(true);
-    try {
-      const { error } = await (supabase as any).rpc('start_trading_session');
-      if (error) throw error;
-      toast({ title: 'AI Trading Activated', description: 'Auto-trade running for 24h.' });
-      setLivePnl(0);
-      setTrades([]);
-      fetchAll();
-    } catch (e: any) {
-      toast({ title: 'Cannot start', description: e.message, variant: 'destructive' });
-    } finally { setBusy(false); }
-  };
+    // progress
+    const progInterval = setInterval(() => {
+      const pct = Math.min(99, ((Date.now() - start) / totalMs) * 100);
+      setScanProgress(pct);
+    }, 100);
 
-  const claim = async () => {
-    setBusy(true);
+    // wait for the simulated scan to finish, then call backend
+    await new Promise(r => setTimeout(r, totalMs));
+    clearInterval(tradeInterval);
+    clearInterval(progInterval);
+    clearTimeout(phaseTimer1);
+    clearTimeout(phaseTimer2);
+    setScanProgress(100);
+
     try {
-      const { data, error } = await (supabase as any).rpc('claim_trading_session');
+      const { data, error } = await (supabase as any).rpc('run_ai_scalping');
       if (error) throw error;
       const r = data as any;
-      toast({ title: 'Session Closed', description: `PnL: ${Number(r.profit).toFixed(2)} USDT · Win rate ${r.win_rate}%` });
-      setLivePnl(0);
-      setTrades([]);
-      fetchAll();
+      setFinalProfit(Number(r.profit));
+      setPhase('complete');
+      toast({
+        title: `Scalp Complete · L${r.level}`,
+        description: `Net Profit: +${Number(r.profit).toFixed(4)} USDT (${Number(r.pct).toFixed(2)}%)`,
+      });
+      await fetchAll();
+      setTimeout(() => { setPhase('idle'); setScanTrades([]); setLivePnl(0); setFinalProfit(null); }, 6000);
     } catch (e: any) {
-      toast({ title: 'Claim failed', description: e.message, variant: 'destructive' });
-    } finally { setBusy(false); }
+      toast({ title: 'AI Scalp failed', description: e.message, variant: 'destructive' });
+      setPhase('idle');
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const sessionFinished = activeSession && new Date(activeSession.ends_at).getTime() <= now;
-  const remainingMs = activeSession ? new Date(activeSession.ends_at).getTime() - now : 0;
-  const hours = Math.max(0, Math.floor(remainingMs / 3600000));
-  const minutes = Math.max(0, Math.floor((remainingMs % 3600000) / 60000));
-  const seconds = Math.max(0, Math.floor((remainingMs % 60000) / 1000));
-
-  const sentiment = useMemo(() => {
-    const r = (Math.sin(now / 60000) + 1) / 2; // 0..1
-    if (r > 0.66) return { label: 'Bullish', color: 'text-success', val: 70 + Math.round(r * 25) };
-    if (r > 0.33) return { label: 'Neutral', color: 'text-crypto-gold', val: 40 + Math.round(r * 25) };
-    return { label: 'Bearish', color: 'text-destructive', val: 20 + Math.round(r * 20) };
-  }, [Math.floor(now / 5000)]);
-
-  const winRate = trades.length ? Math.round((trades.filter(t => t.pnl > 0).length / trades.length) * 100) : 0;
-
   if (loading) return <div className="cyber-card rounded-xl p-6 animate-pulse h-40" />;
+
+  const balance = Number(profile?.trading_wallet || 0);
+  const phaseLabel: Record<Phase, string> = {
+    idle: 'Standby', scanning: 'Scanning Markets', analyzing: 'Analyzing Volatility',
+    executing: 'Executing Scalps', complete: 'Cycle Complete',
+  };
+  const winCount = scanTrades.filter(t => t.pnl > 0).length;
+  const winRate = scanTrades.length ? Math.round((winCount / scanTrades.length) * 100) : 0;
 
   return (
     <div className="space-y-8 pb-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="animate-fade-in-up">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in-up">
+        <div>
           <h1 className="text-3xl font-mono font-bold gradient-text flex items-center gap-3">
             <Brain className="h-8 w-8 text-primary" />
-            AI Trading Bot
+            AI Scalping Engine
           </h1>
-          <p className="text-muted-foreground mt-1">Premium scalping bot trading BTC / ETH / SOL with adaptive strategies.</p>
+          <p className="text-muted-foreground mt-1">Level-based autonomous scalping bot · 24h cooldown per cycle.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Trading Wallet</p>
-            <p className="text-xl font-mono font-bold text-accent">
-              <AnimatedNumber value={Number(profile?.trading_wallet || 0)} glowColor="pink" suffix=" USDT" />
-            </p>
-          </div>
-          <NeonButton onClick={() => setTradeOpen(true)} disabled={!profile?.trading_wallet}>
-            <Rocket className="h-4 w-4 mr-2" /> Place Trade
-          </NeonButton>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Trading Wallet</p>
+          <p className="text-2xl font-mono font-bold text-accent">
+            <AnimatedNumber value={balance} glowColor="pink" suffix=" USDT" />
+          </p>
         </div>
       </div>
 
-      {/* Live Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {SYMS.map(s => <Chart key={s.sym} {...s} />)}
-      </div>
-
-      {/* Bot Control */}
-      <CyberCard glowColor={activeSession ? 'cyan' : 'purple'} className="relative overflow-hidden">
-        {activeSession && !sessionFinished && (
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent animate-pulse" />
-        )}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className={`relative h-14 w-14 rounded-full border-2 flex items-center justify-center ${activeSession ? 'border-primary animate-pulse' : 'border-muted'}`}>
-                <Cpu className={`h-7 w-7 ${activeSession ? 'text-primary' : 'text-muted-foreground'}`} />
-                {activeSession && <div className="absolute inset-0 rounded-full border border-primary animate-ping" />}
+      {/* Rank + Engine */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Rank badge */}
+        <CyberCard glowColor={(currentLevel?.color as any) || 'cyan'} className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-neon-gradient opacity-5" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">AI Rank</span>
+              {currentLevel && (
+                <Badge variant="outline" className="border-primary text-primary font-mono">
+                  L{currentLevel.lvl}
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className={`relative h-20 w-20 rounded-2xl border-2 border-primary/40 flex items-center justify-center bg-background/60 ${currentLevel ? 'animate-pulse-slow' : 'opacity-50'}`}>
+                {currentLevel ? <currentLevel.icon className="h-10 w-10 text-primary" /> : <Lock className="h-10 w-10 text-muted-foreground" />}
+                {currentLevel && <div className="absolute inset-0 rounded-2xl border border-primary animate-ping opacity-30" />}
               </div>
               <div>
-                <h2 className="text-xl font-mono font-bold">
-                  {activeSession ? (sessionFinished ? 'Session Complete' : 'AI Bot Active') : 'Bot Standby'}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {activeSession
-                    ? sessionFinished ? 'Claim your PnL to start a new run.' : 'Scanning markets · executing scalp trades'
-                    : 'Activate to run a 24-hour auto-trading cycle.'}
+                <p className="text-2xl font-mono font-bold gradient-text">{currentLevel?.name || 'Unranked'}</p>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {currentLevel ? `${currentLevel.min}% – ${currentLevel.max}% / cycle` : 'Deposit 100+ USDT to unlock L1'}
                 </p>
               </div>
             </div>
 
-            {activeSession && !sessionFinished && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                  <span>Time remaining</span>
-                  <span className="text-primary text-base">{String(hours).padStart(2,'0')}:{String(minutes).padStart(2,'0')}:{String(seconds).padStart(2,'0')}</span>
+            {nextLevel && (
+              <div className="space-y-2 pt-3 border-t border-primary/10">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-muted-foreground">Next: L{nextLevel.lvl} {nextLevel.name}</span>
+                  <span className="text-primary">+{nextLevel.min}–{nextLevel.max}%</span>
                 </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                  <div className="rounded border border-primary/20 p-2 bg-background/40">
+                    <div className="text-muted-foreground uppercase">Balance</div>
+                    <div className={balance >= nextLevel.bal ? 'text-success' : 'text-foreground'}>
+                      {balance.toFixed(0)} / {nextLevel.bal}
+                    </div>
+                  </div>
+                  <div className="rounded border border-primary/20 p-2 bg-background/40">
+                    <div className="text-muted-foreground uppercase">Active Refs</div>
+                    <div className={refsCount >= nextLevel.refs ? 'text-success' : 'text-foreground'}>
+                      {refsCount} / {nextLevel.refs}
+                    </div>
+                  </div>
+                </div>
+                <Progress value={Math.min(100, (balance / nextLevel.bal) * 100)} className="h-1.5 mt-1" />
+              </div>
+            )}
+          </div>
+        </CyberCard>
+
+        {/* Engine */}
+        <CyberCard glowColor={phase !== 'idle' ? 'cyan' : 'purple'} className="lg:col-span-2 relative overflow-hidden">
+          {phase !== 'idle' && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent animate-pulse" />
+          )}
+          <div className="space-y-5">
+            <div className="flex items-center gap-3">
+              <div className={`relative h-14 w-14 rounded-full border-2 flex items-center justify-center ${phase !== 'idle' ? 'border-primary animate-pulse' : 'border-muted'}`}>
+                <Cpu className={`h-7 w-7 ${phase !== 'idle' ? 'text-primary' : 'text-muted-foreground'}`} />
+                {phase !== 'idle' && <div className="absolute inset-0 rounded-full border border-primary animate-ping" />}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-mono font-bold">{phaseLabel[phase]}</h2>
+                <p className="text-xs text-muted-foreground">
+                  {phase === 'idle' && (onCooldown
+                    ? `Cooldown active · next cycle in ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
+                    : 'Activate to scan the market and execute scalps')}
+                  {phase === 'scanning' && 'Sweeping order books across BTC · ETH · SOL · BNB'}
+                  {phase === 'analyzing' && 'Calibrating volatility, liquidity, and momentum signals'}
+                  {phase === 'executing' && 'Bot is firing high-frequency scalp trades'}
+                  {phase === 'complete' && `Net profit secured to your Trading Wallet`}
+                </p>
+              </div>
+              {phase !== 'idle' && (
+                <Badge variant="outline" className="border-success text-success font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse mr-1.5" /> LIVE
+                </Badge>
+              )}
+            </div>
+
+            {(phase === 'scanning' || phase === 'analyzing' || phase === 'executing') && (
+              <>
+                <div>
+                  <div className="flex items-center justify-between text-[10px] font-mono uppercase text-muted-foreground mb-1">
+                    <span><Activity className="h-3 w-3 inline mr-1" /> Scan progress</span>
+                    <span>{Math.floor(scanProgress)}%</span>
+                  </div>
+                  <Progress value={scanProgress} className="h-2" />
+                </div>
+
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-lg border border-primary/20 p-3 bg-background/50">
-                    <div className="text-[10px] uppercase text-muted-foreground">Live PnL</div>
-                    <div className={`font-mono font-bold ${livePnl >= 0 ? 'text-success' : 'text-destructive'}`}>{livePnl >= 0 ? '+' : ''}{livePnl.toFixed(2)} USDT</div>
+                    <div className="text-[10px] uppercase text-muted-foreground">Live Pnl</div>
+                    <div className={`font-mono font-bold ${livePnl >= 0 ? 'text-success' : 'text-destructive'}`}>
+                      {livePnl >= 0 ? '+' : ''}{livePnl.toFixed(2)}
+                    </div>
                   </div>
                   <div className="rounded-lg border border-primary/20 p-3 bg-background/50">
                     <div className="text-[10px] uppercase text-muted-foreground">Win Rate</div>
                     <div className="font-mono font-bold text-success">{winRate}%</div>
                   </div>
                   <div className="rounded-lg border border-primary/20 p-3 bg-background/50">
-                    <div className="text-[10px] uppercase text-muted-foreground">Sentiment</div>
-                    <div className={`font-mono font-bold ${sentiment.color}`}>{sentiment.label} {sentiment.val}</div>
+                    <div className="text-[10px] uppercase text-muted-foreground">Trades</div>
+                    <div className="font-mono font-bold text-primary">{scanTrades.length}</div>
                   </div>
                 </div>
 
-                {/* Scanning bar */}
-                <div className="rounded-lg border border-primary/20 p-3 bg-background/50">
-                  <div className="flex items-center gap-2 text-xs font-mono mb-2"><Activity className="h-3 w-3 text-primary animate-pulse" /> AI scanning order books...</div>
-                  <div className="relative h-1.5 bg-muted/30 rounded-full overflow-hidden">
-                    <div className="absolute inset-y-0 w-1/3 bg-neon-gradient rounded-full" style={{ animation: 'slide-in-right 2s linear infinite' }} />
-                  </div>
+                <div className="rounded-lg border border-primary/10 bg-background/30 p-3 max-h-48 overflow-y-auto space-y-1.5">
+                  {scanTrades.map(t => (
+                    <div key={t.id} className="flex items-center justify-between text-xs font-mono animate-fade-in-up">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className={t.side === 'BUY' ? 'border-success text-success' : 'border-destructive text-destructive'}>
+                          {t.side === 'BUY' ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+                          {t.side}
+                        </Badge>
+                        <span>{t.sym}/USDT</span>
+                      </div>
+                      <span className={t.pnl >= 0 ? 'text-success' : 'text-destructive'}>
+                        {t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(3)}
+                      </span>
+                    </div>
+                  ))}
+                  {!scanTrades.length && <p className="text-xs text-muted-foreground italic">Waiting for first execution...</p>}
                 </div>
+              </>
+            )}
+
+            {phase === 'complete' && finalProfit !== null && (
+              <div className="rounded-xl border border-success/40 bg-success/5 p-5 text-center animate-scale-in">
+                <CheckCircle2 className="h-10 w-10 text-success mx-auto mb-2" />
+                <p className="text-xs font-mono uppercase text-muted-foreground">Net Profit Credited</p>
+                <p className="text-3xl font-mono font-bold text-success mt-1">+{finalProfit.toFixed(4)} USDT</p>
               </div>
             )}
 
-            <div className="pt-2">
-              {!activeSession ? (
-                <NeonButton onClick={start} disabled={busy || !profile?.trading_wallet} className="w-full text-base py-5">
-                  {busy ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
-                  Activate Auto Trade (24h)
-                </NeonButton>
-              ) : sessionFinished ? (
-                <NeonButton glowColor="cyan" onClick={claim} disabled={busy} className="w-full text-base py-5">
-                  {busy ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Award className="h-4 w-4 mr-2" />}
-                  Close Session & Claim PnL
-                </NeonButton>
-              ) : null}
-              {!profile?.trading_wallet && !activeSession && (
-                <p className="text-xs text-center text-muted-foreground mt-2">Trading Wallet is empty — transfer funds to activate.</p>
+            <NeonButton
+              onClick={runScalp}
+              disabled={busy || !canRun}
+              className="w-full text-base py-5"
+              glowColor={canRun ? 'cyan' : 'purple'}
+            >
+              {phase !== 'idle' && phase !== 'complete' ? (
+                <><RefreshCw className="h-4 w-4 animate-spin mr-2" /> {phaseLabel[phase]}...</>
+              ) : onCooldown ? (
+                <><Timer className="h-4 w-4 mr-2" /> Next Scalp in {String(hh).padStart(2,'0')}:{String(mm).padStart(2,'0')}:{String(ss).padStart(2,'0')}</>
+              ) : balance < 100 ? (
+                <><Lock className="h-4 w-4 mr-2" /> Need 100+ USDT in Trading Wallet</>
+              ) : (
+                <><Zap className="h-4 w-4 mr-2" /> Start AI Scalping</>
               )}
-            </div>
+            </NeonButton>
           </div>
+        </CyberCard>
+      </div>
 
-          {/* Trade tape */}
-          <div className="border-l-0 lg:border-l border-primary/10 lg:pl-6">
-            <h3 className="font-mono font-bold mb-3 flex items-center gap-2"><BarChart3 className="h-4 w-4 text-primary" /> Live Trades</h3>
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-              {trades.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">{activeSession ? 'Waiting for first trade...' : 'No active session'}</p>
-              ) : trades.map(t => (
-                <div key={t.id} className="flex items-center justify-between text-xs font-mono p-2 rounded bg-muted/20 border border-primary/10 animate-fade-in-up">
+      {/* Level ladder */}
+      <CyberCard glowColor="gold">
+        <h2 className="text-xl font-mono font-bold mb-4 flex items-center gap-2">
+          <Crown className="h-5 w-5 text-crypto-gold" /> Rank Ladder
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {LEVELS.map(L => {
+            const unlocked = balance >= L.bal && refsCount >= L.refs;
+            const isCurrent = currentLevel?.lvl === L.lvl;
+            return (
+              <div
+                key={L.lvl}
+                className={`rounded-xl border p-4 transition-all ${isCurrent ? 'border-primary bg-primary/5 neon-glow-purple' : unlocked ? 'border-success/40 bg-success/5' : 'border-primary/10 bg-background/40 opacity-70'}`}
+              >
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={t.side === 'BUY' ? 'border-success text-success' : 'border-destructive text-destructive'}>{t.side}</Badge>
-                    <span>{t.sym}</span>
+                    <L.icon className={`h-5 w-5 ${isCurrent ? 'text-primary' : unlocked ? 'text-success' : 'text-muted-foreground'}`} />
+                    <span className="font-mono font-bold">L{L.lvl} · {L.name}</span>
                   </div>
-                  <span className={t.pnl >= 0 ? 'text-success' : 'text-destructive'}>{t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(3)}</span>
+                  {isCurrent ? <Badge variant="outline" className="border-primary text-primary">ACTIVE</Badge>
+                    : unlocked ? <CheckCircle2 className="h-4 w-4 text-success" />
+                    : <Lock className="h-4 w-4 text-muted-foreground" />}
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="text-xs font-mono text-muted-foreground space-y-1">
+                  <div className="flex justify-between"><span>Balance</span><span className="text-foreground">{L.bal} USDT</span></div>
+                  <div className="flex justify-between"><span>Active Refs</span><span className="text-foreground">{L.refs}</span></div>
+                  <div className="flex justify-between"><span>Return / cycle</span><span className="text-success font-bold">{L.min}% – {L.max}%</span></div>
+                </div>
+              </div>
+            );
+          })}
         </div>
+        <p className="text-[11px] text-muted-foreground font-mono mt-4 flex items-center gap-1.5">
+          <Users className="h-3 w-3" /> Active referral = a referred user holding 100+ USDT in their Trading Wallet (L1 unlocked).
+        </p>
       </CyberCard>
 
-      {/* Past sessions */}
-      <CyberCard glowColor="gold">
-        <h2 className="text-xl font-mono font-bold mb-4 flex items-center gap-2"><Award className="h-5 w-5 text-crypto-gold" /> Trading History</h2>
-        {pastSessions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No completed sessions yet.</p>
+      {/* History */}
+      <CyberCard glowColor="purple">
+        <h2 className="text-xl font-mono font-bold mb-4 flex items-center gap-2">
+          <Award className="h-5 w-5 text-primary" /> Scalp History
+        </h2>
+        {history.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No scalp cycles completed yet.</p>
         ) : (
           <div className="space-y-2">
-            {pastSessions.map(s => {
-              const isManual = s.status === 'manual';
-              const meta = isManual && Array.isArray(s.trades_json) ? s.trades_json[0] : null;
+            {history.map(s => {
+              const meta = s.trades_json as any;
               return (
                 <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg border border-primary/10 bg-muted/10">
                   <div className="text-xs font-mono text-muted-foreground flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className={isManual ? 'border-accent text-accent' : 'border-primary text-primary'}>
-                      {isManual ? 'MANUAL' : 'AI 24H'}
-                    </Badge>
-                    {meta && (
-                      <Badge variant="outline" className={meta.side === 'BUY' ? 'border-success text-success' : 'border-destructive text-destructive'}>
-                        {meta.side} {meta.symbol}
-                      </Badge>
-                    )}
-                    <span>{new Date(s.started_at).toLocaleString()} · size {Number(s.capital).toFixed(2)} USDT</span>
+                    <Badge variant="outline" className="border-primary text-primary">L{meta?.level || '?'}</Badge>
+                    <span>{new Date(s.started_at).toLocaleString()}</span>
+                    <span>· capital {Number(s.capital).toFixed(2)} USDT</span>
+                    {meta?.pct && <span>· {Number(meta.pct).toFixed(2)}%</span>}
                   </div>
                   <div className="flex items-center gap-3 text-sm font-mono">
-                    {!isManual && <span className="text-muted-foreground">Win {Number(s.win_rate).toFixed(1)}%</span>}
-                    <span className={Number(s.profit) >= 0 ? 'text-success font-bold' : 'text-destructive font-bold'}>
-                      {Number(s.profit) >= 0 ? '+' : ''}{Number(s.profit).toFixed(2)} USDT
-                    </span>
+                    <span className="text-muted-foreground">Win {Number(s.win_rate).toFixed(1)}%</span>
+                    <span className="text-success font-bold">+{Number(s.profit).toFixed(4)} USDT</span>
                   </div>
                 </div>
               );
@@ -387,15 +408,6 @@ const Trading = () => {
           </div>
         )}
       </CyberCard>
-
-      {profile && (
-        <ManualTradeModal
-          open={tradeOpen}
-          onOpenChange={setTradeOpen}
-          tradingWallet={Number(profile.trading_wallet || 0)}
-          onCompleted={fetchAll}
-        />
-      )}
     </div>
   );
 };
