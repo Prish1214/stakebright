@@ -9,7 +9,6 @@ import { Users, Trophy, Sparkles, CheckCircle2, Clock } from 'lucide-react';
 interface Member {
   user_id: string;
   username: string | null;
-  email: string;
   created_at: string;
   total_deposits: number;
   qualified: boolean;
