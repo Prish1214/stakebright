@@ -1,109 +1,92 @@
+## Goal
 
-# Admin Panel Build Plan
+Replace the legacy Main Wallet (`wallet_balance`) with a unified **Withdrawable Earnings** bucket that holds only staking, mining, and referral rewards. Trading Wallet stays independent and fully withdrawable. Referral logic and qualification rules are rewritten. Mining UI gains clearer status indicators.
 
-A premium dark fintech admin panel mounted at `/admin/*`, gated by the existing `app_role = 'admin'` check (`has_role()` RPC). All pages use the same shared layout with collapsible sidebar, top bar, and animated cards consistent with the existing cyberpunk neon theme.
+## 1. Database migration
 
-## Access & routing
+**New / renamed columns on `profiles`:**
+- Add `withdrawable_earnings NUMERIC NOT NULL DEFAULT 0` — replaces `wallet_balance` semantically.
+- Add three breakdown counters (informational, drive the Withdraw breakdown UI):
+  - `earnings_staking NUMERIC DEFAULT 0`
+  - `earnings_mining NUMERIC DEFAULT 0`
+  - `earnings_referral NUMERIC DEFAULT 0`
+- Keep `wallet_balance` column for now (we migrate value out, then stop writing to it; will be dropped in a follow-up after frontend cleanup is verified).
 
-- New route group `/admin` protected by an `AdminGuard` that calls `has_role(auth.uid(), 'admin')`. Non-admins redirected to `/dashboard`.
-- Routes:
-  - `/admin` — Dashboard
-  - `/admin/users` — User Management
-  - `/admin/deposits` — Deposits
-  - `/admin/withdrawals` — Withdrawals
-  - `/admin/staking` — Staking Management
-  - `/admin/trading` — AI Trading Management
-  - `/admin/mining` — Mining Management
-  - `/admin/referrals` — Referral Analytics
-  - `/admin/analytics` — Charts & Analytics
-  - `/admin/controls` — Reward/Announcement/Section controls
-  - `/admin/security` — Activity logs, IP tracking, webhook logs
+**Data migration (one-time):**
+- Set `withdrawable_earnings = wallet_balance` for every profile.
+- Best-effort backfill of breakdown counters: `earnings_referral = SUM(referral_earnings.amount)`, `earnings_staking = SUM(stakes.total_earned)`, `earnings_mining = SUM(mining_rentals.total_yield)`, then clamp `earnings_staking` so the three sum ≤ `withdrawable_earnings` (residual goes into `earnings_staking`).
+- Zero out `wallet_balance` after migration.
 
-## Pages
+**Function rewrites (all `SECURITY DEFINER`, `search_path=public`):**
+- `accrue_mining_yields()` — credit `withdrawable_earnings` and `earnings_mining` (instead of `wallet_balance`). On runtime end, refund `locked_amount` to `mining_wallet` (unchanged).
+- `search_exchange()` — credit `withdrawable_earnings` and `earnings_staking`.
+- `add_daily_staking_earnings()` / `complete_expired_stakes()` — when a stake completes, move principal + remaining unpaid daily returns to `withdrawable_earnings` + `earnings_staking` (today principal isn't refunded anywhere — fixing as part of this work).
+- `claim_mining_rewards()` (legacy) and `claim_miner_rewards()` — credit `withdrawable_earnings` + `earnings_mining`.
+- `handle_deposit_approved_balance()` — drop the `main` branch. Only accept `target_wallet IN ('staking','mining','trading')`. Any deposit with `target_wallet='main'` is rejected by trigger with a clear error (and the deposit UI will no longer offer Main).
+- `handle_deposit_approval()` (referral trigger) — rewritten per new referral logic (see §3).
+- `transfer_between_wallets()` — drop `'main'` as a valid source/destination.
+- `admin_adjust_balance()` / `admin_credit_reward()` — replace `'main'` with `'earnings'` keyword that writes to `withdrawable_earnings` + chosen breakdown bucket.
+- `admin_process_withdrawal()` — on reject, refund into `withdrawable_earnings` instead of `wallet_balance`.
 
-### 1. Dashboard (`/admin`)
-KPI cards (animated counters): total users, active users (logged in 7d), total deposits ($), total withdrawals ($), total locked funds (active stakes + mining rentals), total withdrawable balance, active staking users, active AI trading users (used scalp in 24h), active mining allocations, pending withdrawals count. Plus a live activity feed (recent deposits/withdrawals/stakes/scalps) auto-refreshing every 15s.
+**New helper:** `get_withdrawable_balance(uid)` returns `withdrawable_earnings` minus pending withdrawals.
 
-### 2. User Management (`/admin/users`)
-Searchable, filterable table of all profiles. Columns: email, username, wallet balances (main/staking/mining/trading), total deposits, total withdrawals, qualified referrals, active stake count, AI level, last activity. Row actions: freeze/unfreeze, edit balances, edit notes. Edit balance opens a modal calling a new `admin_adjust_balance()` RPC. Freeze toggles a new `is_frozen` flag on profile.
+## 2. Referral system (new)
 
-### 3. Deposits (`/admin/deposits`)
-Table of all deposits with filter by status / network (bep20/trc20) / target wallet. Suspicious indicators: duplicate tx hash, amount mismatch, multi-user same tx. Approve/reject buttons (already credited via trigger; admin can mark approved/rejected with note).
+**Qualification:** A referee counts as a qualified staking referral once the sum of their approved deposits with `target_wallet='staking'` is ≥ $50.
 
-### 4. Withdrawals (`/admin/withdrawals`)
-Table of all withdrawals with status filter, approve/reject actions calling a new `admin_process_withdrawal()` RPC. On approve: status → completed, on reject: refund net+fee back to source wallet.
+**Rewards:** Two-part model.
+- **Activation bonus:** On the referee's first qualifying staking deposit (the one that crosses the $50 cumulative threshold), pay the referrer **5%** of that deposit. Recorded in `referral_earnings` with new column `kind='activation'`.
+- **Ongoing yield share:** Each time the referee earns staking yield (via `search_exchange` or daily cron), the referrer receives **1%** of that yield, credited to `withdrawable_earnings` + `earnings_referral`, and recorded in `referral_earnings` with `kind='yield_share'`.
 
-### 5. Staking Management (`/admin/staking`)
-Active stakes table, upcoming unlocks (next 7/30 days, sum), total staking liability (sum of remaining payouts), per-plan analytics chart (active count, locked, paid out).
+**Schema changes:**
+- `referral_earnings` add `kind TEXT NOT NULL DEFAULT 'legacy'` (existing rows backfilled to `'legacy'`, preserving history per user's choice).
+- `referral_earnings` add nullable `stake_id UUID` for yield-share rows.
 
-### 6. AI Trading Management (`/admin/trading`)
-Daily bot activations (24h count), level distribution chart (L1..L6), total rewards distributed, line chart of daily profits.
+**Function changes:**
+- Rewrite `handle_deposit_approval()`: only fire activation bonus when referee's cumulative approved staking deposits crosses $50 for the first time AND no prior activation row exists for that pair.
+- Update `search_exchange()` and `complete_expired_stakes()` to insert yield-share rows + credit referrer.
+- Rewrite `qualified_referrals_count()` to count by staking-target deposits only.
+- `get_staking_referral_team()` returns `total_staking_deposits` and `qualified` based on the new rule.
 
-### 7. Mining Management (`/admin/mining`)
-Active mining allocations table, coin usage pie (BTC/LTC/DOGE), runtime expiries (next 7 days), total mining reward exposure (sum of max possible remaining yields).
+## 3. Frontend changes
 
-### 8. Referral Analytics (`/admin/referrals`)
-Top 20 referrers by qualified referrals & by earnings, active referral graph by day, suspicious detection: same-IP signups (when IP available), zero-deposit referees, signups in rapid succession.
+**`src/pages/Withdraw.tsx`** — restructure into 4 stacked sections:
+- **A. Withdrawable Earnings** card with breakdown rows (Staking, Mining, Referral) summing to `withdrawable_earnings`. Single "Withdraw Earnings" button (10% fee, min from settings).
+- **B. Trading Wallet Balance** card. Shows `trading_wallet`. "Withdraw Trading Balance" button (uses a new withdrawal_type `'trading'`; same 10% fee).
+- **C. Locked Balance Overview** — strip the Trading row; keep Staking Locked + Mining Allocation only.
+- **D. Stake Principal Status** — keep existing unlock countdown cards.
 
-### 9. Analytics (`/admin/analytics`)
-Daily growth (signups/day), deposits vs withdrawals stacked, revenue/liability chart, engagement (active users / day) — using recharts.
+**`src/components/withdraw/LockedBalanceOverview.tsx`** — remove trading entry.
 
-### 10. Admin Controls (`/admin/controls`)
-- Reward ranges: edit min/max for staking plans and mining tiers and AI levels (stored in `system_settings` as JSON for AI/mining; staking already in `staking_plans`).
-- Announcements/banners: CRUD on new `announcements` table (title, body, type, active, starts_at, ends_at).
-- Manual reward: credit any wallet of a user with note.
-- Section freeze toggles: stored in `system_settings` (`freeze_staking`, `freeze_mining`, `freeze_trading`, `freeze_withdrawals`). Frontend pages read these and disable actions when frozen.
+**`src/pages/Deposit.tsx`** — remove "Main Wallet" from the target wallet selector; default to Staking.
 
-### 11. Security (`/admin/security`)
-- `admin_activity_logs` table view (every admin action logged).
-- Login/IP tracking: new `login_events` table (best-effort via client capture on auth).
-- Webhook/payment logs: surface `nowpayments-webhook` edge function logs link + recent deposits with payment metadata.
-- Suspicious activity feed (large withdrawals, duplicate tx, rapid signups).
+**`src/pages/Mining.tsx`** — add a clearer rental status block per active rental:
+- Active allocation (USDT)
+- Runtime remaining (countdown — exists)
+- Allocation unlock countdown (same as runtime end) explicitly labeled
+- After completion, show "Allocation Returned to Mining Wallet" badge on completed cards.
+- Update copy: "Yields are credited to your Withdrawable Earnings."
 
-## Database changes (single migration)
+**`src/pages/Dashboard.tsx`** and any KPI that reads `wallet_balance` — switch to `withdrawable_earnings`. Rename "Main Wallet" label everywhere to "Withdrawable Earnings".
 
-```sql
--- profile flags
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_frozen boolean NOT NULL DEFAULT false;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS admin_notes text;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS last_login_at timestamptz;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS last_login_ip text;
+**`src/components/StakingReferralTeam.tsx`** — show `total_staking_deposits` instead of `total_deposits`; update qualification badge copy.
 
--- announcements
-CREATE TABLE announcements (id, title, body, type, is_active, starts_at, ends_at, created_by, created_at);
+**Admin pages** — update wallet dropdowns (`'main'` → `'earnings'`) in `admin/Users.tsx` and any reward-credit UI.
 
--- admin activity logs
-CREATE TABLE admin_activity_logs (id, admin_id, action, target_type, target_id, metadata jsonb, created_at);
+## 4. Withdrawal flow
 
--- login events
-CREATE TABLE login_events (id, user_id, ip, user_agent, created_at);
+- `withdrawals` table gains `source TEXT NOT NULL DEFAULT 'earnings'` (values: `'earnings'`, `'trading'`).
+- On request:
+  - `'earnings'` → debit `withdrawable_earnings` (and pro-rata the three breakdown counters).
+  - `'trading'` → debit `trading_wallet`.
+- On admin reject → refund into the original source.
 
--- RLS: admins ALL, users SELECT own (login_events), public SELECT active announcements
-```
+## 5. Memory updates
 
-RPCs (SECURITY DEFINER, admin-only via `has_role` check):
-- `admin_adjust_balance(p_user_id, p_wallet, p_delta, p_note)`
-- `admin_process_withdrawal(p_id, p_action, p_note)` — approve/reject with refund
-- `admin_update_deposit_status(p_id, p_status, p_note)`
-- `admin_credit_reward(p_user_id, p_wallet, p_amount, p_note)`
-- `admin_set_setting(p_key, p_value)`
-- `log_login_event(p_ip, p_ua)` — callable by any authenticated user, updates `last_login_*` + inserts row
-- `admin_stats()` — returns JSON with all dashboard KPIs in one round-trip
+After approval, update `mem://features/wallet-balance-system`, `mem://features/withdrawal-system`, `mem://ui/withdraw-page`, `mem://features/referral-program` to reflect the new model. Update `mem://index.md` Core line about wallet/withdrawal formulas.
 
-## Frontend additions
+## Out of scope / follow-ups
 
-- `src/components/admin/AdminLayout.tsx` (sidebar + topbar, dark fintech)
-- `src/components/admin/AdminGuard.tsx`
-- `src/components/admin/KpiCard.tsx`, `ActivityFeed.tsx`, `DataTable.tsx`
-- `src/pages/admin/Dashboard.tsx` + the 10 other pages above
-- Sidebar link "Admin Panel" appears only for admins (gated via `useAuth` + role check)
-- Charts via existing `recharts` dep
-
-## Design
-
-Dark `#0a0e1a` base with neon cyan/violet accents, glassmorphism cards, subtle grid, soft glow on KPIs, smooth fade/slide animations, premium exchange feel (Binance/Bybit-inspired layout density).
-
-## Out of scope / notes
-
-- IP capture is best-effort from client (no server middleware available in SPA); a more accurate version would require an edge function. We'll add a `log_login_event` RPC called from `useAuth` after sign-in.
-- Suspicious referral detection is heuristic-based on data we already have.
+- Physically dropping the `wallet_balance` column (kept temporarily to make rollback safe).
+- Migrating the historical 5%-per-deposit referral rows to the new schema (kept as `kind='legacy'`).
+- Any redesign beyond what's needed for the new sections.
