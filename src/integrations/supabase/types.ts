@@ -803,6 +803,10 @@ export type Database = {
       claim_mining_rewards: { Args: never; Returns: Json }
       claim_trading_session: { Args: never; Returns: Json }
       complete_expired_stakes: { Args: never; Returns: number }
+      create_stake: {
+        Args: { p_amount: number; p_plan_id: string }
+        Returns: Json
+      }
       get_my_referred_users: {
         Args: never
         Returns: {

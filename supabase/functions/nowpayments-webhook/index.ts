@@ -33,17 +33,23 @@ serve(async (req) => {
     console.log('Received webhook payload:', body);
     console.log('Signature:', signature);
 
-    // Verify signature
-    if (signature) {
+    // Verify signature — REQUIRED. Reject if missing or invalid.
+    if (!signature) {
+      console.error('Missing x-nowpayments-sig header');
+      return new Response(JSON.stringify({ error: 'Missing signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    {
       const payload = JSON.parse(body);
-      // Sort keys alphabetically for signature verification
       const sortedPayload = Object.keys(payload)
         .sort()
         .reduce((acc: Record<string, unknown>, key) => {
           acc[key] = payload[key];
           return acc;
         }, {});
-      
+
       const hmac = createHmac('sha512', ipnSecret);
       hmac.update(JSON.stringify(sortedPayload));
       const expectedSignature = hmac.digest('hex');
