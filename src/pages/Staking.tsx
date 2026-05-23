@@ -261,7 +261,6 @@ const Staking = () => {
             <p className="text-2xl font-bold text-success">
               {userProfile ? Number(userProfile.staking_wallet).toFixed(2) : '0.00'} USDT
             </p>
-            <p className="text-xs text-muted-foreground">Main: {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT</p>
           </div>
         </div>
       </div>
