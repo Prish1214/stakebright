@@ -55,7 +55,7 @@ serve(async (req) => {
       });
     }
 
-    const validWallets = ['staking', 'trading', 'mining', 'main'];
+    const validWallets = ['staking', 'trading', 'mining'];
     const validNetworks = ['bep20', 'trc20'];
     const wallet = validWallets.includes(target_wallet) ? target_wallet : 'staking';
     const net = validNetworks.includes(network) ? network : 'bep20';
