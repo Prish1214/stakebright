@@ -207,6 +207,7 @@ const Withdraw = () => {
         status: 'pending',
       });
       if (error) throw error;
+      saveAddress(withdrawalAddress);
       toast({ title: 'Earnings Withdrawal Requested', description: 'Submitted for admin approval' });
       setWithdrawalAmount('');
       setWithdrawalAddress('');
