@@ -119,7 +119,7 @@ const Staking = () => {
     if (!user) return;
     const { data, error } = await (supabase as any)
       .from('profiles')
-      .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet')
+      .select('staking_wallet, mining_wallet, trading_wallet')
       .eq('user_id', user.id)
       .single();
     if (error) return;
