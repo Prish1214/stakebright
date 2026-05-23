@@ -819,7 +819,6 @@ export type Database = {
         Args: never
         Returns: {
           created_at: string
-          email: string
           qualified: boolean
           total_deposits: number
           user_id: string
@@ -830,10 +829,8 @@ export type Database = {
         Args: never
         Returns: {
           created_at: string
-          email: string
           qualified: boolean
           trading_level: number
-          trading_wallet: number
           user_id: string
           username: string
         }[]

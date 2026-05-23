@@ -9,7 +9,6 @@ import { Users, Trophy, Sparkles, CheckCircle2, Clock } from 'lucide-react';
 interface Member {
   user_id: string;
   username: string | null;
-  email: string;
   created_at: string;
   total_deposits: number;
   qualified: boolean;
@@ -94,7 +93,7 @@ export const StakingReferralTeam = () => {
                   className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-card/40 hover:border-crypto-purple/30 transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="font-medium truncate">{m.username || m.email}</p>
+                    <p className="font-medium truncate">{m.username || 'Member'}</p>
                     <p className="text-xs text-muted-foreground">
                       Deposited ${Number(m.total_deposits).toFixed(2)} • req $50
                     </p>
