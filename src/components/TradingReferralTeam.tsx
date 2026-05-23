@@ -117,10 +117,10 @@ export const TradingReferralTeam = () => {
                   className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-card/40 hover:border-cyan-500/30 transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="font-medium truncate">{m.username || m.email}</p>
+                    <p className="font-medium truncate">{m.username || 'Member'}</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <TrendingUp className="h-3 w-3" />
-                      Trading Wallet ${Number(m.trading_wallet).toFixed(2)}
+                      Joined {new Date(m.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
