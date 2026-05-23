@@ -164,7 +164,7 @@ const Mining = () => {
             <Pickaxe className="h-8 w-8 text-primary" />
             Mining Power Rental
           </h1>
-          <p className="text-muted-foreground mt-1">Allocate Mining Wallet balance to rent hashpower. Earn variable daily yields to your withdrawable balance. Locked funds unlock automatically when runtime ends.</p>
+          <p className="text-muted-foreground mt-1">Allocate Mining Wallet balance to rent hashpower. Daily yields are credited automatically to your Withdrawable Earnings. The allocation stays locked for the runtime and returns to your Mining Wallet when it ends.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="text-right">
