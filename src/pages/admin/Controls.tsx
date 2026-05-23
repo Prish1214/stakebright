@@ -16,7 +16,7 @@ export default function AdminControls() {
   const [plans, setPlans] = useState<any[]>([]);
   const [anns, setAnns] = useState<any[]>([]);
   const [newAnn, setNewAnn] = useState({ title: '', body: '', type: 'info' });
-  const [reward, setReward] = useState({ user_id: '', wallet: 'main', amount: '', note: '' });
+  const [reward, setReward] = useState({ user_id: '', wallet: 'earnings', amount: '', note: '' });
 
   const load = async () => {
     const [s, p, a] = await Promise.all([
