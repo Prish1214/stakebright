@@ -358,7 +358,14 @@ const Withdraw = () => {
             />
           </div>
           <div>
-            <Label htmlFor="address">USDT BEP20 Address</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="address">USDT BEP20 Address</Label>
+              {withdrawalAddress.trim() && !savedAddresses.includes(withdrawalAddress.trim()) && (
+                <button type="button" onClick={() => saveAddress(withdrawalAddress)} className="text-xs text-crypto-purple hover:text-crypto-purple/80 flex items-center gap-1">
+                  <BookmarkPlus className="h-3 w-3" /> Save address
+                </button>
+              )}
+            </div>
             <Input
               id="address"
               type="text"
@@ -366,7 +373,24 @@ const Withdraw = () => {
               value={withdrawalAddress}
               onChange={(e) => setWithdrawalAddress(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            {savedAddresses.length > 0 && (
+              <div className="mt-2">
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Saved addresses</p>
+                <div className="flex flex-wrap gap-2">
+                  {savedAddresses.map((a) => (
+                    <div key={a} className="flex items-center gap-1 rounded-full border border-border bg-muted/40 pl-2 pr-1 py-0.5 text-xs">
+                      <button type="button" onClick={() => setWithdrawalAddress(a)} className="font-mono hover:text-crypto-purple">
+                        {a.slice(0, 8)}…{a.slice(-6)}
+                      </button>
+                      <button type="button" onClick={() => removeAddress(a)} className="text-muted-foreground hover:text-destructive p-0.5">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-2">
               ⚠️ Only USDT BEP20 network. Wrong network = lost funds!
             </p>
           </div>
