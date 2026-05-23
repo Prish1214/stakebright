@@ -110,7 +110,7 @@ const Mining = () => {
     try {
       try { await (supabase as any).rpc('accrue_mining_yields'); } catch {}
       const [pRes, rRes] = await Promise.all([
-        (supabase as any).from('profiles').select('wallet_balance, mining_wallet').eq('user_id', user.id).maybeSingle(),
+        (supabase as any).from('profiles').select('mining_wallet').eq('user_id', user.id).maybeSingle(),
         (supabase as any).from('mining_rentals').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
       if (pRes?.data) setProfile(pRes.data);
