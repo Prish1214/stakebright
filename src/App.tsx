@@ -18,8 +18,18 @@ import FAQ from "./pages/FAQ";
 import About from "./pages/About";
 import LatestUpdates from "./pages/LatestUpdates";
 import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
+import { AdminLayout } from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminDeposits from "./pages/admin/Deposits";
+import AdminWithdrawals from "./pages/admin/Withdrawals";
+import AdminStaking from "./pages/admin/Staking";
+import AdminTrading from "./pages/admin/Trading";
+import AdminMining from "./pages/admin/Mining";
+import AdminReferrals from "./pages/admin/Referrals";
+import AdminAnalytics from "./pages/admin/Analytics";
+import AdminControls from "./pages/admin/Controls";
+import AdminSecurity from "./pages/admin/Security";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
