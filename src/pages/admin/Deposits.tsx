@@ -92,7 +92,7 @@ export default function AdminDeposits() {
                     <td className="py-2 pr-3 capitalize text-xs">{r.target_wallet}</td>
                     <td className="py-2 pr-3 text-xs font-mono text-cyan-300 flex items-center gap-1">
                       {r.transaction_hash?.slice(0, 10)}…
-                      {dup && <AlertTriangle className="w-3.5 h-3.5 text-amber-400" title="Duplicate hash" />}
+                      {dup && <AlertTriangle className="w-3.5 h-3.5 text-amber-400" aria-label="Duplicate hash" />}
                     </td>
                     <td className="py-2 pr-3">
                       <Badge className={r.status === 'approved' ? 'bg-emerald-500/20 text-emerald-300' : r.status === 'rejected' ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'}>
