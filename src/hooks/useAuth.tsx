@@ -140,6 +140,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return { error };
       }
 
+      // Best-effort login event log (don't block on failure)
+      try {
+        let ip: string | null = null;
+        try {
+          const r = await fetch('https://api.ipify.org?format=json');
+          const j = await r.json();
+          ip = j?.ip ?? null;
+        } catch {}
+        await (supabase as any).rpc('log_login_event', { p_ip: ip, p_ua: navigator.userAgent });
+      } catch {}
+
       toast({
         title: "Welcome back!",
         description: "You have been signed in successfully."
