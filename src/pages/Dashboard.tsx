@@ -83,12 +83,14 @@ const Dashboard = () => {
     try {
       const { data: profileData, error: profileError } = await (supabase as any)
         .from('profiles')
-        .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet, referral_code')
+        .select('withdrawable_earnings, earnings_staking, earnings_mining, earnings_referral, staking_wallet, mining_wallet, trading_wallet, referral_code')
         .eq('user_id', user.id)
         .single();
 
       if (profileError) throw profileError;
       setProfile(profileData);
+      setWithdrawableEarnings(Number(profileData?.withdrawable_earnings || 0));
+      setReferralEarnings(Number(profileData?.earnings_referral || 0));
 
       // Fetch active stakes
       const { data: activeStakesData, error: activeStakesError } = await supabase
