@@ -10,7 +10,7 @@ interface Member {
   user_id: string;
   username: string | null;
   created_at: string;
-  total_deposits: number;
+  total_staking_deposits: number;
   qualified: boolean;
 }
 
