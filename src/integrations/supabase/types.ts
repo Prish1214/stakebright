@@ -802,6 +802,29 @@ export type Database = {
       claim_mining_rewards: { Args: never; Returns: Json }
       claim_trading_session: { Args: never; Returns: Json }
       complete_expired_stakes: { Args: never; Returns: number }
+      get_staking_referral_team: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          qualified: boolean
+          total_deposits: number
+          user_id: string
+          username: string
+        }[]
+      }
+      get_trading_referral_team: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          qualified: boolean
+          trading_level: number
+          trading_wallet: number
+          user_id: string
+          username: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
