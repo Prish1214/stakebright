@@ -166,7 +166,7 @@ const Staking = () => {
       return toast({ title: 'Invalid amount', description: `Minimum is ${selectedPlan.minimum_amount} USDT`, variant: 'destructive' });
     }
     if (amount > userProfile.staking_wallet) {
-      return toast({ title: 'Insufficient Staking Wallet', description: 'Transfer USDT from Main Wallet first.', variant: 'destructive' });
+      return toast({ title: 'Insufficient Staking Wallet', description: 'Deposit USDT directly to your Staking Wallet from the Deposit page.', variant: 'destructive' });
     }
 
     setLoading(true);
