@@ -536,7 +536,7 @@ const Staking = () => {
                 <p className="text-5xl font-bold bg-gradient-to-r from-success via-primary to-accent bg-clip-text text-transparent">
                   +{resultData.profit.toFixed(4)}
                 </p>
-                <p className="text-sm text-muted-foreground">USDT credited to Main Wallet</p>
+                <p className="text-sm text-muted-foreground">USDT credited to Withdrawable Earnings</p>
                 <Badge className="bg-success/20 text-success border-success/30 text-sm">
                   {resultData.percentage.toFixed(3)}% daily rate
                 </Badge>
