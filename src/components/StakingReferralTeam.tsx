@@ -95,7 +95,7 @@ export const StakingReferralTeam = () => {
                   <div className="min-w-0">
                     <p className="font-medium truncate">{m.username || 'Member'}</p>
                     <p className="text-xs text-muted-foreground">
-                      Deposited ${Number(m.total_deposits).toFixed(2)} • req $50
+                      Staked deposits ${Number(m.total_staking_deposits).toFixed(2)} • req $50
                     </p>
                   </div>
                   {m.qualified ? (
