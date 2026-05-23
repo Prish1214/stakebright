@@ -67,7 +67,7 @@ const Trading = () => {
   const fetchAll = async () => {
     if (!user) return;
     const [{ data: p }, { data: sessions }, { count }] = await Promise.all([
-      (supabase as any).from('profiles').select('wallet_balance, staking_wallet, mining_wallet, trading_wallet').eq('user_id', user.id).single(),
+      (supabase as any).from('profiles').select('staking_wallet, mining_wallet, trading_wallet').eq('user_id', user.id).single(),
       (supabase as any).from('trading_sessions').select('*').eq('user_id', user.id).eq('status', 'scalp').order('started_at', { ascending: false }).limit(15),
       (supabase as any).from('profiles').select('user_id', { count: 'exact', head: true }).eq('referred_by', user.id).gte('trading_wallet', 100),
     ]);
