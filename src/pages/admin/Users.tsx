@@ -98,7 +98,7 @@ export default function AdminUsers() {
                     <div className="font-medium text-slate-100">{u.username || u.email}</div>
                     <div className="text-[11px] text-slate-500">{u.email}</div>
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.wallet_balance)}</td>
+                  <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.withdrawable_earnings)}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.staking_wallet)}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.mining_wallet)}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.trading_wallet)}</td>
