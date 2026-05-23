@@ -5,15 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import NeonButton from '@/components/ui/NeonButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
-import { ArrowRight, ArrowDownUp, Wallet, TrendingUp, Pickaxe, LineChart } from 'lucide-react';
+import { ArrowRight, ArrowDownUp, TrendingUp, Pickaxe, LineChart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 
-export type WalletKey = 'main' | 'staking' | 'mining' | 'trading';
+export type WalletKey = 'staking' | 'mining' | 'trading';
 
 export interface WalletBalances {
-  main: number;
   staking: number;
   mining: number;
   trading: number;
@@ -29,7 +28,6 @@ interface Props {
 }
 
 const WALLETS: { key: WalletKey; label: string; icon: any; color: string }[] = [
-  { key: 'main', label: 'Main Wallet', icon: Wallet, color: 'text-secondary' },
   { key: 'staking', label: 'Staking Wallet', icon: TrendingUp, color: 'text-primary' },
   { key: 'mining', label: 'Mining Wallet', icon: Pickaxe, color: 'text-crypto-gold' },
   { key: 'trading', label: 'Trading Wallet', icon: LineChart, color: 'text-accent' },
@@ -37,7 +35,7 @@ const WALLETS: { key: WalletKey; label: string; icon: any; color: string }[] = [
 
 const labelOf = (k: WalletKey) => WALLETS.find(w => w.key === k)!.label;
 
-export const WalletTransferModal = ({ open, onOpenChange, balances, defaultFrom = 'main', defaultTo = 'staking', onTransferred }: Props) => {
+export const WalletTransferModal = ({ open, onOpenChange, balances, defaultFrom = 'staking', defaultTo = 'trading', onTransferred }: Props) => {
   const { user } = useAuth();
   const [from, setFrom] = useState<WalletKey>(defaultFrom);
   const [to, setTo] = useState<WalletKey>(defaultTo);
