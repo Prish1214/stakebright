@@ -59,7 +59,7 @@ export default function AdminControls() {
       p_user_id: reward.user_id, p_wallet: reward.wallet, p_amount: Number(reward.amount), p_note: reward.note
     });
     if (error) toast({ title: 'Failed', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Reward credited' }); setReward({ user_id: '', wallet: 'main', amount: '', note: '' }); }
+    else { toast({ title: 'Reward credited' }); setReward({ user_id: '', wallet: 'earnings', amount: '', note: '' }); }
   };
 
   const get = (k: string) => settings.find(s => s.setting_key === k)?.setting_value;
