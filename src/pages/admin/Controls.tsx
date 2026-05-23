@@ -101,7 +101,7 @@ export default function AdminControls() {
           <Select value={reward.wallet} onValueChange={(v) => setReward({ ...reward, wallet: v })}>
             <SelectTrigger className="bg-[#0a0e1a] border-cyan-500/20"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="main">Main</SelectItem>
+              <SelectItem value="earnings">Withdrawable Earnings</SelectItem>
               <SelectItem value="staking">Staking</SelectItem>
               <SelectItem value="mining">Mining</SelectItem>
               <SelectItem value="trading">Trading</SelectItem>
