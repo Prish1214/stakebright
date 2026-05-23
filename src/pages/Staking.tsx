@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { StakingReferralTeam } from '@/components/StakingReferralTeam';
 import {
   Dialog,
   DialogContent,
@@ -562,6 +563,7 @@ const Staking = () => {
         </DialogContent>
       </Dialog>
 
+      <StakingReferralTeam />
     </div>
   );
 };
