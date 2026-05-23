@@ -1,77 +1,109 @@
-## Overview
 
-Build a multi-wallet system with manual transfers, plus rebuild Mining around purchasable miners and add a new AI Trading Bot page. This is a large change touching the database, multiple pages, and adding new components.
+# Admin Panel Build Plan
 
-## 1. Database Changes (single migration)
+A premium dark fintech admin panel mounted at `/admin/*`, gated by the existing `app_role = 'admin'` check (`has_role()` RPC). All pages use the same shared layout with collapsible sidebar, top bar, and animated cards consistent with the existing cyberpunk neon theme.
 
-**Add wallet columns to `profiles`:**
-- `staking_wallet` numeric default 0
-- `mining_wallet` numeric default 0
-- `trading_wallet` numeric default 0
-- (`wallet_balance` stays as the Main Wallet)
+## Access & routing
 
-**New table `wallet_transfers`** — id, user_id, from_wallet, to_wallet, amount, created_at. RLS: users select/insert own.
+- New route group `/admin` protected by an `AdminGuard` that calls `has_role(auth.uid(), 'admin')`. Non-admins redirected to `/dashboard`.
+- Routes:
+  - `/admin` — Dashboard
+  - `/admin/users` — User Management
+  - `/admin/deposits` — Deposits
+  - `/admin/withdrawals` — Withdrawals
+  - `/admin/staking` — Staking Management
+  - `/admin/trading` — AI Trading Management
+  - `/admin/mining` — Mining Management
+  - `/admin/referrals` — Referral Analytics
+  - `/admin/analytics` — Charts & Analytics
+  - `/admin/controls` — Reward/Announcement/Section controls
+  - `/admin/security` — Activity logs, IP tracking, webhook logs
 
-**New table `user_miners`** — id, user_id, miner_type (BTC/LTC/DOGE), miner_tier, hashrate, efficiency, lifespan_days, price, purchased_at, expires_at, last_started_at, mining_ends_at, is_mining, total_mined. RLS: users select/insert/update own.
+## Pages
 
-**New table `trading_sessions`** — id, user_id, started_at, ends_at, profit, status, trades_json. RLS: users own.
+### 1. Dashboard (`/admin`)
+KPI cards (animated counters): total users, active users (logged in 7d), total deposits ($), total withdrawals ($), total locked funds (active stakes + mining rentals), total withdrawable balance, active staking users, active AI trading users (used scalp in 24h), active mining allocations, pending withdrawals count. Plus a live activity feed (recent deposits/withdrawals/stakes/scalps) auto-refreshing every 15s.
 
-**New RPCs:**
-- `transfer_between_wallets(from_wallet text, to_wallet text, amount numeric)` — validates balance, atomic update.
-- `purchase_miner(miner_type text, tier text)` — deducts from mining_wallet, inserts user_miners row.
-- `start_miner(miner_id uuid)` — 24h cycle per miner.
-- `claim_miner_rewards(miner_id uuid)` — credits mining_wallet with variable amount based on miner.
-- `start_trading_session()` — requires trading_wallet > 0, 24h cycle.
-- `claim_trading_session()` — applies variable PnL to trading_wallet.
+### 2. User Management (`/admin/users`)
+Searchable, filterable table of all profiles. Columns: email, username, wallet balances (main/staking/mining/trading), total deposits, total withdrawals, qualified referrals, active stake count, AI level, last activity. Row actions: freeze/unfreeze, edit balances, edit notes. Edit balance opens a modal calling a new `admin_adjust_balance()` RPC. Freeze toggles a new `is_frozen` flag on profile.
 
-**Modify existing RPCs:**
-- Staking creation must deduct from `staking_wallet` (not main `wallet_balance`).
-- Old `start_cloud_mining` / `claim_mining_rewards` deprecated (replaced by per-miner flow).
+### 3. Deposits (`/admin/deposits`)
+Table of all deposits with filter by status / network (bep20/trc20) / target wallet. Suspicious indicators: duplicate tx hash, amount mismatch, multi-user same tx. Approve/reject buttons (already credited via trigger; admin can mark approved/rejected with note).
 
-## 2. Frontend
+### 4. Withdrawals (`/admin/withdrawals`)
+Table of all withdrawals with status filter, approve/reject actions calling a new `admin_process_withdrawal()` RPC. On approve: status → completed, on reject: refund net+fee back to source wallet.
 
-**New shared `WalletTransferModal` component:**
-- Source + destination wallet selector, amount input, animated balance ticker, recent transfers list.
-- Used from Dashboard, Staking, Mining, Trading pages.
+### 5. Staking Management (`/admin/staking`)
+Active stakes table, upcoming unlocks (next 7/30 days, sum), total staking liability (sum of remaining payouts), per-plan analytics chart (active count, locked, paid out).
 
-**Dashboard updates:**
-- 4 wallet cards (Main / Staking / Mining / Trading) with neon styling, "Transfer" button on each.
-- Total staked summary kept.
+### 6. AI Trading Management (`/admin/trading`)
+Daily bot activations (24h count), level distribution chart (L1..L6), total rewards distributed, line chart of daily profits.
 
-**Staking page:**
-- Reads `staking_wallet` for available balance instead of main.
-- Shows "Transfer to Staking Wallet" CTA when insufficient.
+### 7. Mining Management (`/admin/mining`)
+Active mining allocations table, coin usage pie (BTC/LTC/DOGE), runtime expiries (next 7 days), total mining reward exposure (sum of max possible remaining yields).
 
-**Mining page (rebuild):**
-- Catalog of miners: BTC / LTC / DOGE, each with 3 tiers (Basic/Pro/Elite) showing hashrate, efficiency, lifespan, price, est. daily return range.
-- Purchase with mining_wallet.
-- "My Miners" grid: each miner card has 24h countdown, Start/Claim button, glowing rig animation, progress circle.
-- Variable rewards (random within range stored on miner).
+### 8. Referral Analytics (`/admin/referrals`)
+Top 20 referrers by qualified referrals & by earnings, active referral graph by day, suspicious detection: same-IP signups (when IP available), zero-deposit referees, signups in rapid succession.
 
-**New Trading page (`/trading`):**
-- Live-feel BTC/ETH/SOL candlestick charts (lightweight-charts or custom SVG with simulated ticks).
-- "Activate Auto Trade" button (24h cooldown via `trading_sessions`).
-- During active session: AI scanning animation, scalping trade cards animating in, profit counter ticking up, win-rate gauge, market sentiment indicator.
-- Past sessions history with PnL.
-- Variable returns computed server-side at claim.
+### 9. Analytics (`/admin/analytics`)
+Daily growth (signups/day), deposits vs withdrawals stacked, revenue/liability chart, engagement (active users / day) — using recharts.
 
-**Routing & nav:** Add `/trading` route + sidebar link; keep `/mining`.
+### 10. Admin Controls (`/admin/controls`)
+- Reward ranges: edit min/max for staking plans and mining tiers and AI levels (stored in `system_settings` as JSON for AI/mining; staking already in `staking_plans`).
+- Announcements/banners: CRUD on new `announcements` table (title, body, type, active, starts_at, ends_at).
+- Manual reward: credit any wallet of a user with note.
+- Section freeze toggles: stored in `system_settings` (`freeze_staking`, `freeze_mining`, `freeze_trading`, `freeze_withdrawals`). Frontend pages read these and disable actions when frozen.
 
-## 3. Behavior rules enforced
+### 11. Security (`/admin/security`)
+- `admin_activity_logs` table view (every admin action logged).
+- Login/IP tracking: new `login_events` table (best-effort via client capture on auth).
+- Webhook/payment logs: surface `nowpayments-webhook` edge function logs link + recent deposits with payment metadata.
+- Suspicious activity feed (large withdrawals, duplicate tx, rapid signups).
 
-- Staking → only `staking_wallet`
-- Mining purchase + rewards → only `mining_wallet`
-- Trading → only `trading_wallet`
-- All wallets fed by manual transfers from Main Wallet (and back).
-- Withdrawals continue to come from earnings/principal as today (Main Wallet path unchanged).
+## Database changes (single migration)
 
-## Technical notes
+```sql
+-- profile flags
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_frozen boolean NOT NULL DEFAULT false;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS admin_notes text;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS last_login_at timestamptz;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS last_login_ip text;
 
-- Lightweight charts: use `lightweight-charts` npm package for realistic candles.
-- Variable returns: server-side `random()` within sane bounds per miner tier / trading volatility tier.
-- All balance mutations go through SECURITY DEFINER RPCs with row locks (`FOR UPDATE`) to prevent race conditions.
-- Reuse `CyberCard`, `NeonButton`, `AnimatedNumber`, `GlowingIcon` for consistent neon theme.
+-- announcements
+CREATE TABLE announcements (id, title, body, type, is_active, starts_at, ends_at, created_by, created_at);
 
-## Approval needed
+-- admin activity logs
+CREATE TABLE admin_activity_logs (id, admin_id, action, target_type, target_id, metadata jsonb, created_at);
 
-Database migration must be approved before I can wire frontend to the new tables/RPCs. Shall I proceed with the migration?
+-- login events
+CREATE TABLE login_events (id, user_id, ip, user_agent, created_at);
+
+-- RLS: admins ALL, users SELECT own (login_events), public SELECT active announcements
+```
+
+RPCs (SECURITY DEFINER, admin-only via `has_role` check):
+- `admin_adjust_balance(p_user_id, p_wallet, p_delta, p_note)`
+- `admin_process_withdrawal(p_id, p_action, p_note)` — approve/reject with refund
+- `admin_update_deposit_status(p_id, p_status, p_note)`
+- `admin_credit_reward(p_user_id, p_wallet, p_amount, p_note)`
+- `admin_set_setting(p_key, p_value)`
+- `log_login_event(p_ip, p_ua)` — callable by any authenticated user, updates `last_login_*` + inserts row
+- `admin_stats()` — returns JSON with all dashboard KPIs in one round-trip
+
+## Frontend additions
+
+- `src/components/admin/AdminLayout.tsx` (sidebar + topbar, dark fintech)
+- `src/components/admin/AdminGuard.tsx`
+- `src/components/admin/KpiCard.tsx`, `ActivityFeed.tsx`, `DataTable.tsx`
+- `src/pages/admin/Dashboard.tsx` + the 10 other pages above
+- Sidebar link "Admin Panel" appears only for admins (gated via `useAuth` + role check)
+- Charts via existing `recharts` dep
+
+## Design
+
+Dark `#0a0e1a` base with neon cyan/violet accents, glassmorphism cards, subtle grid, soft glow on KPIs, smooth fade/slide animations, premium exchange feel (Binance/Bybit-inspired layout density).
+
+## Out of scope / notes
+
+- IP capture is best-effort from client (no server middleware available in SPA); a more accurate version would require an edge function. We'll add a `log_login_event` RPC called from `useAuth` after sign-in.
+- Suspicious referral detection is heuristic-based on data we already have.
