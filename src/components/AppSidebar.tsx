@@ -70,6 +70,7 @@ export function AppSidebar() {
     setOpenMobile
   } = useSidebar();
   const location = useLocation();
+  const { isAdmin } = useIsAdmin();
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({
