@@ -16,7 +16,7 @@ export default function AdminUsers() {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState<any | null>(null);
-  const [editWallet, setEditWallet] = useState('main');
+  const [editWallet, setEditWallet] = useState('earnings');
   const [editDelta, setEditDelta] = useState('');
   const [editNote, setEditNote] = useState('');
 
