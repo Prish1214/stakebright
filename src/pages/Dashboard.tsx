@@ -152,26 +152,11 @@ const Dashboard = () => {
       const totalDailyEarnings = activeStakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
       setDailyEarnings(totalDailyEarnings);
 
-      const { data: referralData, error: referralError } = await supabase
-        .from('referral_earnings')
-        .select('amount')
-        .eq('referrer_id', user.id);
-
-      if (referralError) throw referralError;
-      const refEarnings = referralData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-      setReferralEarnings(refEarnings);
-      const total = stakesEarnings + refEarnings;
+      // Total earnings = lifetime stake yields + referral earnings (informational)
+      const refRowsTotal = Number(profileData?.earnings_referral || 0);
+      const total = stakesEarnings + refRowsTotal;
       setTotalEarnings(total);
-
-      // Withdrawable = total earnings - earnings already withdrawn (active statuses)
-      const { data: withdrawalsData } = await supabase
-        .from('withdrawals')
-        .select('amount, withdrawal_type, status')
-        .eq('user_id', user.id);
-      const earningsWithdrawn = (withdrawalsData || [])
-        .filter((w: any) => w.withdrawal_type === 'earnings' && ACTIVE_WITHDRAWAL_STATUSES.includes(w.status))
-        .reduce((s: number, w: any) => s + Number(w.amount), 0);
-      setWithdrawableEarnings(Math.max(0, total - earningsWithdrawn));
+      // withdrawableEarnings already set from profileData above
 
       // Mining allocation = sum of active mining rentals locked
       const { data: rentalsData } = await (supabase as any)
