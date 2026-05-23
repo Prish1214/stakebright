@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpCircle, DollarSign, Clock, CheckCircle, Lock, Unlock, Coins } from 'lucide-react';
+import { ArrowUpCircle, DollarSign, Clock, CheckCircle, Lock, Unlock, Coins, BookmarkPlus, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { LockedBalanceOverview } from '@/components/withdraw/LockedBalanceOverview';
 
 interface WithdrawalHistory {
   id: string;
@@ -50,6 +51,27 @@ const Withdraw = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submittingPrincipal, setSubmittingPrincipal] = useState<string | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
+
+  const SAVED_KEY = 'withdraw_saved_addresses';
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      if (raw) setSavedAddresses(JSON.parse(raw));
+    } catch {}
+  }, []);
+  const persistAddresses = (list: string[]) => {
+    setSavedAddresses(list);
+    try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)); } catch {}
+  };
+  const saveAddress = (addr: string) => {
+    const a = addr.trim();
+    if (!a || savedAddresses.includes(a)) return;
+    const list = [a, ...savedAddresses].slice(0, 5);
+    persistAddresses(list);
+    toast({ title: 'Address saved' });
+  };
+  const removeAddress = (addr: string) => persistAddresses(savedAddresses.filter(a => a !== addr));
 
   useEffect(() => {
     if (user) fetchData();
@@ -185,6 +207,7 @@ const Withdraw = () => {
         status: 'pending',
       });
       if (error) throw error;
+      saveAddress(withdrawalAddress);
       toast({ title: 'Earnings Withdrawal Requested', description: 'Submitted for admin approval' });
       setWithdrawalAmount('');
       setWithdrawalAddress('');
@@ -299,18 +322,21 @@ const Withdraw = () => {
         <Card className="border-crypto-purple/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Coins className="h-5 w-5 text-crypto-purple" />
-              Unlocked Principal
+              <Unlock className="h-5 w-5 text-crypto-purple" />
+              Available To Withdraw
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-crypto-purple">{completedPrincipalAvailable.toFixed(2)} USDT</div>
             <p className="text-sm text-muted-foreground mt-2">
-              From stakes whose lock period has ended (no fee)
+              Unlocked principal from completed stakes (no fee)
             </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Locked Balance Overview */}
+      <LockedBalanceOverview userId={user?.id} />
 
       {/* Withdraw Earnings */}
       <Card className="border-crypto-purple/20">
@@ -333,7 +359,14 @@ const Withdraw = () => {
             />
           </div>
           <div>
-            <Label htmlFor="address">USDT BEP20 Address</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="address">USDT BEP20 Address</Label>
+              {withdrawalAddress.trim() && !savedAddresses.includes(withdrawalAddress.trim()) && (
+                <button type="button" onClick={() => saveAddress(withdrawalAddress)} className="text-xs text-crypto-purple hover:text-crypto-purple/80 flex items-center gap-1">
+                  <BookmarkPlus className="h-3 w-3" /> Save address
+                </button>
+              )}
+            </div>
             <Input
               id="address"
               type="text"
@@ -341,7 +374,24 @@ const Withdraw = () => {
               value={withdrawalAddress}
               onChange={(e) => setWithdrawalAddress(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            {savedAddresses.length > 0 && (
+              <div className="mt-2">
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Saved addresses</p>
+                <div className="flex flex-wrap gap-2">
+                  {savedAddresses.map((a) => (
+                    <div key={a} className="flex items-center gap-1 rounded-full border border-border bg-muted/40 pl-2 pr-1 py-0.5 text-xs">
+                      <button type="button" onClick={() => setWithdrawalAddress(a)} className="font-mono hover:text-crypto-purple">
+                        {a.slice(0, 8)}…{a.slice(-6)}
+                      </button>
+                      <button type="button" onClick={() => removeAddress(a)} className="text-muted-foreground hover:text-destructive p-0.5">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-2">
               ⚠️ Only USDT BEP20 network. Wrong network = lost funds!
             </p>
           </div>
