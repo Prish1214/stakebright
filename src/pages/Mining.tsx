@@ -316,7 +316,7 @@ const Mining = () => {
                       </div>
                     </div>
 
-                    <div className="text-center text-[11px] text-primary py-1 animate-pulse font-mono">⚡ Hashpower streaming yields hourly</div>
+                    <div className="text-center text-[11px] text-primary py-1 animate-pulse font-mono">⚡ Yields stream daily to Withdrawable Earnings · allocation unlocks at runtime end</div>
                   </div>
                 </div>
               );
