@@ -80,7 +80,7 @@ export default function AdminUsers() {
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400 border-b border-cyan-500/10">
                 <th className="py-2 pr-3">User</th>
-                <th className="py-2 pr-3 text-right">Main</th>
+                <th className="py-2 pr-3 text-right">Earnings</th>
                 <th className="py-2 pr-3 text-right">Staking</th>
                 <th className="py-2 pr-3 text-right">Mining</th>
                 <th className="py-2 pr-3 text-right">Trading</th>
