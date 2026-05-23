@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Send, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CryptoProfitsTicker from '@/components/CryptoProfitsTicker';
+import { FrozenBanner } from '@/components/FrozenBanner';
+import { AnnouncementsBanner } from '@/components/AnnouncementsBanner';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,7 +37,9 @@ export const Layout = ({ children }: LayoutProps) => {
       <div className="min-h-screen flex w-full bg-background grid-bg">
         <AppSidebar />
         <div className="flex-1 flex flex-col pt-10">
+          <FrozenBanner />
           <Header />
+          <AnnouncementsBanner />
           <main className="flex-1 p-6">
             {children}
           </main>
