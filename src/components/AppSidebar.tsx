@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { LayoutDashboard, Wallet, TrendingUp, ArrowUpCircle, Users, Settings, Shield, HelpCircle, CheckCircle, BarChart3, Info, Megaphone, ExternalLink, Pickaxe, LineChart } from 'lucide-react';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 const menuItems = [{
   title: 'Dashboard',
@@ -69,6 +70,7 @@ export function AppSidebar() {
     setOpenMobile
   } = useSidebar();
   const location = useLocation();
+  const { isAdmin } = useIsAdmin();
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({
@@ -144,6 +146,24 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/admin" className={getNavCls} onClick={handleMenuClick}>
+                      <Shield className="w-4 h-4 mr-2" />
+                      {state !== 'collapsed' && <span className="text-[#fcfcfc]">Admin Panel</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
       </SidebarContent>
     </Sidebar>;

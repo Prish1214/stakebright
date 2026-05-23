@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          starts_at: string
+          title: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          starts_at?: string
+          title: string
+          type?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          starts_at?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       deposit_credits: {
         Row: {
           amount_credited: number
@@ -107,6 +173,30 @@ export type Database = {
           },
         ]
       }
+      login_events: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       mining_rentals: {
         Row: {
           coin: string
@@ -166,10 +256,14 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_notes: string | null
           created_at: string | null
           email: string
           id: string
+          is_frozen: boolean
           is_mining: boolean | null
+          last_login_at: string | null
+          last_login_ip: string | null
           last_mining_start: string | null
           mining_ends_at: string | null
           mining_power_multiplier: number | null
@@ -186,10 +280,14 @@ export type Database = {
           wallet_balance: number | null
         }
         Insert: {
+          admin_notes?: string | null
           created_at?: string | null
           email: string
           id?: string
+          is_frozen?: boolean
           is_mining?: boolean | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
           last_mining_start?: string | null
           mining_ends_at?: string | null
           mining_power_multiplier?: number | null
@@ -206,10 +304,14 @@ export type Database = {
           wallet_balance?: number | null
         }
         Update: {
+          admin_notes?: string | null
           created_at?: string | null
           email?: string
           id?: string
+          is_frozen?: boolean
           is_mining?: boolean | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
           last_mining_start?: string | null
           mining_ends_at?: string | null
           mining_power_multiplier?: number | null
@@ -645,6 +747,57 @@ export type Database = {
     Functions: {
       accrue_mining_yields: { Args: never; Returns: Json }
       add_daily_staking_earnings: { Args: never; Returns: undefined }
+      admin_adjust_balance: {
+        Args: {
+          p_delta: number
+          p_note: string
+          p_user_id: string
+          p_wallet: string
+        }
+        Returns: Json
+      }
+      admin_credit_reward: {
+        Args: {
+          p_amount: number
+          p_note: string
+          p_user_id: string
+          p_wallet: string
+        }
+        Returns: Json
+      }
+      admin_daily_growth: {
+        Args: { p_days?: number }
+        Returns: {
+          day: string
+          deposits: number
+          signups: number
+          withdrawals: number
+        }[]
+      }
+      admin_process_withdrawal: {
+        Args: { p_action: string; p_id: string; p_note: string }
+        Returns: Json
+      }
+      admin_set_setting: {
+        Args: { p_key: string; p_value: string }
+        Returns: Json
+      }
+      admin_stats: { Args: never; Returns: Json }
+      admin_top_referrers: {
+        Args: { p_limit?: number }
+        Returns: {
+          email: string
+          qualified_count: number
+          referral_code: string
+          total_earnings: number
+          user_id: string
+          username: string
+        }[]
+      }
+      admin_update_deposit_status: {
+        Args: { p_id: string; p_note: string; p_status: string }
+        Returns: Json
+      }
       claim_miner_rewards: { Args: { p_miner_id: string }; Returns: Json }
       claim_mining_rewards: { Args: never; Returns: Json }
       claim_trading_session: { Args: never; Returns: Json }
@@ -655,6 +808,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_login_event: {
+        Args: { p_ip: string; p_ua: string }
+        Returns: undefined
       }
       process_daily_staking_returns: { Args: never; Returns: undefined }
       purchase_miner: {
