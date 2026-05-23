@@ -798,6 +798,7 @@ export type Database = {
         Args: { p_id: string; p_note: string; p_status: string }
         Returns: Json
       }
+      assert_not_frozen: { Args: { _user_id: string }; Returns: undefined }
       claim_miner_rewards: { Args: { p_miner_id: string }; Returns: Json }
       claim_mining_rewards: { Args: never; Returns: Json }
       claim_trading_session: { Args: never; Returns: Json }
