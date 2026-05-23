@@ -24,7 +24,7 @@ export default function AdminUsers() {
     setLoading(true);
     const { data } = await supabase
       .from('profiles')
-      .select('user_id,email,username,wallet_balance,staking_wallet,mining_wallet,trading_wallet,is_frozen,referral_code,referred_by,last_login_at,created_at,admin_notes')
+      .select('user_id,email,username,withdrawable_earnings,staking_wallet,mining_wallet,trading_wallet,is_frozen,referral_code,referred_by,last_login_at,created_at,admin_notes')
       .order('created_at', { ascending: false })
       .limit(1000);
     setRows(data || []);
