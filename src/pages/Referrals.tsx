@@ -70,19 +70,16 @@ const Referrals = () => {
       if (earningsError) throw earningsError;
       setReferralEarnings(earningsData || []);
       
-      // Fetch all referred users
+      // Fetch all referred users via safe RPC (only exposes username + created_at)
       const { data: referredData, error: referredError } = await supabase
-        .from('profiles')
-        .select('user_id, username, created_at')
-        .eq('referred_by', user?.id)
-        .order('created_at', { ascending: false });
+        .rpc('get_my_referred_users');
 
       if (referredError) throw referredError;
-      const referredUsersData = referredData?.map(user => ({
-        id: user.user_id,
-        username: user.username,
-        created_at: user.created_at
-      })) || [];
+      const referredUsersData = (referredData || []).map((u: any) => ({
+        id: u.user_id,
+        username: u.username,
+        created_at: u.created_at,
+      }));
       setReferredUsers(referredUsersData);
       
       const total = earningsData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
