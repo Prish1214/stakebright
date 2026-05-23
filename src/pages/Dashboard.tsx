@@ -155,7 +155,26 @@ const Dashboard = () => {
       if (referralError) throw referralError;
       const refEarnings = referralData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
       setReferralEarnings(refEarnings);
-      setTotalEarnings(stakesEarnings + refEarnings);
+      const total = stakesEarnings + refEarnings;
+      setTotalEarnings(total);
+
+      // Withdrawable = total earnings - earnings already withdrawn (active statuses)
+      const { data: withdrawalsData } = await supabase
+        .from('withdrawals')
+        .select('amount, withdrawal_type, status')
+        .eq('user_id', user.id);
+      const earningsWithdrawn = (withdrawalsData || [])
+        .filter((w: any) => w.withdrawal_type === 'earnings' && ACTIVE_WITHDRAWAL_STATUSES.includes(w.status))
+        .reduce((s: number, w: any) => s + Number(w.amount), 0);
+      setWithdrawableEarnings(Math.max(0, total - earningsWithdrawn));
+
+      // Mining allocation = sum of active mining rentals locked
+      const { data: rentalsData } = await (supabase as any)
+        .from('mining_rentals')
+        .select('locked_amount, status')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+      setMiningAllocation((rentalsData || []).reduce((s: number, r: any) => s + Number(r.locked_amount), 0));
 
     } catch (error: any) {
       toast({
