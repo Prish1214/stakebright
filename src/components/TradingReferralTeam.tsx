@@ -9,9 +9,7 @@ import { Users, Zap, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
 interface Member {
   user_id: string;
   username: string | null;
-  email: string;
   created_at: string;
-  trading_wallet: number;
   qualified: boolean;
   trading_level: number;
 }
