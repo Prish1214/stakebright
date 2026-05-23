@@ -175,9 +175,9 @@ const Mining = () => {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Withdrawable</p>
-            <p className="text-lg font-mono font-bold text-success">
-              <AnimatedNumber value={Number(profile?.wallet_balance || 0)} glowColor="green" suffix=" USDT" />
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Active Allocation</p>
+            <p className="text-lg font-mono font-bold text-primary">
+              <AnimatedNumber value={rentals.filter(r => r.status === 'active').reduce((s, r) => s + Number(r.locked_amount), 0)} glowColor="purple" suffix=" USDT" />
             </p>
           </div>
         </div>
