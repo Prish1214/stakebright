@@ -18,7 +18,7 @@ type Sym = 'BTC' | 'ETH' | 'SOL' | 'BNB';
 type Phase = 'idle' | 'scanning' | 'analyzing' | 'executing' | 'complete';
 
 interface Profile {
-  wallet_balance: number; staking_wallet: number; mining_wallet: number; trading_wallet: number;
+  staking_wallet: number; mining_wallet: number; trading_wallet: number;
 }
 
 interface Session {
