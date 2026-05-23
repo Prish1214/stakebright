@@ -28,10 +28,13 @@ import {
   LineChart
 } from 'lucide-react';
 
-type WalletKey = 'main' | 'staking' | 'mining' | 'trading';
+type WalletKey = 'staking' | 'mining' | 'trading';
 
 interface UserProfile {
-  wallet_balance: number;
+  withdrawable_earnings: number;
+  earnings_staking: number;
+  earnings_mining: number;
+  earnings_referral: number;
   staking_wallet: number;
   mining_wallet: number;
   trading_wallet: number;
