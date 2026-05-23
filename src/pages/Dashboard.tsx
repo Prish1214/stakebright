@@ -28,10 +28,13 @@ import {
   LineChart
 } from 'lucide-react';
 
-type WalletKey = 'main' | 'staking' | 'mining' | 'trading';
+type WalletKey = 'staking' | 'mining' | 'trading';
 
 interface UserProfile {
-  wallet_balance: number;
+  withdrawable_earnings: number;
+  earnings_staking: number;
+  earnings_mining: number;
+  earnings_referral: number;
   staking_wallet: number;
   mining_wallet: number;
   trading_wallet: number;
@@ -80,12 +83,14 @@ const Dashboard = () => {
     try {
       const { data: profileData, error: profileError } = await (supabase as any)
         .from('profiles')
-        .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet, referral_code')
+        .select('withdrawable_earnings, earnings_staking, earnings_mining, earnings_referral, staking_wallet, mining_wallet, trading_wallet, referral_code')
         .eq('user_id', user.id)
         .single();
 
       if (profileError) throw profileError;
       setProfile(profileData);
+      setWithdrawableEarnings(Number(profileData?.withdrawable_earnings || 0));
+      setReferralEarnings(Number(profileData?.earnings_referral || 0));
 
       // Fetch active stakes
       const { data: activeStakesData, error: activeStakesError } = await supabase
@@ -147,26 +152,11 @@ const Dashboard = () => {
       const totalDailyEarnings = activeStakesData?.reduce((sum, stake) => sum + Number(stake.daily_return), 0) || 0;
       setDailyEarnings(totalDailyEarnings);
 
-      const { data: referralData, error: referralError } = await supabase
-        .from('referral_earnings')
-        .select('amount')
-        .eq('referrer_id', user.id);
-
-      if (referralError) throw referralError;
-      const refEarnings = referralData?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-      setReferralEarnings(refEarnings);
-      const total = stakesEarnings + refEarnings;
+      // Total earnings = lifetime stake yields + referral earnings (informational)
+      const refRowsTotal = Number(profileData?.earnings_referral || 0);
+      const total = stakesEarnings + refRowsTotal;
       setTotalEarnings(total);
-
-      // Withdrawable = total earnings - earnings already withdrawn (active statuses)
-      const { data: withdrawalsData } = await supabase
-        .from('withdrawals')
-        .select('amount, withdrawal_type, status')
-        .eq('user_id', user.id);
-      const earningsWithdrawn = (withdrawalsData || [])
-        .filter((w: any) => w.withdrawal_type === 'earnings' && ACTIVE_WITHDRAWAL_STATUSES.includes(w.status))
-        .reduce((s: number, w: any) => s + Number(w.amount), 0);
-      setWithdrawableEarnings(Math.max(0, total - earningsWithdrawn));
+      // withdrawableEarnings already set from profileData above
 
       // Mining allocation = sum of active mining rentals locked
       const { data: rentalsData } = await (supabase as any)

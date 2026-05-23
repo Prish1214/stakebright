@@ -16,7 +16,7 @@ export default function AdminControls() {
   const [plans, setPlans] = useState<any[]>([]);
   const [anns, setAnns] = useState<any[]>([]);
   const [newAnn, setNewAnn] = useState({ title: '', body: '', type: 'info' });
-  const [reward, setReward] = useState({ user_id: '', wallet: 'main', amount: '', note: '' });
+  const [reward, setReward] = useState({ user_id: '', wallet: 'earnings', amount: '', note: '' });
 
   const load = async () => {
     const [s, p, a] = await Promise.all([
@@ -59,7 +59,7 @@ export default function AdminControls() {
       p_user_id: reward.user_id, p_wallet: reward.wallet, p_amount: Number(reward.amount), p_note: reward.note
     });
     if (error) toast({ title: 'Failed', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Reward credited' }); setReward({ user_id: '', wallet: 'main', amount: '', note: '' }); }
+    else { toast({ title: 'Reward credited' }); setReward({ user_id: '', wallet: 'earnings', amount: '', note: '' }); }
   };
 
   const get = (k: string) => settings.find(s => s.setting_key === k)?.setting_value;
@@ -101,7 +101,7 @@ export default function AdminControls() {
           <Select value={reward.wallet} onValueChange={(v) => setReward({ ...reward, wallet: v })}>
             <SelectTrigger className="bg-[#0a0e1a] border-cyan-500/20"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="main">Main</SelectItem>
+              <SelectItem value="earnings">Withdrawable Earnings</SelectItem>
               <SelectItem value="staking">Staking</SelectItem>
               <SelectItem value="mining">Mining</SelectItem>
               <SelectItem value="trading">Trading</SelectItem>

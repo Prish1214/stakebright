@@ -16,7 +16,7 @@ export default function AdminUsers() {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState<any | null>(null);
-  const [editWallet, setEditWallet] = useState('main');
+  const [editWallet, setEditWallet] = useState('earnings');
   const [editDelta, setEditDelta] = useState('');
   const [editNote, setEditNote] = useState('');
 
@@ -24,7 +24,7 @@ export default function AdminUsers() {
     setLoading(true);
     const { data } = await supabase
       .from('profiles')
-      .select('user_id,email,username,wallet_balance,staking_wallet,mining_wallet,trading_wallet,is_frozen,referral_code,referred_by,last_login_at,created_at,admin_notes')
+      .select('user_id,email,username,withdrawable_earnings,staking_wallet,mining_wallet,trading_wallet,is_frozen,referral_code,referred_by,last_login_at,created_at,admin_notes')
       .order('created_at', { ascending: false })
       .limit(1000);
     setRows(data || []);
@@ -80,7 +80,7 @@ export default function AdminUsers() {
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400 border-b border-cyan-500/10">
                 <th className="py-2 pr-3">User</th>
-                <th className="py-2 pr-3 text-right">Main</th>
+                <th className="py-2 pr-3 text-right">Earnings</th>
                 <th className="py-2 pr-3 text-right">Staking</th>
                 <th className="py-2 pr-3 text-right">Mining</th>
                 <th className="py-2 pr-3 text-right">Trading</th>
@@ -98,7 +98,7 @@ export default function AdminUsers() {
                     <div className="font-medium text-slate-100">{u.username || u.email}</div>
                     <div className="text-[11px] text-slate-500">{u.email}</div>
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.wallet_balance)}</td>
+                  <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.withdrawable_earnings)}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.staking_wallet)}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.mining_wallet)}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">{fmt(u.trading_wallet)}</td>
@@ -129,7 +129,7 @@ export default function AdminUsers() {
               <Select value={editWallet} onValueChange={setEditWallet}>
                 <SelectTrigger className="bg-[#0a0e1a] border-cyan-500/20"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="main">Main</SelectItem>
+                  <SelectItem value="earnings">Withdrawable Earnings</SelectItem>
                   <SelectItem value="staking">Staking</SelectItem>
                   <SelectItem value="mining">Mining</SelectItem>
                   <SelectItem value="trading">Trading</SelectItem>

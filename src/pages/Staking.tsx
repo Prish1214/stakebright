@@ -45,7 +45,6 @@ interface StakingPlan {
 }
 
 interface UserProfile {
-  wallet_balance: number;
   staking_wallet: number;
   mining_wallet: number;
   trading_wallet: number;
@@ -120,7 +119,7 @@ const Staking = () => {
     if (!user) return;
     const { data, error } = await (supabase as any)
       .from('profiles')
-      .select('wallet_balance, staking_wallet, mining_wallet, trading_wallet')
+      .select('staking_wallet, mining_wallet, trading_wallet')
       .eq('user_id', user.id)
       .single();
     if (error) return;
@@ -167,7 +166,7 @@ const Staking = () => {
       return toast({ title: 'Invalid amount', description: `Minimum is ${selectedPlan.minimum_amount} USDT`, variant: 'destructive' });
     }
     if (amount > userProfile.staking_wallet) {
-      return toast({ title: 'Insufficient Staking Wallet', description: 'Transfer USDT from Main Wallet first.', variant: 'destructive' });
+      return toast({ title: 'Insufficient Staking Wallet', description: 'Deposit USDT directly to your Staking Wallet from the Deposit page.', variant: 'destructive' });
     }
 
     setLoading(true);
@@ -262,7 +261,6 @@ const Staking = () => {
             <p className="text-2xl font-bold text-success">
               {userProfile ? Number(userProfile.staking_wallet).toFixed(2) : '0.00'} USDT
             </p>
-            <p className="text-xs text-muted-foreground">Main: {userProfile ? Number(userProfile.wallet_balance).toFixed(2) : '0.00'} USDT</p>
           </div>
         </div>
       </div>
@@ -538,7 +536,7 @@ const Staking = () => {
                 <p className="text-5xl font-bold bg-gradient-to-r from-success via-primary to-accent bg-clip-text text-transparent">
                   +{resultData.profit.toFixed(4)}
                 </p>
-                <p className="text-sm text-muted-foreground">USDT credited to Main Wallet</p>
+                <p className="text-sm text-muted-foreground">USDT credited to Withdrawable Earnings</p>
                 <Badge className="bg-success/20 text-success border-success/30 text-sm">
                   {resultData.percentage.toFixed(3)}% daily rate
                 </Badge>

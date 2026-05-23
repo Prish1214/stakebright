@@ -258,6 +258,9 @@ export type Database = {
         Row: {
           admin_notes: string | null
           created_at: string | null
+          earnings_mining: number
+          earnings_referral: number
+          earnings_staking: number
           email: string
           id: string
           is_frozen: boolean
@@ -278,10 +281,14 @@ export type Database = {
           user_id: string
           username: string | null
           wallet_balance: number | null
+          withdrawable_earnings: number
         }
         Insert: {
           admin_notes?: string | null
           created_at?: string | null
+          earnings_mining?: number
+          earnings_referral?: number
+          earnings_staking?: number
           email: string
           id?: string
           is_frozen?: boolean
@@ -302,10 +309,14 @@ export type Database = {
           user_id: string
           username?: string | null
           wallet_balance?: number | null
+          withdrawable_earnings?: number
         }
         Update: {
           admin_notes?: string | null
           created_at?: string | null
+          earnings_mining?: number
+          earnings_referral?: number
+          earnings_staking?: number
           email?: string
           id?: string
           is_frozen?: boolean
@@ -326,6 +337,7 @@ export type Database = {
           user_id?: string
           username?: string | null
           wallet_balance?: number | null
+          withdrawable_earnings?: number
         }
         Relationships: [
           {
@@ -341,29 +353,35 @@ export type Database = {
         Row: {
           amount: number
           created_at: string | null
-          deposit_id: string
+          deposit_id: string | null
           id: string
+          kind: string
           percentage: number
           referred_id: string
           referrer_id: string
+          stake_id: string | null
         }
         Insert: {
           amount: number
           created_at?: string | null
-          deposit_id: string
+          deposit_id?: string | null
           id?: string
+          kind?: string
           percentage: number
           referred_id: string
           referrer_id: string
+          stake_id?: string | null
         }
         Update: {
           amount?: number
           created_at?: string | null
-          deposit_id?: string
+          deposit_id?: string | null
           id?: string
+          kind?: string
           percentage?: number
           referred_id?: string
           referrer_id?: string
+          stake_id?: string | null
         }
         Relationships: [
           {
@@ -680,6 +698,7 @@ export type Database = {
           net_amount: number
           processed_at: string | null
           processed_by: string | null
+          source: string
           stake_id: string | null
           status: string | null
           user_id: string
@@ -695,6 +714,7 @@ export type Database = {
           net_amount: number
           processed_at?: string | null
           processed_by?: string | null
+          source?: string
           stake_id?: string | null
           status?: string | null
           user_id: string
@@ -710,6 +730,7 @@ export type Database = {
           net_amount?: number
           processed_at?: string | null
           processed_by?: string | null
+          source?: string
           stake_id?: string | null
           status?: string | null
           user_id?: string
@@ -807,6 +828,10 @@ export type Database = {
         Args: { p_amount: number; p_plan_id: string }
         Returns: Json
       }
+      credit_referrer_yield_share: {
+        Args: { p_referee: string; p_stake_id: string; p_yield: number }
+        Returns: undefined
+      }
       get_my_referred_users: {
         Args: never
         Returns: {
@@ -820,7 +845,7 @@ export type Database = {
         Returns: {
           created_at: string
           qualified: boolean
-          total_deposits: number
+          total_staking_deposits: number
           user_id: string
           username: string
         }[]
@@ -855,6 +880,10 @@ export type Database = {
       qualified_trading_referrals_count: {
         Args: { _user_id: string }
         Returns: number
+      }
+      request_withdrawal: {
+        Args: { p_address: string; p_amount: number; p_source: string }
+        Returns: Json
       }
       run_ai_scalping: { Args: never; Returns: Json }
       search_exchange: { Args: { p_stake_id: string }; Returns: Json }

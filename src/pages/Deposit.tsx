@@ -204,7 +204,7 @@ const Deposit = () => {
     return 'bg-destructive/10 text-destructive border-destructive/20';
   };
   const walletLabel = (w?: string) =>
-    w === 'staking' ? 'Stake' : w === 'trading' ? 'AI Trading' : w === 'mining' ? 'Mining' : w === 'main' ? 'Main' : '—';
+    w === 'staking' ? 'Stake' : w === 'trading' ? 'AI Trading' : w === 'mining' ? 'Mining' : '—';
 
   // Stepper UI
   const Stepper = () => (

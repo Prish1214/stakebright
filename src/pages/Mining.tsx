@@ -14,7 +14,6 @@ type Coin = 'BTC' | 'LTC' | 'DOGE';
 type Tier = 'Basic' | 'Pro' | 'Elite';
 
 interface Profile {
-  wallet_balance: number;
   mining_wallet: number;
 }
 
@@ -111,7 +110,7 @@ const Mining = () => {
     try {
       try { await (supabase as any).rpc('accrue_mining_yields'); } catch {}
       const [pRes, rRes] = await Promise.all([
-        (supabase as any).from('profiles').select('wallet_balance, mining_wallet').eq('user_id', user.id).maybeSingle(),
+        (supabase as any).from('profiles').select('mining_wallet').eq('user_id', user.id).maybeSingle(),
         (supabase as any).from('mining_rentals').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
       if (pRes?.data) setProfile(pRes.data);
@@ -165,7 +164,7 @@ const Mining = () => {
             <Pickaxe className="h-8 w-8 text-primary" />
             Mining Power Rental
           </h1>
-          <p className="text-muted-foreground mt-1">Allocate Mining Wallet balance to rent hashpower. Earn variable daily yields to your withdrawable balance. Locked funds unlock automatically when runtime ends.</p>
+          <p className="text-muted-foreground mt-1">Allocate Mining Wallet balance to rent hashpower. Daily yields are credited automatically to your Withdrawable Earnings. The allocation stays locked for the runtime and returns to your Mining Wallet when it ends.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="text-right">
@@ -317,7 +316,7 @@ const Mining = () => {
                       </div>
                     </div>
 
-                    <div className="text-center text-[11px] text-primary py-1 animate-pulse font-mono">⚡ Hashpower streaming yields hourly</div>
+                    <div className="text-center text-[11px] text-primary py-1 animate-pulse font-mono">⚡ Yields stream daily to Withdrawable Earnings · allocation unlocks at runtime end</div>
                   </div>
                 </div>
               );
@@ -338,7 +337,7 @@ const Mining = () => {
                     <Server className={`h-4 w-4 ${COIN_META[r.coin].color}`} />
                     <span className="font-mono text-sm font-bold">{r.coin} {r.tier}</span>
                   </div>
-                  <Badge variant="outline" className="border-success/50 text-success text-[10px]">Unlocked</Badge>
+                  <Badge variant="outline" className="border-success/50 text-success text-[10px]">Allocation Returned</Badge>
                 </div>
                 <div className="text-xs space-y-1 font-mono">
                   <div className="flex justify-between text-muted-foreground"><span>Allocated</span><span>{fmt(r.locked_amount, 2)} USDT</span></div>

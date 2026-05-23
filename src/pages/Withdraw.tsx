@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpCircle, DollarSign, Clock, CheckCircle, Lock, Unlock, Coins, BookmarkPlus, X } from 'lucide-react';
+import { ArrowUpCircle, DollarSign, Clock, CheckCircle, Lock, Unlock, Coins, BookmarkPlus, X, TrendingUp, Pickaxe, Users, LineChart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -20,7 +20,7 @@ interface WithdrawalHistory {
   withdrawal_address: string;
   stake_id: string | null;
   created_at: string;
-  processed_at: string | null;
+  source?: string;
 }
 
 interface StakeRow {
@@ -35,21 +35,32 @@ interface StakeRow {
   plan_name?: string;
 }
 
+interface EarningsBreakdown {
+  total: number;
+  staking: number;
+  mining: number;
+  referral: number;
+  trading: number;
+}
+
 const ACTIVE_WITHDRAWAL_STATUSES = ['pending', 'approved', 'confirmed', 'completed'];
 
 const Withdraw = () => {
   const { user } = useAuth();
-  const [earningsBalance, setEarningsBalance] = useState(0);
+  const [earnings, setEarnings] = useState<EarningsBreakdown>({ total: 0, staking: 0, mining: 0, referral: 0, trading: 0 });
   const [stakes, setStakes] = useState<StakeRow[]>([]);
   const [pendingPrincipalStakeIds, setPendingPrincipalStakeIds] = useState<Set<string>>(new Set());
-  const [withdrawalAmount, setWithdrawalAmount] = useState('');
-  const [withdrawalAddress, setWithdrawalAddress] = useState('');
+  const [earningsAmount, setEarningsAmount] = useState('');
+  const [earningsAddress, setEarningsAddress] = useState('');
+  const [tradingAmount, setTradingAmount] = useState('');
+  const [tradingAddress, setTradingAddress] = useState('');
   const [principalAddress, setPrincipalAddress] = useState('');
   const [principalStakeId, setPrincipalStakeId] = useState<string | null>(null);
   const [withdrawalHistory, setWithdrawalHistory] = useState<WithdrawalHistory[]>([]);
   const [feePercentage, setFeePercentage] = useState(10);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [submittingEarnings, setSubmittingEarnings] = useState(false);
+  const [submittingTrading, setSubmittingTrading] = useState(false);
   const [submittingPrincipal, setSubmittingPrincipal] = useState<string | null>(null);
   const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
 
@@ -75,17 +86,14 @@ const Withdraw = () => {
 
   useEffect(() => {
     if (user) fetchData();
-
     const withdrawalChannel = supabase
       .channel('withdrawal-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'withdrawals', filter: `user_id=eq.${user?.id}` }, () => fetchData())
       .subscribe();
-
     const profileChannel = supabase
       .channel('profile-changes')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `user_id=eq.${user?.id}` }, () => fetchData())
       .subscribe();
-
     return () => {
       supabase.removeChannel(withdrawalChannel);
       supabase.removeChannel(profileChannel);
@@ -93,45 +101,44 @@ const Withdraw = () => {
   }, [user]);
 
   const fetchData = async () => {
+    if (!user) return;
     try {
       const { data: settingsData } = await supabase
-        .from('system_settings')
-        .select('setting_value')
-        .eq('setting_key', 'withdrawal_fee_percentage')
-        .single();
+        .from('system_settings').select('setting_value')
+        .eq('setting_key', 'withdrawal_fee_percentage').single();
       if (settingsData) setFeePercentage(Number(settingsData.setting_value));
 
-      // Fetch stakes with plan name
-      const { data: stakesData, error: stakesError } = await supabase
+      // Profile = source of truth for earnings & trading balances
+      const { data: profile } = await (supabase as any)
+        .from('profiles')
+        .select('withdrawable_earnings, earnings_staking, earnings_mining, earnings_referral, trading_wallet')
+        .eq('user_id', user.id).maybeSingle();
+
+      setEarnings({
+        total: Number(profile?.withdrawable_earnings || 0),
+        staking: Number(profile?.earnings_staking || 0),
+        mining: Number(profile?.earnings_mining || 0),
+        referral: Number(profile?.earnings_referral || 0),
+        trading: Number(profile?.trading_wallet || 0),
+      });
+
+      const { data: stakesData } = await supabase
         .from('stakes')
         .select('id, amount, total_earned, daily_return, start_date, end_date, is_active, principal_withdrawn, staking_plans(name)')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('end_date', { ascending: false });
-      if (stakesError) throw stakesError;
-
-      const normalizedStakes: StakeRow[] = (stakesData || []).map((s: any) => ({
-        id: s.id,
-        amount: Number(s.amount),
-        total_earned: Number(s.total_earned ?? 0),
-        daily_return: Number(s.daily_return ?? 0),
-        start_date: s.start_date,
-        end_date: s.end_date,
-        is_active: s.is_active,
-        principal_withdrawn: s.principal_withdrawn,
-        plan_name: s.staking_plans?.name,
+      const normalized: StakeRow[] = (stakesData || []).map((s: any) => ({
+        id: s.id, amount: Number(s.amount), total_earned: Number(s.total_earned ?? 0),
+        daily_return: Number(s.daily_return ?? 0), start_date: s.start_date, end_date: s.end_date,
+        is_active: s.is_active, principal_withdrawn: s.principal_withdrawn, plan_name: s.staking_plans?.name,
       }));
-      setStakes(normalizedStakes);
+      setStakes(normalized);
 
-      // Withdrawals
-      const { data: historyData, error: historyError } = await supabase
-        .from('withdrawals')
-        .select('*')
-        .eq('user_id', user?.id)
+      const { data: historyData } = await supabase
+        .from('withdrawals').select('*').eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      if (historyError) throw historyError;
-      setWithdrawalHistory(historyData || []);
+      setWithdrawalHistory((historyData as any) || []);
 
-      // Compute pending/active principal withdrawals per stake
       const pendingPrincipal = new Set<string>();
       (historyData || []).forEach((w: any) => {
         if (w.withdrawal_type === 'principal' && w.stake_id && ACTIVE_WITHDRAWAL_STATUSES.includes(w.status)) {
@@ -139,35 +146,6 @@ const Withdraw = () => {
         }
       });
       setPendingPrincipalStakeIds(pendingPrincipal);
-
-      // Earnings balance
-      let totalEarnings = 0;
-      const now = new Date();
-      normalizedStakes.forEach((stake) => {
-        const startDate = new Date(stake.start_date);
-        const endDate = new Date(stake.end_date);
-        const stakeEnded = now >= endDate;
-        if (stake.is_active) {
-          const effectiveEndDate = stakeEnded ? endDate : now;
-          const daysPassed = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-          totalEarnings += stake.total_earned + daysPassed * stake.daily_return;
-        } else {
-          totalEarnings += stake.total_earned;
-        }
-      });
-
-      const { data: referralData, error: referralError } = await supabase
-        .from('referral_earnings')
-        .select('amount')
-        .eq('referrer_id', user?.id);
-      if (referralError) throw referralError;
-      const referralEarnings = referralData?.reduce((sum, r) => sum + Number(r.amount), 0) || 0;
-
-      const earningsWithdrawn = (historyData || [])
-        .filter((w: any) => w.withdrawal_type === 'earnings' && ACTIVE_WITHDRAWAL_STATUSES.includes(w.status))
-        .reduce((sum: number, w: any) => sum + Number(w.amount), 0);
-
-      setEarningsBalance(Math.max(0, totalEarnings + referralEarnings - earningsWithdrawn));
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
@@ -175,73 +153,50 @@ const Withdraw = () => {
     }
   };
 
-  const calculateFee = (amount: number) => (amount * feePercentage) / 100;
-  const calculateNetAmount = (amount: number) => amount - calculateFee(amount);
+  const calcFee = (n: number) => (n * feePercentage) / 100;
+  const calcNet = (n: number) => n - calcFee(n);
 
-  const handleWithdrawEarnings = async () => {
-    if (!withdrawalAmount || Number(withdrawalAmount) <= 0) {
-      toast({ title: 'Invalid Amount', description: 'Please enter a valid withdrawal amount', variant: 'destructive' });
-      return;
-    }
-    if (!withdrawalAddress.trim()) {
-      toast({ title: 'Address Required', description: 'Please enter your USDT BEP20 withdrawal address', variant: 'destructive' });
-      return;
-    }
-    const amount = Number(withdrawalAmount);
-    if (amount > earningsBalance) {
-      toast({ title: 'Insufficient Balance', description: 'Withdrawal amount exceeds available earnings', variant: 'destructive' });
-      return;
-    }
+  const handleWithdraw = async (source: 'earnings' | 'trading') => {
+    const amountStr = source === 'earnings' ? earningsAmount : tradingAmount;
+    const address = source === 'earnings' ? earningsAddress : tradingAddress;
+    const balance = source === 'earnings' ? earnings.total : earnings.trading;
+    const amount = Number(amountStr);
 
-    setSubmitting(true);
+    if (!amount || amount <= 0) { toast({ title: 'Invalid amount', variant: 'destructive' }); return; }
+    if (!address.trim()) { toast({ title: 'Address required', variant: 'destructive' }); return; }
+    if (amount > balance) { toast({ title: 'Insufficient balance', variant: 'destructive' }); return; }
+
+    source === 'earnings' ? setSubmittingEarnings(true) : setSubmittingTrading(true);
     try {
-      const feeAmount = calculateFee(amount);
-      const netAmount = calculateNetAmount(amount);
-      const { error } = await supabase.from('withdrawals').insert({
-        user_id: user?.id,
-        amount,
-        fee_amount: feeAmount,
-        net_amount: netAmount,
-        withdrawal_type: 'earnings',
-        withdrawal_address: withdrawalAddress.trim(),
-        status: 'pending',
+      const { data, error } = await (supabase as any).rpc('request_withdrawal', {
+        p_source: source, p_amount: amount, p_address: address.trim(),
       });
       if (error) throw error;
-      saveAddress(withdrawalAddress);
-      toast({ title: 'Earnings Withdrawal Requested', description: 'Submitted for admin approval' });
-      setWithdrawalAmount('');
-      setWithdrawalAddress('');
+      if (data?.success === false) throw new Error(data?.error || 'Failed');
+      saveAddress(address);
+      toast({ title: source === 'earnings' ? 'Earnings Withdrawal Requested' : 'Trading Withdrawal Requested', description: 'Submitted for admin approval' });
+      if (source === 'earnings') { setEarningsAmount(''); setEarningsAddress(''); }
+      else { setTradingAmount(''); setTradingAddress(''); }
       fetchData();
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
-      setSubmitting(false);
+      source === 'earnings' ? setSubmittingEarnings(false) : setSubmittingTrading(false);
     }
   };
 
   const handleWithdrawPrincipal = async (stake: StakeRow) => {
-    if (!principalAddress.trim()) {
-      toast({ title: 'Address Required', description: 'Enter your USDT BEP20 address', variant: 'destructive' });
-      return;
-    }
+    if (!principalAddress.trim()) { toast({ title: 'Address Required', variant: 'destructive' }); return; }
     setSubmittingPrincipal(stake.id);
     try {
-      const amount = stake.amount;
       const { error } = await supabase.from('withdrawals').insert({
-        user_id: user?.id,
-        amount,
-        fee_amount: 0,
-        net_amount: amount,
-        withdrawal_type: 'principal',
-        stake_id: stake.id,
-        withdrawal_address: principalAddress.trim(),
-        status: 'pending',
+        user_id: user!.id, amount: stake.amount, fee_amount: 0, net_amount: stake.amount,
+        withdrawal_type: 'principal', stake_id: stake.id,
+        withdrawal_address: principalAddress.trim(), status: 'pending',
       });
       if (error) throw error;
       toast({ title: 'Principal Withdrawal Requested', description: 'Submitted for admin approval (no fee)' });
-      setPrincipalStakeId(null);
-      setPrincipalAddress('');
-      fetchData();
+      setPrincipalStakeId(null); setPrincipalAddress(''); fetchData();
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
@@ -250,174 +205,183 @@ const Withdraw = () => {
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-      case 'approved':
-      case 'confirmed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      default:
-        return <ArrowUpCircle className="h-4 w-4 text-red-500" />;
-    }
+    if (['completed','approved','confirmed'].includes(status)) return <CheckCircle className="h-4 w-4 text-green-500" />;
+    if (status === 'pending') return <Clock className="h-4 w-4 text-yellow-500" />;
+    return <ArrowUpCircle className="h-4 w-4 text-red-500" />;
   };
-
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-      case 'approved':
-      case 'confirmed':
-        return 'text-green-500';
-      case 'pending':
-        return 'text-yellow-500';
-      default:
-        return 'text-red-500';
-    }
+    if (['completed','approved','confirmed'].includes(status)) return 'text-green-500';
+    if (status === 'pending') return 'text-yellow-500';
+    return 'text-red-500';
   };
+  const formatDate = (d: string) => new Date(d).toLocaleDateString();
+  const daysUntil = (d: string) => Math.max(0, Math.ceil((new Date(d).getTime() - Date.now()) / 86400000));
 
-  const formatDate = (date: string) => new Date(date).toLocaleDateString();
-  const daysUntil = (date: string) => {
-    const diff = new Date(date).getTime() - new Date().getTime();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  };
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  const SavedAddressChips = ({ value, onPick }: { value: string; onPick: (a: string) => void }) =>
+    savedAddresses.length > 0 ? (
+      <div className="mt-2">
+        <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Saved addresses</p>
+        <div className="flex flex-wrap gap-2">
+          {savedAddresses.map((a) => (
+            <div key={a} className="flex items-center gap-1 rounded-full border border-border bg-muted/40 pl-2 pr-1 py-0.5 text-xs">
+              <button type="button" onClick={() => onPick(a)} className="font-mono hover:text-crypto-purple">
+                {a.slice(0, 8)}…{a.slice(-6)}
+              </button>
+              <button type="button" onClick={() => removeAddress(a)} className="text-muted-foreground hover:text-destructive p-0.5">
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-    );
-  }
+    ) : null;
 
   const now = new Date();
-  const completedPrincipalAvailable = stakes
-    .filter((s) => new Date(s.end_date) <= now && !s.principal_withdrawn && !pendingPrincipalStakeIds.has(s.id))
-    .reduce((sum, s) => sum + s.amount, 0);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Withdraw</h1>
         <p className="text-muted-foreground mt-2">
-          Withdraw your daily earnings, referral commissions, or unlocked principals
+          Cash out your Withdrawable Earnings, Trading Wallet balance, or unlocked stake principal.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="border-crypto-gold/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-crypto-gold" />
-              Available Earnings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-crypto-gold">{earningsBalance.toFixed(2)} USDT</div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Daily staking earnings + referral commissions ({feePercentage}% fee on withdrawal)
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-crypto-purple/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Unlock className="h-5 w-5 text-crypto-purple" />
-              Available To Withdraw
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-crypto-purple">{completedPrincipalAvailable.toFixed(2)} USDT</div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Unlocked principal from completed stakes (no fee)
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Locked Balance Overview */}
-      <LockedBalanceOverview userId={user?.id} />
-
-      {/* Withdraw Earnings */}
-      <Card className="border-crypto-purple/20">
+      {/* A. Withdrawable Earnings */}
+      <Card className="border-crypto-gold/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ArrowUpCircle className="h-5 w-5 text-crypto-purple" />
-            Withdraw Earnings
+            <DollarSign className="h-5 w-5 text-crypto-gold" />
+            Withdrawable Earnings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="amount">Amount (USDT)</Label>
-            <Input
-              id="amount"
-              type="number"
-              placeholder="Enter amount to withdraw"
-              value={withdrawalAmount}
-              onChange={(e) => setWithdrawalAmount(e.target.value)}
-              max={earningsBalance}
-            />
+        <CardContent className="space-y-5">
+          <div className="flex items-baseline justify-between flex-wrap gap-2">
+            <div className="text-4xl font-bold text-crypto-gold">{earnings.total.toFixed(2)} <span className="text-base font-normal text-muted-foreground">USDT</span></div>
+            <span className="text-xs text-muted-foreground">{feePercentage}% network fee on withdrawal</span>
           </div>
-          <div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="address">USDT BEP20 Address</Label>
-              {withdrawalAddress.trim() && !savedAddresses.includes(withdrawalAddress.trim()) && (
-                <button type="button" onClick={() => saveAddress(withdrawalAddress)} className="text-xs text-crypto-purple hover:text-crypto-purple/80 flex items-center gap-1">
-                  <BookmarkPlus className="h-3 w-3" /> Save address
-                </button>
-              )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="rounded-lg border border-crypto-purple/20 bg-card/50 p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Staking Rewards</span>
+                <TrendingUp className="h-4 w-4 text-crypto-purple" />
+              </div>
+              <div className="text-xl font-semibold text-crypto-purple">{earnings.staking.toFixed(2)} <span className="text-xs text-muted-foreground">USDT</span></div>
             </div>
-            <Input
-              id="address"
-              type="text"
-              placeholder="0x..."
-              value={withdrawalAddress}
-              onChange={(e) => setWithdrawalAddress(e.target.value)}
-            />
-            {savedAddresses.length > 0 && (
-              <div className="mt-2">
-                <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Saved addresses</p>
-                <div className="flex flex-wrap gap-2">
-                  {savedAddresses.map((a) => (
-                    <div key={a} className="flex items-center gap-1 rounded-full border border-border bg-muted/40 pl-2 pr-1 py-0.5 text-xs">
-                      <button type="button" onClick={() => setWithdrawalAddress(a)} className="font-mono hover:text-crypto-purple">
-                        {a.slice(0, 8)}…{a.slice(-6)}
-                      </button>
-                      <button type="button" onClick={() => removeAddress(a)} className="text-muted-foreground hover:text-destructive p-0.5">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+            <div className="rounded-lg border border-crypto-gold/20 bg-card/50 p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Mining Rewards</span>
+                <Pickaxe className="h-4 w-4 text-crypto-gold" />
+              </div>
+              <div className="text-xl font-semibold text-crypto-gold">{earnings.mining.toFixed(2)} <span className="text-xs text-muted-foreground">USDT</span></div>
+            </div>
+            <div className="rounded-lg border border-accent/20 bg-card/50 p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Referral Rewards</span>
+                <Users className="h-4 w-4 text-accent" />
+              </div>
+              <div className="text-xl font-semibold text-accent">{earnings.referral.toFixed(2)} <span className="text-xs text-muted-foreground">USDT</span></div>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-2 border-t border-border/50">
+            <div>
+              <Label htmlFor="e-amount">Amount (USDT)</Label>
+              <Input id="e-amount" type="number" placeholder="Enter amount to withdraw"
+                value={earningsAmount} onChange={(e) => setEarningsAmount(e.target.value)} max={earnings.total} />
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="e-address">USDT BEP20 Address</Label>
+                {earningsAddress.trim() && !savedAddresses.includes(earningsAddress.trim()) && (
+                  <button type="button" onClick={() => saveAddress(earningsAddress)} className="text-xs text-crypto-purple hover:text-crypto-purple/80 flex items-center gap-1">
+                    <BookmarkPlus className="h-3 w-3" /> Save
+                  </button>
+                )}
+              </div>
+              <Input id="e-address" type="text" placeholder="0x..." value={earningsAddress} onChange={(e) => setEarningsAddress(e.target.value)} />
+              <SavedAddressChips value={earningsAddress} onPick={setEarningsAddress} />
+              <p className="text-xs text-muted-foreground mt-2">⚠️ Only USDT BEP20 network. Wrong network = lost funds!</p>
+            </div>
+            {earningsAmount && Number(earningsAmount) > 0 && (
+              <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm"><span>Amount:</span><span>{Number(earningsAmount).toFixed(2)} USDT</span></div>
+                <div className="flex justify-between text-sm"><span>Fee ({feePercentage}%):</span><span>{calcFee(Number(earningsAmount)).toFixed(2)} USDT</span></div>
+                <div className="flex justify-between font-semibold border-t pt-2"><span>Net:</span><span className="text-crypto-gold">{calcNet(Number(earningsAmount)).toFixed(2)} USDT</span></div>
               </div>
             )}
-            <p className="text-xs text-muted-foreground mt-2">
-              ⚠️ Only USDT BEP20 network. Wrong network = lost funds!
-            </p>
+            <Button onClick={() => handleWithdraw('earnings')}
+              disabled={submittingEarnings || !earningsAmount || Number(earningsAmount) <= 0 || !earningsAddress.trim()}
+              className="w-full">
+              {submittingEarnings ? 'Processing...' : 'Withdraw Earnings'}
+            </Button>
           </div>
-          {withdrawalAmount && Number(withdrawalAmount) > 0 && (
-            <div className="p-4 bg-muted/50 rounded-lg space-y-2">
-              <div className="flex justify-between text-sm"><span>Amount:</span><span>{Number(withdrawalAmount).toFixed(2)} USDT</span></div>
-              <div className="flex justify-between text-sm"><span>Fee ({feePercentage}%):</span><span>{calculateFee(Number(withdrawalAmount)).toFixed(2)} USDT</span></div>
-              <div className="flex justify-between font-semibold border-t pt-2"><span>Net:</span><span className="text-crypto-gold">{calculateNetAmount(Number(withdrawalAmount)).toFixed(2)} USDT</span></div>
-            </div>
-          )}
-          <Button
-            onClick={handleWithdrawEarnings}
-            disabled={submitting || !withdrawalAmount || Number(withdrawalAmount) <= 0 || !withdrawalAddress.trim()}
-            className="w-full"
-          >
-            {submitting ? 'Processing...' : 'Withdraw Earnings'}
-          </Button>
         </CardContent>
       </Card>
 
-      {/* Stakes & Principal */}
+      {/* B. Trading Wallet Balance */}
+      <Card className="border-accent/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <LineChart className="h-5 w-5 text-accent" />
+            Trading Wallet Balance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-baseline justify-between flex-wrap gap-2">
+            <div className="text-3xl font-bold text-accent">{earnings.trading.toFixed(2)} <span className="text-sm font-normal text-muted-foreground">USDT</span></div>
+            <span className="text-xs text-muted-foreground">Compounded auto-trading profits • fully withdrawable anytime</span>
+          </div>
+          <div className="space-y-3 pt-2 border-t border-border/50">
+            <div>
+              <Label htmlFor="t-amount">Amount (USDT)</Label>
+              <Input id="t-amount" type="number" placeholder="Enter amount to withdraw"
+                value={tradingAmount} onChange={(e) => setTradingAmount(e.target.value)} max={earnings.trading} />
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="t-address">USDT BEP20 Address</Label>
+                {tradingAddress.trim() && !savedAddresses.includes(tradingAddress.trim()) && (
+                  <button type="button" onClick={() => saveAddress(tradingAddress)} className="text-xs text-accent hover:text-accent/80 flex items-center gap-1">
+                    <BookmarkPlus className="h-3 w-3" /> Save
+                  </button>
+                )}
+              </div>
+              <Input id="t-address" type="text" placeholder="0x..." value={tradingAddress} onChange={(e) => setTradingAddress(e.target.value)} />
+              <SavedAddressChips value={tradingAddress} onPick={setTradingAddress} />
+            </div>
+            {tradingAmount && Number(tradingAmount) > 0 && (
+              <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm"><span>Amount:</span><span>{Number(tradingAmount).toFixed(2)} USDT</span></div>
+                <div className="flex justify-between text-sm"><span>Fee ({feePercentage}%):</span><span>{calcFee(Number(tradingAmount)).toFixed(2)} USDT</span></div>
+                <div className="flex justify-between font-semibold border-t pt-2"><span>Net:</span><span className="text-accent">{calcNet(Number(tradingAmount)).toFixed(2)} USDT</span></div>
+              </div>
+            )}
+            <Button onClick={() => handleWithdraw('trading')} variant="outline"
+              disabled={submittingTrading || !tradingAmount || Number(tradingAmount) <= 0 || !tradingAddress.trim()}
+              className="w-full border-accent text-accent hover:bg-accent/10">
+              {submittingTrading ? 'Processing...' : 'Withdraw Trading Balance'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* C. Locked Balance Overview */}
+      <LockedBalanceOverview userId={user?.id} />
+
+      {/* D. Stake Principal Status */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5" />
-            Your Stakes — Principal Status
+            Stake Principal Status
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -434,7 +398,6 @@ const Withdraw = () => {
                 const pendingPrincipal = pendingPrincipalStakeIds.has(stake.id);
                 const withdrawable = ended && !stake.principal_withdrawn && !pendingPrincipal;
                 const expanded = principalStakeId === stake.id;
-
                 return (
                   <div key={stake.id} className="p-4 rounded-lg border bg-card/50 space-y-3">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -450,9 +413,7 @@ const Withdraw = () => {
                           ) : pendingPrincipal ? (
                             <Badge variant="outline">Withdrawal Pending</Badge>
                           ) : (
-                            <Badge variant="outline">
-                              <Lock className="h-3 w-3 mr-1" /> Locked
-                            </Badge>
+                            <Badge variant="outline"><Lock className="h-3 w-3 mr-1" /> Locked</Badge>
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -473,22 +434,15 @@ const Withdraw = () => {
                       <div className="space-y-3 pt-2 border-t">
                         <div>
                           <Label htmlFor={`addr-${stake.id}`}>USDT BEP20 Address</Label>
-                          <Input
-                            id={`addr-${stake.id}`}
-                            placeholder="0x..."
-                            value={principalAddress}
-                            onChange={(e) => setPrincipalAddress(e.target.value)}
-                          />
+                          <Input id={`addr-${stake.id}`} placeholder="0x..." value={principalAddress} onChange={(e) => setPrincipalAddress(e.target.value)} />
                         </div>
                         <div className="p-3 bg-muted/50 rounded text-sm flex justify-between">
                           <span>You will receive:</span>
                           <span className="font-semibold text-crypto-gold">{stake.amount.toFixed(2)} USDT (no fee)</span>
                         </div>
-                        <Button
-                          className="w-full"
+                        <Button className="w-full"
                           disabled={submittingPrincipal === stake.id || !principalAddress.trim()}
-                          onClick={() => handleWithdrawPrincipal(stake)}
-                        >
+                          onClick={() => handleWithdrawPrincipal(stake)}>
                           {submittingPrincipal === stake.id ? 'Processing...' : `Confirm Withdraw ${stake.amount.toFixed(2)} USDT`}
                         </Button>
                       </div>
@@ -501,6 +455,7 @@ const Withdraw = () => {
         </CardContent>
       </Card>
 
+      {/* History */}
       <Card>
         <CardHeader><CardTitle>Withdrawal History</CardTitle></CardHeader>
         <CardContent>
@@ -511,19 +466,19 @@ const Withdraw = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {withdrawalHistory.map((withdrawal) => (
-                <div key={withdrawal.id} className="flex items-center justify-between p-4 bg-card/50 rounded-lg border">
+              {withdrawalHistory.map((w) => (
+                <div key={w.id} className="flex items-center justify-between p-4 bg-card/50 rounded-lg border">
                   <div className="flex items-center gap-3">
-                    {getStatusIcon(withdrawal.status)}
+                    {getStatusIcon(w.status)}
                     <div>
-                      <p className="font-medium">{Number(withdrawal.amount).toFixed(2)} USDT</p>
-                      <p className="text-sm text-muted-foreground capitalize">{withdrawal.withdrawal_type}</p>
+                      <p className="font-medium">{Number(w.amount).toFixed(2)} USDT</p>
+                      <p className="text-sm text-muted-foreground capitalize">{w.source || w.withdrawal_type}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-medium capitalize ${getStatusColor(withdrawal.status)}`}>{withdrawal.status}</p>
-                    <p className="text-sm text-muted-foreground">Net: {Number(withdrawal.net_amount).toFixed(2)} USDT</p>
-                    <p className="text-xs text-muted-foreground">{new Date(withdrawal.created_at).toLocaleDateString()}</p>
+                    <p className={`font-medium capitalize ${getStatusColor(w.status)}`}>{w.status}</p>
+                    <p className="text-sm text-muted-foreground">Net: {Number(w.net_amount).toFixed(2)} USDT</p>
+                    <p className="text-xs text-muted-foreground">{new Date(w.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
               ))}
@@ -536,9 +491,10 @@ const Withdraw = () => {
         <CardContent className="pt-6">
           <h3 className="font-semibold mb-4 text-amber-800 dark:text-amber-200">Important Notes</h3>
           <div className="space-y-2 text-sm text-amber-700 dark:text-amber-300">
-            <p>• A {feePercentage}% fee applies to <strong>earnings</strong> withdrawals (daily returns + referral commissions)</p>
+            <p>• A {feePercentage}% fee applies to <strong>Withdrawable Earnings</strong> (staking + mining + referral) and <strong>Trading Wallet</strong> withdrawals</p>
             <p>• Principal withdrawals are <strong>fee-free</strong> after the staking period ends</p>
-            <p>• Each stake's principal is locked until its unlock date shown above</p>
+            <p>• Staking & mining allocations are locked until their runtime completes</p>
+            <p>• Trading Wallet is fully withdrawable anytime — profits auto-compound into it</p>
             <p>• Processing time is typically 24-48 hours</p>
           </div>
         </CardContent>

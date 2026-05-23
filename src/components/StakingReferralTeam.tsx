@@ -10,7 +10,7 @@ interface Member {
   user_id: string;
   username: string | null;
   created_at: string;
-  total_deposits: number;
+  total_staking_deposits: number;
   qualified: boolean;
 }
 
@@ -95,7 +95,7 @@ export const StakingReferralTeam = () => {
                   <div className="min-w-0">
                     <p className="font-medium truncate">{m.username || 'Member'}</p>
                     <p className="text-xs text-muted-foreground">
-                      Deposited ${Number(m.total_deposits).toFixed(2)} • req $50
+                      Staked deposits ${Number(m.total_staking_deposits).toFixed(2)} • req $50
                     </p>
                   </div>
                   {m.qualified ? (
@@ -114,7 +114,7 @@ export const StakingReferralTeam = () => {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          A referral qualifies for staking when their approved deposits total ≥ $50.
+          A referral qualifies when their approved deposits into Staking Wallet total ≥ $50. You earn a 5% one-time activation bonus on their first qualifying deposit, plus 1% of every staking yield they generate.
         </p>
       </CardContent>
     </Card>
