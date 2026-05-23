@@ -172,25 +172,11 @@ const Staking = () => {
 
     setLoading(true);
     try {
-      const avgRate = (selectedPlan.min_daily_rate + selectedPlan.max_daily_rate) / 2;
-      const dailyReturn = amount * avgRate;
-      const endDate = new Date();
-      endDate.setDate(endDate.getDate() + selectedPlan.duration_days);
-
-      const { error: stakeError } = await supabase.from('stakes').insert({
-        user_id: user.id,
-        plan_id: selectedPlan.id,
-        amount,
-        daily_return: dailyReturn,
-        end_date: endDate.toISOString(),
+      const { error: rpcError } = await (supabase as any).rpc('create_stake', {
+        p_plan_id: selectedPlan.id,
+        p_amount: amount,
       });
-      if (stakeError) throw stakeError;
-
-      const { error: updateError } = await (supabase as any)
-        .from('profiles')
-        .update({ staking_wallet: userProfile.staking_wallet - amount })
-        .eq('user_id', user.id);
-      if (updateError) throw updateError;
+      if (rpcError) throw rpcError;
 
       toast({ title: 'Stake activated!', description: `${amount} USDT locked in ${selectedPlan.name}` });
       setDialogOpen(false);
