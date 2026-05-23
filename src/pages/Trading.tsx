@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import CyberCard from '@/components/ui/CyberCard';
 import LiveMarketCharts from '@/components/LiveMarketCharts';
+import { TradingReferralTeam } from '@/components/TradingReferralTeam';
 import NeonButton from '@/components/ui/NeonButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
 import { Badge } from '@/components/ui/badge';
@@ -413,6 +414,8 @@ const Trading = () => {
           </div>
         )}
       </CyberCard>
+
+      <TradingReferralTeam />
     </div>
   );
 };
