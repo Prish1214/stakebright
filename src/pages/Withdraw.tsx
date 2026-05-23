@@ -299,18 +299,21 @@ const Withdraw = () => {
         <Card className="border-crypto-purple/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Coins className="h-5 w-5 text-crypto-purple" />
-              Unlocked Principal
+              <Unlock className="h-5 w-5 text-crypto-purple" />
+              Available To Withdraw
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-crypto-purple">{completedPrincipalAvailable.toFixed(2)} USDT</div>
             <p className="text-sm text-muted-foreground mt-2">
-              From stakes whose lock period has ended (no fee)
+              Unlocked principal from completed stakes (no fee)
             </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Locked Balance Overview */}
+      <LockedBalanceOverview userId={user?.id} />
 
       {/* Withdraw Earnings */}
       <Card className="border-crypto-purple/20">
