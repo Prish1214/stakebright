@@ -51,6 +51,27 @@ const Withdraw = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submittingPrincipal, setSubmittingPrincipal] = useState<string | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
+
+  const SAVED_KEY = 'withdraw_saved_addresses';
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      if (raw) setSavedAddresses(JSON.parse(raw));
+    } catch {}
+  }, []);
+  const persistAddresses = (list: string[]) => {
+    setSavedAddresses(list);
+    try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)); } catch {}
+  };
+  const saveAddress = (addr: string) => {
+    const a = addr.trim();
+    if (!a || savedAddresses.includes(a)) return;
+    const list = [a, ...savedAddresses].slice(0, 5);
+    persistAddresses(list);
+    toast({ title: 'Address saved' });
+  };
+  const removeAddress = (addr: string) => persistAddresses(savedAddresses.filter(a => a !== addr));
 
   useEffect(() => {
     if (user) fetchData();
