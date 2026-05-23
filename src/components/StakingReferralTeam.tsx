@@ -114,7 +114,7 @@ export const StakingReferralTeam = () => {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          A referral qualifies for staking when their approved deposits total ≥ $50.
+          A referral qualifies when their approved deposits into Staking Wallet total ≥ $50. You earn a 5% one-time activation bonus on their first qualifying deposit, plus 1% of every staking yield they generate.
         </p>
       </CardContent>
     </Card>
