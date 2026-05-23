@@ -226,7 +226,7 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {/* 4-Wallet System */}
+      {/* Wallets — Stake / Mining / Trading */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-mono font-bold flex items-center gap-2">
@@ -234,12 +234,11 @@ const Dashboard = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { key: 'main' as WalletKey, label: 'Main Wallet', value: profile?.wallet_balance || 0, glow: 'cyan' as const, icon: Wallet, hint: 'From deposits & withdrawals' },
-            { key: 'staking' as WalletKey, label: 'Staking Wallet', value: (profile as any)?.staking_wallet || 0, glow: 'purple' as const, icon: TrendingUp, hint: 'Used for staking plans' },
-            { key: 'mining' as WalletKey, label: 'Mining Wallet', value: (profile as any)?.mining_wallet || 0, glow: 'gold' as const, icon: Pickaxe, hint: 'Buy & run miners' },
-            { key: 'trading' as WalletKey, label: 'Trading Wallet', value: (profile as any)?.trading_wallet || 0, glow: 'pink' as const, icon: LineChart, hint: 'AI auto-trading capital' },
+            { key: 'staking', label: 'Stake Wallet', value: (profile as any)?.staking_wallet || 0, glow: 'purple' as const, icon: TrendingUp, hint: 'Used for staking plans' },
+            { key: 'mining', label: 'Mining Wallet', value: (profile as any)?.mining_wallet || 0, glow: 'gold' as const, icon: Pickaxe, hint: 'Buy & run miners' },
+            { key: 'trading', label: 'Trading Wallet', value: (profile as any)?.trading_wallet || 0, glow: 'pink' as const, icon: LineChart, hint: 'AI auto-trading capital' },
           ].map((w, i) => (
             <CyberCard key={w.key} glowColor={w.glow} className="animate-fade-in-up" style={{ animationDelay: `${0.05 + i * 0.05}s` }}>
               <div className="flex items-center justify-between mb-3">
@@ -250,52 +249,36 @@ const Dashboard = () => {
                 <AnimatedNumber value={Number(w.value)} glowColor={w.glow} suffix=" USDT" />
               </div>
               <p className="text-[11px] text-muted-foreground">{w.hint}</p>
-
             </CyberCard>
           ))}
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        <CyberCard glowColor="cyan" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <CyberCard glowColor="green" className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Wallet Balance</span>
-            <GlowingIcon icon={Wallet} size="sm" color="cyan" animated={false} />
-          </div>
-          <div className="text-2xl font-mono font-bold text-secondary">
-            <AnimatedNumber value={Number(profile?.wallet_balance || 0)} glowColor="cyan" suffix=" USDT" />
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">Available for staking</p>
-        </CyberCard>
-
-        <CyberCard glowColor="pink" className="animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Total Staked</span>
-            <GlowingIcon icon={Target} size="sm" color="pink" animated={false} />
-          </div>
-          <div className="text-2xl font-mono font-bold text-accent">
-            <AnimatedNumber
-              value={activeStakes.reduce((sum, s) => sum + Number(s.amount), 0)}
-              glowColor="pink"
-              suffix=" USDT"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">Across {activeStakes.length} active stake{activeStakes.length === 1 ? '' : 's'}</p>
-        </CyberCard>
-
-        <CyberCard glowColor="green" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Total Earnings</span>
-            <GlowingIcon icon={DollarSign} size="sm" color="green" animated={false} />
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Withdrawable Earnings</span>
+            <GlowingIcon icon={ArrowUpCircle} size="sm" color="green" animated={false} />
           </div>
           <div className="text-2xl font-mono font-bold text-success">
-            <AnimatedNumber value={totalEarnings} glowColor="green" suffix=" USDT" />
+            <AnimatedNumber value={withdrawableEarnings} glowColor="green" suffix=" USDT" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Ready to cash out</p>
+        </CyberCard>
+
+        <CyberCard glowColor="cyan" className="animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Total Earnings</span>
+            <GlowingIcon icon={DollarSign} size="sm" color="cyan" animated={false} />
+          </div>
+          <div className="text-2xl font-mono font-bold text-secondary">
+            <AnimatedNumber value={totalEarnings} glowColor="cyan" suffix=" USDT" />
           </div>
           <p className="text-xs text-muted-foreground mt-2">Daily returns + referral earnings</p>
         </CyberCard>
 
-        <CyberCard glowColor="purple" className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+        <CyberCard glowColor="purple" className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Active Stakes</span>
             <GlowingIcon icon={TrendingUp} size="sm" color="purple" animated={false} />
@@ -306,7 +289,7 @@ const Dashboard = () => {
           <p className="text-xs text-muted-foreground mt-2">Daily +{dailyEarnings.toFixed(2)} USDT</p>
         </CyberCard>
 
-        <CyberCard glowColor="gold" className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+        <CyberCard glowColor="gold" className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Referral Earnings</span>
             <GlowingIcon icon={Users} size="sm" color="gold" animated={false} />
@@ -317,6 +300,42 @@ const Dashboard = () => {
           <p className="text-xs text-muted-foreground mt-2">5% commission</p>
         </CyberCard>
       </div>
+
+      {/* Portfolio Overview */}
+      {(() => {
+        const stakingLocked = activeStakes.reduce((s, x) => s + Number(x.amount), 0);
+        const tradingCapital = Number((profile as any)?.trading_wallet || 0);
+        const ecosystem = stakingLocked + miningAllocation + tradingCapital + withdrawableEarnings
+          + Number((profile as any)?.staking_wallet || 0) + Number((profile as any)?.mining_wallet || 0);
+        const items = [
+          { label: 'Staking Locked', value: stakingLocked, glow: 'purple' as const, icon: Lock },
+          { label: 'Mining Allocation', value: miningAllocation, glow: 'gold' as const, icon: Pickaxe },
+          { label: 'Trading Capital', value: tradingCapital, glow: 'pink' as const, icon: LineChart },
+          { label: 'Withdrawable Balance', value: withdrawableEarnings, glow: 'green' as const, icon: ArrowUpCircle },
+          { label: 'Total Ecosystem Value', value: ecosystem, glow: 'cyan' as const, icon: Wallet },
+        ];
+        return (
+          <CyberCard glowColor="cyan" className="animate-fade-in-up" style={{ animationDelay: '0.35s' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <GlowingIcon icon={Target} size="sm" color="cyan" animated={false} />
+              <h2 className="text-lg font-mono font-bold">Portfolio Overview</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              {items.map((it) => (
+                <div key={it.label} className="rounded-xl border border-primary/15 bg-muted/5 p-4 hover:border-primary/30 transition-all">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{it.label}</span>
+                    <GlowingIcon icon={it.icon} size="sm" color={it.glow} animated={false} />
+                  </div>
+                  <div className="text-lg font-mono font-bold">
+                    <AnimatedNumber value={Number(it.value)} glowColor={it.glow} suffix=" USDT" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CyberCard>
+        );
+      })()}
 
       {/* Stakes — Active vs History */}
       <Tabs defaultValue="active" className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
