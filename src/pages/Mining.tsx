@@ -14,7 +14,6 @@ type Coin = 'BTC' | 'LTC' | 'DOGE';
 type Tier = 'Basic' | 'Pro' | 'Elite';
 
 interface Profile {
-  wallet_balance: number;
   mining_wallet: number;
 }
 
