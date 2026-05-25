@@ -164,7 +164,7 @@ const Mining = () => {
             <Pickaxe className="h-8 w-8 text-primary" />
             Mining Power Rental
           </h1>
-          <p className="text-muted-foreground mt-1">Allocate Mining Wallet balance to rent hashpower. Daily yields are credited automatically to your Withdrawable Earnings. The allocation stays locked for the runtime and returns to your Mining Wallet when it ends.</p>
+          <p className="text-muted-foreground mt-1">Allocate Mining Wallet balance to rent hashpower. Daily yields are credited to your Withdrawable Earnings. When runtime ends, the principal becomes withdrawable from the Withdraw page (Unlocked Principal) — it no longer returns to your Mining Wallet.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="text-right">
@@ -337,7 +337,7 @@ const Mining = () => {
                     <Server className={`h-4 w-4 ${COIN_META[r.coin].color}`} />
                     <span className="font-mono text-sm font-bold">{r.coin} {r.tier}</span>
                   </div>
-                  <Badge variant="outline" className="border-success/50 text-success text-[10px]">Allocation Returned</Badge>
+                  <Badge variant="outline" className="border-success/50 text-success text-[10px]">Principal Unlocked — Withdraw</Badge>
                 </div>
                 <div className="text-xs space-y-1 font-mono">
                   <div className="flex justify-between text-muted-foreground"><span>Allocated</span><span>{fmt(r.locked_amount, 2)} USDT</span></div>
