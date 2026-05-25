@@ -860,6 +860,14 @@ export type Database = {
           username: string
         }[]
       }
+      grant_staking_referral_activation_bonus: {
+        Args: {
+          p_deposit_id?: string
+          p_qualifying_amount: number
+          p_referee: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -887,6 +895,10 @@ export type Database = {
       }
       run_ai_scalping: { Args: never; Returns: Json }
       search_exchange: { Args: { p_stake_id: string }; Returns: Json }
+      staking_referral_qualifying_total: {
+        Args: { _user_id: string }
+        Returns: number
+      }
       start_cloud_mining: { Args: never; Returns: Json }
       start_miner: { Args: { p_miner_id: string }; Returns: Json }
       start_mining_rental: {
