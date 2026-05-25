@@ -337,7 +337,7 @@ const Mining = () => {
                     <Server className={`h-4 w-4 ${COIN_META[r.coin].color}`} />
                     <span className="font-mono text-sm font-bold">{r.coin} {r.tier}</span>
                   </div>
-                  <Badge variant="outline" className="border-success/50 text-success text-[10px]">Allocation Returned</Badge>
+                  <Badge variant="outline" className="border-success/50 text-success text-[10px]">Principal Unlocked — Withdraw</Badge>
                 </div>
                 <div className="text-xs space-y-1 font-mono">
                   <div className="flex justify-between text-muted-foreground"><span>Allocated</span><span>{fmt(r.locked_amount, 2)} USDT</span></div>
