@@ -209,6 +209,7 @@ export type Database = {
           id: string
           last_yield_at: string
           locked_amount: number
+          principal_withdrawn: boolean
           runtime_days: number
           started_at: string
           status: string
@@ -227,6 +228,7 @@ export type Database = {
           id?: string
           last_yield_at?: string
           locked_amount: number
+          principal_withdrawn?: boolean
           runtime_days: number
           started_at?: string
           status?: string
@@ -245,6 +247,7 @@ export type Database = {
           id?: string
           last_yield_at?: string
           locked_amount?: number
+          principal_withdrawn?: boolean
           runtime_days?: number
           started_at?: string
           status?: string
@@ -695,6 +698,7 @@ export type Database = {
           created_at: string | null
           fee_amount: number
           id: string
+          mining_rental_id: string | null
           net_amount: number
           processed_at: string | null
           processed_by: string | null
@@ -711,6 +715,7 @@ export type Database = {
           created_at?: string | null
           fee_amount: number
           id?: string
+          mining_rental_id?: string | null
           net_amount: number
           processed_at?: string | null
           processed_by?: string | null
@@ -727,6 +732,7 @@ export type Database = {
           created_at?: string | null
           fee_amount?: number
           id?: string
+          mining_rental_id?: string | null
           net_amount?: number
           processed_at?: string | null
           processed_by?: string | null
@@ -888,6 +894,10 @@ export type Database = {
       qualified_trading_referrals_count: {
         Args: { _user_id: string }
         Returns: number
+      }
+      request_principal_withdrawal: {
+        Args: { p_address: string; p_id: string; p_kind: string }
+        Returns: Json
       }
       request_withdrawal: {
         Args: { p_address: string; p_amount: number; p_source: string }
