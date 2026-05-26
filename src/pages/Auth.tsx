@@ -424,8 +424,8 @@ const Auth = () => {
           <div className="text-center mb-8 sm:mb-12 md:mb-16 animate-fade-in-up">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold gradient-text mb-3 sm:mb-4">Four Ways To Earn</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base md:text-lg px-2">
-              A complete USDT earning ecosystem — pick one program or combine all four. Funds move freely between
-              your Main, Staking, Mining and Trading wallets.
+              A complete USDT earning ecosystem — pick one program or combine all four. Rewards land in your
+              Withdrawable Earnings; deposits route directly to your Staking, Mining or Trading wallet.
             </p>
           </div>
 
