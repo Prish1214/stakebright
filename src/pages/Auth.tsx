@@ -436,13 +436,13 @@ const Auth = () => {
                 <GlowingIcon icon={Coins} color="purple" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">USDT Staking</h3>
                 <p className="text-sm text-muted-foreground">
-                  Lock USDT into a fixed-rate plan and earn a guaranteed daily return paid every midnight UTC,
-                  up to your plan's maximum cap. Principal returns to your Main wallet on maturity.
+                  Lock USDT into a fixed-rate plan and earn a guaranteed daily return paid every midnight UTC.
+                  Yields go to your Withdrawable Earnings; principal becomes withdrawable as Unlocked Principal at term end (fee-free).
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Daily auto-payouts</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Transparent on-chain accounting</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Principal back at end of term</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal withdrawal at maturity</li>
                 </ul>
               </div>
               <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-3">
