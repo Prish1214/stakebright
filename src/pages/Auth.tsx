@@ -197,7 +197,7 @@ const Auth = () => {
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
                 One USDT account, four ways to grow it — fixed-rate Staking, AI-powered Trading,
-                Cloud Mining, and a 5% Referral program. Your funds, your profits.
+                Cloud Mining, and a two-tier Referral program (5% activation + 1% lifetime yield share). Your funds, your profits.
               </p>
             </div>
             
@@ -395,8 +395,8 @@ const Auth = () => {
                 <GlowingIcon icon={Users} color="purple" size="lg" className="hidden sm:flex" />
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Referral Rewards</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Earn 5% commission on every deposit made by users you refer. Build your network 
-                  and maximize your passive income.
+                  Earn 5% activation bonus when a referral's first staking deposits reach $50, plus 1% of every
+                  staking yield they earn — forever. Paid straight to your Withdrawable Earnings.
                 </p>
               </div>
             </CyberCard>
@@ -424,8 +424,8 @@ const Auth = () => {
           <div className="text-center mb-8 sm:mb-12 md:mb-16 animate-fade-in-up">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold gradient-text mb-3 sm:mb-4">Four Ways To Earn</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base md:text-lg px-2">
-              A complete USDT earning ecosystem — pick one program or combine all four. Funds move freely between
-              your Main, Staking, Mining and Trading wallets.
+              A complete USDT earning ecosystem — pick one program or combine all four. Rewards land in your
+              Withdrawable Earnings; deposits route directly to your Staking, Mining or Trading wallet.
             </p>
           </div>
 
@@ -436,13 +436,13 @@ const Auth = () => {
                 <GlowingIcon icon={Coins} color="purple" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">USDT Staking</h3>
                 <p className="text-sm text-muted-foreground">
-                  Lock USDT into a fixed-rate plan and earn a guaranteed daily return paid every midnight UTC,
-                  up to your plan's maximum cap. Principal returns to your Main wallet on maturity.
+                  Lock USDT into a fixed-rate plan and earn a guaranteed daily return paid every midnight UTC.
+                  Yields go to your Withdrawable Earnings; principal becomes withdrawable as Unlocked Principal at term end (fee-free).
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Daily auto-payouts</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Transparent on-chain accounting</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Principal back at end of term</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal withdrawal at maturity</li>
                 </ul>
               </div>
               <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -507,12 +507,12 @@ const Auth = () => {
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Cloud Mining</h3>
                 <p className="text-sm text-muted-foreground">
                   Rent virtual hashpower and earn USDT mining rewards without buying hardware.
-                  Rewards stream into your Mining Wallet and can be transferred or withdrawn.
+                  Yields stream into your Withdrawable Earnings; allocated principal unlocks as withdrawable Principal when the contract ends.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No hardware, no setup</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Continuous reward accrual</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Multiple contract sizes</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal unlock at end of runtime</li>
                 </ul>
               </div>
               <div className="lg:col-span-2 grid grid-cols-3 gap-3">
@@ -538,21 +538,31 @@ const Auth = () => {
                 <GlowingIcon icon={Gift} color="pink" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Referral Program</h3>
                 <p className="text-sm text-muted-foreground">
-                  Share your unique referral link and earn <span className="text-accent font-bold">5% commission</span> on
-                  every approved deposit your referrals make — paid instantly into your Main wallet.
+                  Share your unique referral link and earn a <span className="text-accent font-bold">5% activation bonus</span>
+                  once a referral's cumulative staking deposits reach $50, plus <span className="text-accent font-bold">1% of every staking yield</span>
+                  they ever earn — credited directly to your Withdrawable Earnings.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Lifetime commission</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Instant credit on deposit</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 5% activation paid once at $50 staking threshold</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 1% lifetime yield share on every payout</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No cap on referrals</li>
                 </ul>
               </div>
               <div className="lg:col-span-2 flex flex-col justify-center">
                 <div className="rounded-lg border border-accent/30 bg-background/50 p-6 text-center">
-                  <p className="text-5xl font-mono font-bold text-accent neon-text-pink">5%</p>
-                  <p className="text-sm text-muted-foreground mt-2">commission on every deposit, forever</p>
+                  <div className="flex items-center justify-center gap-6">
+                    <div>
+                      <p className="text-4xl sm:text-5xl font-mono font-bold text-accent neon-text-pink">5%</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">activation bonus</p>
+                    </div>
+                    <span className="text-muted-foreground text-xl">+</span>
+                    <div>
+                      <p className="text-4xl sm:text-5xl font-mono font-bold text-accent neon-text-pink">1%</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">lifetime yield share</p>
+                    </div>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-4">
-                    Active stake required to qualify. Track conversions in real-time from the Referrals dashboard.
+                    Qualification: referee must accumulate $50+ in approved staking deposits. Track conversions live in the Referrals dashboard.
                   </p>
                 </div>
               </div>
@@ -568,15 +578,15 @@ const Auth = () => {
                   <h3 className="text-lg sm:text-xl font-mono font-bold gradient-text">Multi-Wallet System</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Every account ships with four isolated USDT wallets. Move funds instantly between them with
-                  zero fee — and withdraw earnings &amp; matured principal anytime (10% network fee on withdrawals).
+                  Every account ships with three deposit wallets plus a unified Withdrawable Earnings bucket.
+                  Deposits route to Staking, Mining or Trading; all rewards consolidate into Withdrawable Earnings, ready to cash out anytime.
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { name: 'Main', desc: 'Deposits & referral commissions', icon: Wallet, color: 'text-primary' },
-                    { name: 'Staking', desc: 'Active stakes & daily payouts', icon: Coins, color: 'text-secondary' },
-                    { name: 'Mining', desc: 'Cloud mining rewards', icon: Cpu, color: 'text-crypto-gold' },
-                    { name: 'Trading', desc: 'AI bot & manual trades', icon: Brain, color: 'text-accent' },
+                    { name: 'Staking Wallet', desc: 'Fund new stakes', icon: Coins, color: 'text-secondary' },
+                    { name: 'Mining Wallet', desc: 'Start mining allocations', icon: Cpu, color: 'text-crypto-gold' },
+                    { name: 'Trading Wallet', desc: 'AI bot & manual trades', icon: Brain, color: 'text-accent' },
+                    { name: 'Withdrawable Earnings', desc: 'All rewards · ready to withdraw', icon: Wallet, color: 'text-primary' },
                   ].map(w => (
                     <div key={w.name} className="rounded-lg border border-primary/20 bg-background/50 p-4 text-center">
                       <w.icon className={`w-6 h-6 mx-auto mb-2 ${w.color}`} />
@@ -585,9 +595,9 @@ const Auth = () => {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Repeat className="w-4 h-4 text-primary" />
-                  <span>Instant transfers · BEP-20 USDT deposits via NOWPayments · 10% withdrawal fee</span>
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground text-center">
+                  <Repeat className="w-4 h-4 text-primary shrink-0" />
+                  <span>BEP-20 USDT deposits via NOWPayments · 10% fee on earnings/trading withdrawals · fee-free principal unlock</span>
                 </div>
               </div>
             </CyberCard>

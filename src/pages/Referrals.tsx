@@ -129,7 +129,8 @@ const Referrals = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Referral Program</h1>
         <p className="text-muted-foreground mt-2">
-          Earn 5% commission on every deposit made by users you refer
+          Earn a <span className="text-crypto-gold font-semibold">5% activation bonus</span> when a referral's
+          staking deposits hit $50, plus <span className="text-crypto-gold font-semibold">1% of every staking yield</span> they ever earn.
         </p>
       </div>
 
@@ -252,7 +253,12 @@ const Referrals = () => {
                         +{Number(earning.amount).toFixed(2)} USDT
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        From {earning.profiles?.username || 'Unknown user'} • {earning.percentage}% commission
+                        From {earning.profiles?.username || 'Unknown user'} •{' '}
+                        {(earning as any).kind === 'activation'
+                          ? '5% activation bonus'
+                          : (earning as any).kind === 'yield_share'
+                            ? '1% staking yield share'
+                            : `${earning.percentage}% commission`}
                       </p>
                     </div>
                     <div className="text-right">
@@ -274,15 +280,26 @@ const Referrals = () => {
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">1</div>
-              <p>Share your unique referral code with friends and family</p>
+              <p>Share your unique referral code or link with friends and family.</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">2</div>
-              <p>Earn <span className="font-bold text-crypto-gold">5% commission on EVERY deposit</span> your referrals make - not just the first one!</p>
+              <p>
+                Once their approved deposits into the <span className="font-semibold">Staking Wallet</span> reach
+                <span className="font-bold text-crypto-gold"> $50</span>, you receive a one-time
+                <span className="font-bold text-crypto-gold"> 5% activation bonus</span> on that qualifying deposit.
+              </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">3</div>
-              <p>Commissions are added to your withdrawable balance immediately</p>
+              <p>
+                After activation you also earn <span className="font-bold text-crypto-gold">1% of every staking yield</span> they
+                ever receive — paid automatically, forever.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-crypto-purple text-white flex items-center justify-center text-xs font-bold">4</div>
+              <p>All commissions land in your <span className="font-semibold">Withdrawable Earnings</span> instantly and can be withdrawn anytime (10% fee).</p>
             </div>
           </div>
         </CardContent>
