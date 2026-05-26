@@ -129,7 +129,8 @@ const Referrals = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Referral Program</h1>
         <p className="text-muted-foreground mt-2">
-          Earn 5% commission on every deposit made by users you refer
+          Earn a <span className="text-crypto-gold font-semibold">5% activation bonus</span> when a referral's
+          staking deposits hit $50, plus <span className="text-crypto-gold font-semibold">1% of every staking yield</span> they ever earn.
         </p>
       </div>
 
