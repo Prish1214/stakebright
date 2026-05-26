@@ -253,7 +253,12 @@ const Referrals = () => {
                         +{Number(earning.amount).toFixed(2)} USDT
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        From {earning.profiles?.username || 'Unknown user'} • {earning.percentage}% commission
+                        From {earning.profiles?.username || 'Unknown user'} •{' '}
+                        {(earning as any).kind === 'activation'
+                          ? '5% activation bonus'
+                          : (earning as any).kind === 'yield_share'
+                            ? '1% staking yield share'
+                            : `${earning.percentage}% commission`}
                       </p>
                     </div>
                     <div className="text-right">
