@@ -197,7 +197,7 @@ const Auth = () => {
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
                 One USDT account, four ways to grow it — fixed-rate Staking, AI-powered Trading,
-                Cloud Mining, and a 5% Referral program. Your funds, your profits.
+                Cloud Mining, and a two-tier Referral program (5% activation + 1% lifetime yield share). Your funds, your profits.
               </p>
             </div>
             
