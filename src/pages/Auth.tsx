@@ -538,21 +538,31 @@ const Auth = () => {
                 <GlowingIcon icon={Gift} color="pink" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Referral Program</h3>
                 <p className="text-sm text-muted-foreground">
-                  Share your unique referral link and earn <span className="text-accent font-bold">5% commission</span> on
-                  every approved deposit your referrals make — paid instantly into your Main wallet.
+                  Share your unique referral link and earn a <span className="text-accent font-bold">5% activation bonus</span>
+                  once a referral's cumulative staking deposits reach $50, plus <span className="text-accent font-bold">1% of every staking yield</span>
+                  they ever earn — credited directly to your Withdrawable Earnings.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Lifetime commission</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Instant credit on deposit</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 5% activation paid once at $50 staking threshold</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 1% lifetime yield share on every payout</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No cap on referrals</li>
                 </ul>
               </div>
               <div className="lg:col-span-2 flex flex-col justify-center">
                 <div className="rounded-lg border border-accent/30 bg-background/50 p-6 text-center">
-                  <p className="text-5xl font-mono font-bold text-accent neon-text-pink">5%</p>
-                  <p className="text-sm text-muted-foreground mt-2">commission on every deposit, forever</p>
+                  <div className="flex items-center justify-center gap-6">
+                    <div>
+                      <p className="text-4xl sm:text-5xl font-mono font-bold text-accent neon-text-pink">5%</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">activation bonus</p>
+                    </div>
+                    <span className="text-muted-foreground text-xl">+</span>
+                    <div>
+                      <p className="text-4xl sm:text-5xl font-mono font-bold text-accent neon-text-pink">1%</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">lifetime yield share</p>
+                    </div>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-4">
-                    Active stake required to qualify. Track conversions in real-time from the Referrals dashboard.
+                    Qualification: referee must accumulate $50+ in approved staking deposits. Track conversions live in the Referrals dashboard.
                   </p>
                 </div>
               </div>
