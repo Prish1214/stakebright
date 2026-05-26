@@ -86,7 +86,37 @@ const ChartCard = ({ sym, pair, color, tf }: { sym: Sym; pair: string; color: st
       } catch {}
     }, TF_CONFIG[tf].pollMs);
 
-    return () => { cancelled = true; clearInterval(poll); ro.disconnect(); chart.remove(); };
+    // Live tick updates via Binance WebSocket so the current candle fluctuates in real time
+    let ws: WebSocket | null = null;
+    const openWs = () => {
+      try {
+        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${pair.toLowerCase()}@kline_${TF_CONFIG[tf].interval}`);
+        ws.onmessage = (ev) => {
+          if (cancelled) return;
+          try {
+            const k = JSON.parse(ev.data)?.k;
+            if (!k) return;
+            const point = { time: Math.floor(k.t / 1000) as UTCTimestamp, value: +(+k.c).toFixed(2) };
+            series.update(point);
+            setPrice(point.value);
+          } catch {}
+        };
+        ws.onclose = () => {
+          if (cancelled) return;
+          setTimeout(openWs, 3000);
+        };
+        ws.onerror = () => { try { ws?.close(); } catch {} };
+      } catch {}
+    };
+    openWs();
+
+    return () => {
+      cancelled = true;
+      clearInterval(poll);
+      ro.disconnect();
+      try { ws?.close(); } catch {}
+      chart.remove();
+    };
   }, [sym, pair, color, tf]);
 
   const change = open ? ((price - open) / open) * 100 : 0;
