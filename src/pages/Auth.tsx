@@ -507,12 +507,12 @@ const Auth = () => {
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Cloud Mining</h3>
                 <p className="text-sm text-muted-foreground">
                   Rent virtual hashpower and earn USDT mining rewards without buying hardware.
-                  Rewards stream into your Mining Wallet and can be transferred or withdrawn.
+                  Yields stream into your Withdrawable Earnings; allocated principal unlocks as withdrawable Principal when the contract ends.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No hardware, no setup</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Continuous reward accrual</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Multiple contract sizes</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal unlock at end of runtime</li>
                 </ul>
               </div>
               <div className="lg:col-span-2 grid grid-cols-3 gap-3">
