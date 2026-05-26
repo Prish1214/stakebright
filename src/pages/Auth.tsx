@@ -395,8 +395,8 @@ const Auth = () => {
                 <GlowingIcon icon={Users} color="purple" size="lg" className="hidden sm:flex" />
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Referral Rewards</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Earn 5% commission on every deposit made by users you refer. Build your network 
-                  and maximize your passive income.
+                  Earn 5% activation bonus when a referral's first staking deposits reach $50, plus 1% of every
+                  staking yield they earn — forever. Paid straight to your Withdrawable Earnings.
                 </p>
               </div>
             </CyberCard>
