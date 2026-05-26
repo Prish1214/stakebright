@@ -578,15 +578,15 @@ const Auth = () => {
                   <h3 className="text-lg sm:text-xl font-mono font-bold gradient-text">Multi-Wallet System</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Every account ships with four isolated USDT wallets. Move funds instantly between them with
-                  zero fee — and withdraw earnings &amp; matured principal anytime (10% network fee on withdrawals).
+                  Every account ships with three deposit wallets plus a unified Withdrawable Earnings bucket.
+                  Deposits route to Staking, Mining or Trading; all rewards consolidate into Withdrawable Earnings, ready to cash out anytime.
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { name: 'Main', desc: 'Deposits & referral commissions', icon: Wallet, color: 'text-primary' },
-                    { name: 'Staking', desc: 'Active stakes & daily payouts', icon: Coins, color: 'text-secondary' },
-                    { name: 'Mining', desc: 'Cloud mining rewards', icon: Cpu, color: 'text-crypto-gold' },
-                    { name: 'Trading', desc: 'AI bot & manual trades', icon: Brain, color: 'text-accent' },
+                    { name: 'Staking Wallet', desc: 'Fund new stakes', icon: Coins, color: 'text-secondary' },
+                    { name: 'Mining Wallet', desc: 'Start mining allocations', icon: Cpu, color: 'text-crypto-gold' },
+                    { name: 'Trading Wallet', desc: 'AI bot & manual trades', icon: Brain, color: 'text-accent' },
+                    { name: 'Withdrawable Earnings', desc: 'All rewards · ready to withdraw', icon: Wallet, color: 'text-primary' },
                   ].map(w => (
                     <div key={w.name} className="rounded-lg border border-primary/20 bg-background/50 p-4 text-center">
                       <w.icon className={`w-6 h-6 mx-auto mb-2 ${w.color}`} />
@@ -595,9 +595,9 @@ const Auth = () => {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Repeat className="w-4 h-4 text-primary" />
-                  <span>Instant transfers · BEP-20 USDT deposits via NOWPayments · 10% withdrawal fee</span>
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground text-center">
+                  <Repeat className="w-4 h-4 text-primary shrink-0" />
+                  <span>BEP-20 USDT deposits via NOWPayments · 10% fee on earnings/trading withdrawals · fee-free principal unlock</span>
                 </div>
               </div>
             </CyberCard>
