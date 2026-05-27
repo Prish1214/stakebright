@@ -337,10 +337,10 @@ const Auth = () => {
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={Wallet} color="purple" size="md" className="sm:hidden" />
                 <GlowingIcon icon={Wallet} color="purple" size="lg" className="hidden sm:flex" />
-                <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Stake Your Stablecoins</h3>
+                <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Direct Deposit</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Deposit USDT, USDC, or other stablecoins. Your funds remain secure while our experts 
-                  put them to work in the crypto markets.
+                  Deposit BEP-20 USDT straight into the program you want to fund — Staking, Mining, or Trading.
+                  No swaps, no intermediate wallets. Your funds go exactly where you choose.
                 </p>
               </div>
             </CyberCard>
@@ -351,10 +351,10 @@ const Auth = () => {
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <GlowingIcon icon={BarChart3} color="cyan" size="md" className="sm:hidden" />
                 <GlowingIcon icon={BarChart3} color="cyan" size="lg" className="hidden sm:flex" />
-                <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Expert Trading</h3>
+                <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">AI Scalping Engine</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Our team of seasoned traders with 7+ years of experience execute strategic trades 
-                  across multiple exchanges and markets.
+                  Activate a level-based AI scalper that scans live Binance order books across BTC, ETH, SOL and BNB.
+                  Higher wallet balance and referrals unlock bigger profit bands.
                 </p>
               </div>
             </CyberCard>
@@ -367,8 +367,8 @@ const Auth = () => {
                 <GlowingIcon icon={TrendingUp} color="gold" size="lg" className="hidden sm:flex" />
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Earn Daily Profits</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Receive daily returns on your staked amount. Watch your investment grow with 
-                  consistent, transparent profit distributions.
+                  Staking pays daily yields at midnight UTC. Mining rewards accrue continuously.
+                  All profits consolidate into one unified Withdrawable Earnings balance.
                 </p>
               </div>
             </CyberCard>
