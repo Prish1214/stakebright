@@ -569,23 +569,24 @@ const Auth = () => {
             </div>
           </CyberCard>
 
-          {/* Wallet system */}
+          {/* Direct Deposit system */}
           <div className="mt-8 sm:mt-12">
             <CyberCard className="animate-fade-in-up">
               <div className="p-5 sm:p-7 md:p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <Layers className="w-6 h-6 text-primary" />
-                  <h3 className="text-lg sm:text-xl font-mono font-bold gradient-text">Multi-Wallet System</h3>
+                  <h3 className="text-lg sm:text-xl font-mono font-bold gradient-text">Direct Deposit System</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Every account ships with three deposit wallets plus a unified Withdrawable Earnings bucket.
-                  Deposits route to Staking, Mining or Trading; all rewards consolidate into Withdrawable Earnings, ready to cash out anytime.
+                  Pick the program you want to fund and deposit USDT straight into it — Staking, Mining or Trading.
+                  No intermediate wallet, no transfers. All rewards from every program consolidate into one unified
+                  Withdrawable Earnings balance, ready to cash out anytime.
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { name: 'Staking Wallet', desc: 'Fund new stakes', icon: Coins, color: 'text-secondary' },
-                    { name: 'Mining Wallet', desc: 'Start mining allocations', icon: Cpu, color: 'text-crypto-gold' },
-                    { name: 'Trading Wallet', desc: 'AI bot & manual trades', icon: Brain, color: 'text-accent' },
+                    { name: 'Staking Wallet', desc: 'Deposit to start a stake', icon: Coins, color: 'text-secondary' },
+                    { name: 'Mining Wallet', desc: 'Deposit to rent hashpower', icon: Cpu, color: 'text-crypto-gold' },
+                    { name: 'Trading Wallet', desc: 'Deposit for AI bot & manual trades', icon: Brain, color: 'text-accent' },
                     { name: 'Withdrawable Earnings', desc: 'All rewards · ready to withdraw', icon: Wallet, color: 'text-primary' },
                   ].map(w => (
                     <div key={w.name} className="rounded-lg border border-primary/20 bg-background/50 p-4 text-center">
@@ -597,11 +598,12 @@ const Auth = () => {
                 </div>
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground text-center">
                   <Repeat className="w-4 h-4 text-primary shrink-0" />
-                  <span>BEP-20 USDT deposits via NOWPayments · 10% fee on earnings/trading withdrawals · fee-free principal unlock</span>
+                  <span>BEP-20 USDT deposits · 10% fee on earnings/trading withdrawals · fee-free principal unlock</span>
                 </div>
               </div>
             </CyberCard>
           </div>
+
         </div>
       </section>
       <section id="performance" className="py-12 sm:py-16 md:py-24 px-3 sm:px-4 relative z-10 bg-muted/20">
