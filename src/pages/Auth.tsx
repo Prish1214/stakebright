@@ -727,27 +727,27 @@ const Auth = () => {
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-bold mb-4 sm:mb-6 text-center">Frequently Asked Questions</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-1 sm:space-y-2">
-                    <h4 className="font-mono text-primary text-sm sm:text-base">How do I start staking?</h4>
+                    <h4 className="font-mono text-primary text-sm sm:text-base">How do I start earning?</h4>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Simply create an account, deposit your stablecoins, and choose a staking plan that fits your goals.
+                      Create an account, deposit BEP-20 USDT directly into the wallet you want to use (Staking, Mining, or Trading), then activate your chosen program.
                     </p>
                   </div>
                   <div className="space-y-1 sm:space-y-2">
                     <h4 className="font-mono text-primary text-sm sm:text-base">When do I receive profits?</h4>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Profits are calculated and added to your account daily based on your active staking plans.
-                    </p>
-                  </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <h4 className="font-mono text-primary text-sm sm:text-base">Is my investment safe?</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      We employ multiple security measures including cold storage and strict risk management protocols.
+                      Staking pays daily at midnight UTC. Mining yields accrue continuously. Trading profits credit immediately after each scalp cycle. All flow to Withdrawable Earnings or Trading Wallet.
                     </p>
                   </div>
                   <div className="space-y-1 sm:space-y-2">
                     <h4 className="font-mono text-primary text-sm sm:text-base">How do withdrawals work?</h4>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Request a withdrawal anytime. Earnings are processed within 24-48 hours after admin approval.
+                      Earnings and Trading Wallet withdrawals carry a 10% fee. Unlocked Principal (staking and mining) withdrawals are fee-free after the contract term ends.
+                    </p>
+                  </div>
+                  <div className="space-y-1 sm:space-y-2">
+                    <h4 className="font-mono text-primary text-sm sm:text-base">How do referrals work?</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Earn a 5% one-time activation bonus when a referral's cumulative staking deposits reach $50, plus 1% of every staking yield they earn — forever.
                     </p>
                   </div>
                 </div>
