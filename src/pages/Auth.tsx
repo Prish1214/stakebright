@@ -409,8 +409,8 @@ const Auth = () => {
                 <GlowingIcon icon={Target} color="gold" size="lg" className="hidden sm:flex" />
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Flexible Plans</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Choose from multiple staking plans tailored to your investment goals. Higher 
-                  stakes unlock premium return rates.
+                  Choose from tiered Staking plans, coin-specific Cloud Mining contracts, and
+                  level-based AI Trading — each with clear requirements and unlock conditions.
                 </p>
               </div>
             </CyberCard>
@@ -436,27 +436,29 @@ const Auth = () => {
                 <GlowingIcon icon={Coins} color="purple" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">USDT Staking</h3>
                 <p className="text-sm text-muted-foreground">
-                  Lock USDT into a fixed-rate plan and earn a guaranteed daily return paid every midnight UTC.
-                  Yields go to your Withdrawable Earnings; principal becomes withdrawable as Unlocked Principal at term end (fee-free).
+                  Lock USDT from your Staking Wallet into a fixed-term plan and earn daily yields paid every midnight UTC.
+                  Yields flow straight to your Withdrawable Earnings; principal unlocks as Unlocked Principal at term end (fee-free).
+                  Plans are unlocked by qualified referrals — higher tiers need more referrals to access.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Daily auto-payouts</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Transparent on-chain accounting</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Daily auto-payouts at midnight UTC</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Search Exchange bonus scan every 24h</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal withdrawal at maturity</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Plans unlock via qualified referrals</li>
                 </ul>
               </div>
-              <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
                 {[
-                  { name: 'Bronze', rate: '1.0%', dur: '30d', min: '$10' },
-                  { name: 'Silver', rate: '1.5%', dur: '45d', min: '$100' },
-                  { name: 'Gold', rate: '2.0%', dur: '60d', min: '$500' },
-                  { name: 'Platinum', rate: '2.5%', dur: '90d', min: '$2,000' },
+                  { name: 'Silver', rate: '1.5%', dur: '45 days', min: '$100', refs: '3 refs' },
+                  { name: 'Gold', rate: '2.0%', dur: '60 days', min: '$500', refs: '8 refs' },
+                  { name: 'Platinum', rate: '2.5%', dur: '90 days', min: '$2,000', refs: '20 refs' },
                 ].map(p => (
                   <div key={p.name} className="rounded-lg border border-primary/20 bg-background/50 p-3 text-center hover:border-primary/40 transition-colors">
                     <p className="font-mono text-xs text-muted-foreground uppercase">{p.name}</p>
                     <p className="text-2xl font-mono font-bold text-primary mt-1">{p.rate}</p>
                     <p className="text-[10px] text-muted-foreground">daily · {p.dur}</p>
                     <p className="text-[10px] text-success mt-1">min {p.min}</p>
+                    <p className="text-[10px] text-accent mt-0.5">{p.refs}</p>
                   </div>
                 ))}
               </div>
