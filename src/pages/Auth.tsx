@@ -472,31 +472,33 @@ const Auth = () => {
                 <GlowingIcon icon={Brain} color="cyan" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">AI Trading Bot</h3>
                 <p className="text-sm text-muted-foreground">
-                  Activate a 24-hour AI scalper that trades BTC / ETH / SOL pairs with live market data
-                  and adaptive strategy — or place instant manual trades from your Trading Wallet.
+                  Activate a level-based AI scalper that sweeps live Binance order books across BTC, ETH, SOL and BNB.
+                  Each 24-hour cycle runs autonomously — higher wallet balance and more active referrals unlock bigger profit bands.
+                  Profits credit directly to your Trading Wallet, fully withdrawable.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Live Binance price feed</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Manual scalp trades (BUY/SELL)</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Win-rate &amp; PnL tracking</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 6 unlockable levels (Recruit → Sovereign)</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Live WebSocket price feed from Binance</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 24h cooldown between scalp cycles</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Trading Wallet profits — 10% withdraw fee</li>
                 </ul>
               </div>
-              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
-                  <p className="text-xs uppercase text-muted-foreground">Cycle</p>
-                  <p className="text-2xl font-mono font-bold text-secondary mt-1">24h</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">Auto-trade session length</p>
-                </div>
-                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
-                  <p className="text-xs uppercase text-muted-foreground">Manual fee</p>
-                  <p className="text-2xl font-mono font-bold text-secondary mt-1">0.1%</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">Per scalp trade</p>
-                </div>
-                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
-                  <p className="text-xs uppercase text-muted-foreground">P/L range</p>
-                  <p className="text-2xl font-mono font-bold text-secondary mt-1">-2% / +5%</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">Per manual trade</p>
-                </div>
+              <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+                {[
+                  { lvl: 'L1', name: 'Recruit', range: '0.8–1.0%', req: '$100 bal' },
+                  { lvl: 'L2', name: 'Operator', range: '1.05–1.2%', req: '$500 · 3 refs' },
+                  { lvl: 'L3', name: 'Strategist', range: '1.5–1.7%', req: '$1.5K · 8 refs' },
+                  { lvl: 'L4', name: 'Commander', range: '1.85–2.0%', req: '$5K · 20 refs' },
+                  { lvl: 'L5', name: 'Architect', range: '2.2–2.6%', req: '$12K · 50 refs' },
+                  { lvl: 'L6', name: 'Sovereign', range: '3.2–3.5%', req: '$30K · 100 refs' },
+                ].map(p => (
+                  <div key={p.lvl} className="rounded-lg border border-secondary/30 bg-background/50 p-3 text-center hover:border-secondary/50 transition-colors">
+                    <p className="font-mono text-[10px] text-muted-foreground uppercase">{p.lvl} {p.name}</p>
+                    <p className="text-xl font-mono font-bold text-secondary mt-1">{p.range}</p>
+                    <p className="text-[10px] text-muted-foreground">/ cycle est.</p>
+                    <p className="text-[10px] text-accent mt-1">{p.req}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </CyberCard>
@@ -508,25 +510,29 @@ const Auth = () => {
                 <GlowingIcon icon={Cpu} color="gold" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Cloud Mining</h3>
                 <p className="text-sm text-muted-foreground">
-                  Rent virtual hashpower and earn USDT mining rewards without buying hardware.
-                  Yields stream into your Withdrawable Earnings; allocated principal unlocks as withdrawable Principal when the contract ends.
+                  Rent virtual hashpower for Bitcoin, Litecoin or Dogecoin and earn USDT rewards without buying hardware.
+                  Yields stream into your Withdrawable Earnings; allocated principal stays locked until runtime ends,
+                  then becomes withdrawable Unlocked Principal — just like staking. Mining Wallet is only used to start new rentals.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No hardware, no setup</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Continuous reward accrual</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 3 coins: BTC, LTC, DOGE</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Continuous reward accrual while active</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal unlock at end of runtime</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Principal does not return to Mining Wallet</li>
                 </ul>
               </div>
-              <div className="lg:col-span-2 grid grid-cols-3 gap-3">
+              <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
                 {[
-                  { name: 'Starter', power: '1 TH/s', daily: '~0.8%' },
-                  { name: 'Pro', power: '5 TH/s', daily: '~1.2%' },
-                  { name: 'Enterprise', power: '20 TH/s', daily: '~1.8%' },
+                  { coin: 'Bitcoin', tier: 'Basic / Pro / Elite', price: '$50 / $200 / $750', days: '30 / 60 / 90d', daily: '0.7–1.5%' },
+                  { coin: 'Litecoin', tier: 'Basic / Pro / Elite', price: '$40 / $180 / $700', days: '30 / 60 / 90d', daily: '0.9–1.7%' },
+                  { coin: 'Dogecoin', tier: 'Basic / Pro / Elite', price: '$30 / $150 / $600', days: '20 / 45 / 75d', daily: '1.2–2.3%' },
                 ].map(p => (
-                  <div key={p.name} className="rounded-lg border border-crypto-gold/30 bg-background/50 p-4 text-center">
-                    <p className="font-mono text-xs text-muted-foreground uppercase">{p.name}</p>
-                    <p className="text-lg font-mono font-bold text-crypto-gold mt-1">{p.power}</p>
-                    <p className="text-[11px] text-success mt-1">{p.daily} daily est.</p>
+                  <div key={p.coin} className="rounded-lg border border-crypto-gold/30 bg-background/50 p-3 text-center hover:border-crypto-gold/50 transition-colors">
+                    <p className="font-mono text-xs text-muted-foreground uppercase">{p.coin}</p>
+                    <p className="text-sm font-mono font-bold text-crypto-gold mt-1">{p.tier}</p>
+                    <p className="text-[10px] text-muted-foreground">{p.price}</p>
+                    <p className="text-[10px] text-success mt-1">{p.daily} daily</p>
+                    <p className="text-[10px] text-muted-foreground">{p.days}</p>
                   </div>
                 ))}
               </div>
