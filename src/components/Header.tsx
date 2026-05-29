@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
-import { LogOut, User, Menu } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
+import { LogOut, User, Menu, Sun, Moon } from 'lucide-react';
+
 import { 
   DropdownMenu,
   DropdownMenuContent,
