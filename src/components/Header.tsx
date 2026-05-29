@@ -16,6 +16,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export const Header = () => {
   const { user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+
 
   const userInitials = user?.email?.charAt(0).toUpperCase() || 'U';
 
