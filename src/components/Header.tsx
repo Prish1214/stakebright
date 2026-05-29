@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
-import { LogOut, User, Menu } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
+import { LogOut, User, Menu, Sun, Moon } from 'lucide-react';
+
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +16,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export const Header = () => {
   const { user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+
 
   const userInitials = user?.email?.charAt(0).toUpperCase() || 'U';
 
@@ -26,7 +30,17 @@ export const Header = () => {
           </SidebarTrigger>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            className="h-9 w-9"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
