@@ -103,7 +103,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={getNavCls} onClick={handleMenuClick}>
                       <item.icon className="w-4 h-4 mr-2" />
-                      {state !== 'collapsed' && <span className="text-[#fcfcfc]">{item.title}</span>}
+                      {state !== 'collapsed' && <span className="text-sidebar-foreground">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
@@ -122,7 +122,7 @@ export function AppSidebar() {
                         <item.icon className="w-4 h-4 mr-2" />
                         {state !== 'collapsed' && (
                           <>
-                            <span className="text-[#fcfcfc]">{item.title}</span>
+                            <span className="text-sidebar-foreground">{item.title}</span>
                             <ExternalLink className="w-3 h-3 ml-auto text-muted-foreground" />
                           </>
                         )}
@@ -130,7 +130,7 @@ export function AppSidebar() {
                     ) : (
                       <NavLink to={item.url} className={getNavCls} onClick={handleMenuClick}>
                         <item.icon className="w-4 h-4 mr-2" />
-                        {state !== 'collapsed' && <span className="text-[#fcfcfc]">{item.title}</span>}
+                        {state !== 'collapsed' && <span className="text-sidebar-foreground">{item.title}</span>}
                       </NavLink>
                     )}
                   </SidebarMenuButton>
@@ -139,7 +139,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild>
                   <NavLink to="/latest-updates" className={getNavCls} onClick={handleMenuClick}>
                     <Megaphone className="w-4 h-4 mr-2" />
-                    {state !== 'collapsed' && <span className="text-[#fcfcfc]">Latest Updates/Offers</span>}
+                    {state !== 'collapsed' && <span className="text-sidebar-foreground">Latest Updates/Offers</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -156,7 +156,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to="/admin" className={getNavCls} onClick={handleMenuClick}>
                       <Shield className="w-4 h-4 mr-2" />
-                      {state !== 'collapsed' && <span className="text-[#fcfcfc]">Admin Panel</span>}
+                      {state !== 'collapsed' && <span className="text-sidebar-foreground">Admin Panel</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
