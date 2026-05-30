@@ -39,11 +39,6 @@ const proofItems = [{
   icon: HelpCircle,
   external: false
 }, {
-  title: 'Withdraw Proof',
-  url: 'https://t.me/+0Jj0_GyXh5RlMGJl',
-  icon: CheckCircle,
-  external: true
-}, {
   title: 'About',
   url: '/about',
   icon: Info,
