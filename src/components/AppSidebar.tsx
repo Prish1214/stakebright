@@ -44,11 +44,6 @@ const proofItems = [{
   icon: CheckCircle,
   external: true
 }, {
-  title: 'Trading-Profits Proof',
-  url: 'https://t.me/+0Jj0_GyXh5RlMGJl',
-  icon: BarChart3,
-  external: true
-}, {
   title: 'About',
   url: '/about',
   icon: Info,
