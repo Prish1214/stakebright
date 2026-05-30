@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import NeonButton from '@/components/ui/NeonButton';
 import GlowingIcon from '@/components/ui/GlowingIcon';
 import CyberCard from '@/components/ui/CyberCard';
+import platformLogo from '@/assets/logo.jpeg';
 const Auth = () => {
   const {
     user,
@@ -163,8 +164,8 @@ const Auth = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-primary/20">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-neon-gradient flex items-center justify-center">
-              <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-background" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg overflow-hidden ring-1 ring-primary/40 dark:bg-black bg-white flex items-center justify-center neon-glow-purple">
+              <img src={platformLogo} alt="Stake Bright logo" className="w-full h-full object-contain dark:mix-blend-normal mix-blend-multiply" />
             </div>
             <span className="font-mono text-base sm:text-xl font-bold gradient-text">STAKE BRIGHT</span>
           </div>
