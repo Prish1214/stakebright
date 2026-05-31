@@ -61,7 +61,7 @@ const WALLETS: { id: WalletType; title: string; desc: string; icon: React.Elemen
 const NETWORKS: { id: NetworkType; title: string; desc: string; badge: string; disabled?: boolean; soon?: boolean }[] = [
   { id: 'bep20', title: 'USDT • BEP20', desc: 'Binance Smart Chain — fast & low fee', badge: 'Recommended' },
   { id: 'trc20', title: 'USDT • TRC20', desc: 'Tron network — ultra low fees', badge: 'Popular' },
-  { id: 'upi',   title: 'INR • UPI',     desc: 'Coming soon — pay in INR via UPI',  badge: 'Soon', disabled: true, soon: true },
+  { id: 'upi',   title: 'INR • UPI',     desc: 'Pay in INR via UPI — powered by Transak',  badge: 'New' },
 ];
 
 const Deposit = () => {
@@ -80,6 +80,11 @@ const Deposit = () => {
   const [amount, setAmount] = useState('');
   const [minDeposit, setMinDeposit] = useState<number | null>(null);
   const [minLoading, setMinLoading] = useState(false);
+
+  // INR/Transak state
+  const [inrAmount, setInrAmount] = useState('');
+  const [quote, setQuote] = useState<{ usdt_amount: number; rate: number; fees_inr: number; fallback?: boolean } | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
 
   const cancelDeposit = useCallback(async (depositId: string) => {
     try {
@@ -186,8 +191,54 @@ const Deposit = () => {
     }
   };
 
+  // Debounced INR quote fetch
+  useEffect(() => {
+    if (step !== 3 || network !== 'upi') { setQuote(null); return; }
+    const amt = parseFloat(inrAmount);
+    if (!amt || amt < 100) { setQuote(null); return; }
+    setQuoteLoading(true);
+    const t = setTimeout(() => {
+      supabase.functions.invoke('transak-quote', { body: { inr_amount: amt } })
+        .then(({ data, error }) => {
+          if (!error && data?.usdt_amount) setQuote(data);
+        })
+        .finally(() => setQuoteLoading(false));
+    }, 350);
+    return () => clearTimeout(t);
+  }, [inrAmount, network, step]);
+
+  const handleCreateTransakOrder = async () => {
+    if (!wallet || network !== 'upi') return;
+    const amt = parseFloat(inrAmount);
+    if (!amt || amt < 100) {
+      toast({ title: 'Amount too low', description: 'Minimum INR deposit is ₹100', variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('transak-create-order', {
+        body: {
+          inr_amount: amt,
+          target_wallet: wallet,
+          usdt_amount: quote?.usdt_amount,
+          rate: quote?.rate,
+        }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      window.open(data.widget_url, '_blank', 'noopener,noreferrer');
+      toast({ title: 'Transak opened', description: 'Complete the payment in the new tab. USDT will be credited automatically.' });
+      resetFlow();
+      fetchDepositHistory();
+    } catch (e) {
+      toast({ title: 'Could not start payment', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetFlow = () => {
-    setStep(1); setWallet(null); setNetwork(null); setAmount('');
+    setStep(1); setWallet(null); setNetwork(null); setAmount(''); setInrAmount(''); setQuote(null);
     setPaymentData(null); setTimeLeft(null); setCurrentDepositId(null);
   };
 
@@ -348,8 +399,8 @@ const Deposit = () => {
               </div>
             )}
 
-            {/* STEP 3 — Amount */}
-            {!paymentData && step === 3 && (
+            {/* STEP 3 — Amount (USDT crypto) */}
+            {!paymentData && step === 3 && network !== 'upi' && (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">Enter Deposit Amount</h3>
@@ -392,6 +443,79 @@ const Deposit = () => {
                     {loading ? 'Generating…' : minLoading ? 'Checking minimum…' : 'Generate Payment Address'}
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* STEP 3 — INR (Transak) */}
+            {!paymentData && step === 3 && network === 'upi' && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold">Pay in INR via UPI</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Powered by <span className="font-semibold text-primary">Transak</span> • USDT credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span>
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inr">Amount (INR)</Label>
+                  <div className="relative">
+                    <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="inr" type="number" placeholder="1000" min="100" step="1" className="pl-9"
+                      value={inrAmount} onChange={(e) => setInrAmount(e.target.value)} />
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {[500, 1000, 5000, 10000, 25000].map(v => (
+                      <button key={v} type="button" onClick={() => setInrAmount(String(v))}
+                        className="px-3 py-1 text-xs rounded-full border border-border hover:border-primary hover:bg-primary/10 transition">
+                        ₹{v.toLocaleString('en-IN')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">You pay</span>
+                    <span className="font-semibold">₹{inrAmount ? Number(inrAmount).toLocaleString('en-IN') : '0'}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">You receive</span>
+                    <span className="font-semibold text-primary">
+                      {quoteLoading ? 'Calculating…' : quote ? `≈ ${quote.usdt_amount.toFixed(2)} USDT` : '— USDT'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Live rate</span>
+                    <span>{quote ? `1 USDT ≈ ₹${quote.rate.toFixed(2)}` : '—'}</span>
+                  </div>
+                  {quote && quote.fees_inr > 0 && (
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Transak fees</span>
+                      <span>₹{quote.fees_inr.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-xs pt-2 border-t border-border/50">
+                    <span className="text-muted-foreground">Destination</span>
+                    <span className="font-medium">{walletLabel(wallet || undefined)} Wallet</span>
+                  </div>
+                </div>
+
+                {inrAmount && parseFloat(inrAmount) < 100 && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-xs p-3">
+                    Minimum INR amount is <span className="font-bold">₹100</span>.
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(2)}><ChevronLeft className="h-4 w-4" /></Button>
+                  <Button className="flex-1"
+                    disabled={loading || !inrAmount || parseFloat(inrAmount) < 100 || quoteLoading}
+                    onClick={handleCreateTransakOrder}>
+                    {loading ? 'Opening Transak…' : 'Continue to Pay with UPI'}
+                  </Button>
+                </div>
+                <p className="text-[10px] text-center text-muted-foreground">
+                  You'll be redirected to Transak in a new tab. After successful payment, USDT is credited to your wallet automatically.
+                </p>
               </div>
             )}
 
@@ -494,8 +618,8 @@ const Deposit = () => {
           </h4>
           <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
             <li>Pick the wallet you want to fund (Stake, AI Trading, or Mining)</li>
-            <li>Choose your network — USDT BEP20 or TRC20 (INR/UPI coming soon)</li>
-            <li>Send the exact amount within 3 minutes</li>
+            <li>Choose your network — USDT BEP20, USDT TRC20, or INR via UPI (Transak)</li>
+            <li>For crypto: send the exact amount within 3 minutes. For INR: complete UPI payment in Transak.</li>
             <li>Funds are credited directly to your chosen wallet — no manual transfer required</li>
           </ul>
         </CardContent>

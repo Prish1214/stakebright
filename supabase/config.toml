@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.create-payment]
 verify_jwt = true
+
+[functions.transak-webhook]
+verify_jwt = false
+
+[functions.transak-quote]
+verify_jwt = false
+
+[functions.transak-create-order]
+verify_jwt = true
