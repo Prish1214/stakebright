@@ -399,8 +399,8 @@ const Deposit = () => {
               </div>
             )}
 
-            {/* STEP 3 — Amount */}
-            {!paymentData && step === 3 && (
+            {/* STEP 3 — Amount (USDT crypto) */}
+            {!paymentData && step === 3 && network !== 'upi' && (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">Enter Deposit Amount</h3>
@@ -443,6 +443,79 @@ const Deposit = () => {
                     {loading ? 'Generating…' : minLoading ? 'Checking minimum…' : 'Generate Payment Address'}
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* STEP 3 — INR (Transak) */}
+            {!paymentData && step === 3 && network === 'upi' && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold">Pay in INR via UPI</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Powered by <span className="font-semibold text-primary">Transak</span> • USDT credited to <span className="text-primary font-medium">{walletLabel(wallet || undefined)} Wallet</span>
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inr">Amount (INR)</Label>
+                  <div className="relative">
+                    <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="inr" type="number" placeholder="1000" min="100" step="1" className="pl-9"
+                      value={inrAmount} onChange={(e) => setInrAmount(e.target.value)} />
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {[500, 1000, 5000, 10000, 25000].map(v => (
+                      <button key={v} type="button" onClick={() => setInrAmount(String(v))}
+                        className="px-3 py-1 text-xs rounded-full border border-border hover:border-primary hover:bg-primary/10 transition">
+                        ₹{v.toLocaleString('en-IN')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">You pay</span>
+                    <span className="font-semibold">₹{inrAmount ? Number(inrAmount).toLocaleString('en-IN') : '0'}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">You receive</span>
+                    <span className="font-semibold text-primary">
+                      {quoteLoading ? 'Calculating…' : quote ? `≈ ${quote.usdt_amount.toFixed(2)} USDT` : '— USDT'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Live rate</span>
+                    <span>{quote ? `1 USDT ≈ ₹${quote.rate.toFixed(2)}` : '—'}</span>
+                  </div>
+                  {quote && quote.fees_inr > 0 && (
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Transak fees</span>
+                      <span>₹{quote.fees_inr.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-xs pt-2 border-t border-border/50">
+                    <span className="text-muted-foreground">Destination</span>
+                    <span className="font-medium">{walletLabel(wallet || undefined)} Wallet</span>
+                  </div>
+                </div>
+
+                {inrAmount && parseFloat(inrAmount) < 100 && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-xs p-3">
+                    Minimum INR amount is <span className="font-bold">₹100</span>.
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(2)}><ChevronLeft className="h-4 w-4" /></Button>
+                  <Button className="flex-1"
+                    disabled={loading || !inrAmount || parseFloat(inrAmount) < 100 || quoteLoading}
+                    onClick={handleCreateTransakOrder}>
+                    {loading ? 'Opening Transak…' : 'Continue to Pay with UPI'}
+                  </Button>
+                </div>
+                <p className="text-[10px] text-center text-muted-foreground">
+                  You'll be redirected to Transak in a new tab. After successful payment, USDT is credited to your wallet automatically.
+                </p>
               </div>
             )}
 
