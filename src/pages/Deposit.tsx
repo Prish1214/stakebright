@@ -61,7 +61,7 @@ const WALLETS: { id: WalletType; title: string; desc: string; icon: React.Elemen
 const NETWORKS: { id: NetworkType; title: string; desc: string; badge: string; disabled?: boolean; soon?: boolean }[] = [
   { id: 'bep20', title: 'USDT • BEP20', desc: 'Binance Smart Chain — fast & low fee', badge: 'Recommended' },
   { id: 'trc20', title: 'USDT • TRC20', desc: 'Tron network — ultra low fees', badge: 'Popular' },
-  { id: 'upi',   title: 'INR • UPI',     desc: 'Coming soon — pay in INR via UPI',  badge: 'Soon', disabled: true, soon: true },
+  { id: 'upi',   title: 'INR • UPI',     desc: 'Pay in INR via UPI — powered by Transak',  badge: 'New' },
 ];
 
 const Deposit = () => {
