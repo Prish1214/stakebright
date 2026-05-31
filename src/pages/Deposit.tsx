@@ -618,8 +618,8 @@ const Deposit = () => {
           </h4>
           <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
             <li>Pick the wallet you want to fund (Stake, AI Trading, or Mining)</li>
-            <li>Choose your network — USDT BEP20 or TRC20 (INR/UPI coming soon)</li>
-            <li>Send the exact amount within 3 minutes</li>
+            <li>Choose your network — USDT BEP20, USDT TRC20, or INR via UPI (Transak)</li>
+            <li>For crypto: send the exact amount within 3 minutes. For INR: complete UPI payment in Transak.</li>
             <li>Funds are credited directly to your chosen wallet — no manual transfer required</li>
           </ul>
         </CardContent>
