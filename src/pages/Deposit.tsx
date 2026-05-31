@@ -81,6 +81,11 @@ const Deposit = () => {
   const [minDeposit, setMinDeposit] = useState<number | null>(null);
   const [minLoading, setMinLoading] = useState(false);
 
+  // INR/Transak state
+  const [inrAmount, setInrAmount] = useState('');
+  const [quote, setQuote] = useState<{ usdt_amount: number; rate: number; fees_inr: number; fallback?: boolean } | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+
   const cancelDeposit = useCallback(async (depositId: string) => {
     try {
       await supabase
