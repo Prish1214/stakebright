@@ -583,6 +583,54 @@ export type Database = {
         }
         Relationships: []
       }
+      transak_orders: {
+        Row: {
+          conversion_rate: number | null
+          created_at: string
+          credited: boolean
+          id: string
+          inr_amount: number
+          partner_order_id: string
+          raw_event: Json | null
+          status: string
+          target_wallet: string
+          transak_order_id: string | null
+          updated_at: string
+          usdt_amount: number | null
+          user_id: string
+        }
+        Insert: {
+          conversion_rate?: number | null
+          created_at?: string
+          credited?: boolean
+          id?: string
+          inr_amount: number
+          partner_order_id: string
+          raw_event?: Json | null
+          status?: string
+          target_wallet: string
+          transak_order_id?: string | null
+          updated_at?: string
+          usdt_amount?: number | null
+          user_id: string
+        }
+        Update: {
+          conversion_rate?: number | null
+          created_at?: string
+          credited?: boolean
+          id?: string
+          inr_amount?: number
+          partner_order_id?: string
+          raw_event?: Json | null
+          status?: string
+          target_wallet?: string
+          transak_order_id?: string | null
+          updated_at?: string
+          usdt_amount?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_miners: {
         Row: {
           created_at: string
@@ -838,6 +886,7 @@ export type Database = {
         Args: { p_referee: string; p_stake_id: string; p_yield: number }
         Returns: undefined
       }
+      credit_transak_order: { Args: { p_order_id: string }; Returns: Json }
       get_my_referred_users: {
         Args: never
         Returns: {
