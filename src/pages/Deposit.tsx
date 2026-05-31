@@ -191,8 +191,54 @@ const Deposit = () => {
     }
   };
 
+  // Debounced INR quote fetch
+  useEffect(() => {
+    if (step !== 3 || network !== 'upi') { setQuote(null); return; }
+    const amt = parseFloat(inrAmount);
+    if (!amt || amt < 100) { setQuote(null); return; }
+    setQuoteLoading(true);
+    const t = setTimeout(() => {
+      supabase.functions.invoke('transak-quote', { body: { inr_amount: amt } })
+        .then(({ data, error }) => {
+          if (!error && data?.usdt_amount) setQuote(data);
+        })
+        .finally(() => setQuoteLoading(false));
+    }, 350);
+    return () => clearTimeout(t);
+  }, [inrAmount, network, step]);
+
+  const handleCreateTransakOrder = async () => {
+    if (!wallet || network !== 'upi') return;
+    const amt = parseFloat(inrAmount);
+    if (!amt || amt < 100) {
+      toast({ title: 'Amount too low', description: 'Minimum INR deposit is ₹100', variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('transak-create-order', {
+        body: {
+          inr_amount: amt,
+          target_wallet: wallet,
+          usdt_amount: quote?.usdt_amount,
+          rate: quote?.rate,
+        }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      window.open(data.widget_url, '_blank', 'noopener,noreferrer');
+      toast({ title: 'Transak opened', description: 'Complete the payment in the new tab. USDT will be credited automatically.' });
+      resetFlow();
+      fetchDepositHistory();
+    } catch (e) {
+      toast({ title: 'Could not start payment', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetFlow = () => {
-    setStep(1); setWallet(null); setNetwork(null); setAmount('');
+    setStep(1); setWallet(null); setNetwork(null); setAmount(''); setInrAmount(''); setQuote(null);
     setPaymentData(null); setTimeLeft(null); setCurrentDepositId(null);
   };
 
