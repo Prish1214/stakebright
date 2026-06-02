@@ -551,18 +551,24 @@ const Auth = () => {
                   once a referral's cumulative staking deposits reach $50, plus <span className="text-accent font-bold">1% of every staking yield</span>
                   they ever earn — credited directly to your Withdrawable Earnings.
                 </p>
+                <p className="text-sm text-muted-foreground">
+                  For AI Trading, build a qualified team to unlock <span className="text-accent font-bold">2–6% team bonuses</span>
+                  based on your Trading Wallet balance and active referrals.
+                </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 5% activation paid once at $50 staking threshold</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 1% lifetime yield share on every payout</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 5% staking activation paid once at $50 threshold</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 1% lifetime yield share on every staking payout</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> AI Trading team bonuses: 2% to 6% by level</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> No cap on referrals</li>
                 </ul>
               </div>
-              <div className="lg:col-span-2 flex flex-col justify-center">
+              <div className="lg:col-span-2 flex flex-col gap-4">
+                {/* Staking referral highlights */}
                 <div className="rounded-lg border border-accent/30 bg-background/50 p-6 text-center">
                   <div className="flex items-center justify-center gap-6">
                     <div>
                       <p className="text-4xl sm:text-5xl font-mono font-bold text-accent neon-text-pink">5%</p>
-                      <p className="text-[11px] text-muted-foreground mt-1">activation bonus</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">staking activation</p>
                     </div>
                     <span className="text-muted-foreground text-xl">+</span>
                     <div>
@@ -572,6 +578,29 @@ const Auth = () => {
                   </div>
                   <p className="text-xs text-muted-foreground mt-4">
                     Qualification: referee must accumulate $50+ in approved staking deposits. Track conversions live in the Referrals dashboard.
+                  </p>
+                </div>
+                {/* AI Trading team bonus levels */}
+                <div className="rounded-lg border border-secondary/30 bg-background/50 p-4">
+                  <p className="text-xs font-mono text-secondary uppercase tracking-wide mb-3 text-center">AI Trading Team Bonus Levels</p>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                    {[
+                      { lvl: 'L1', bonus: '—', req: '$100' },
+                      { lvl: 'L2', bonus: '2%', req: '$500 · 3 refs' },
+                      { lvl: 'L3', bonus: '3%', req: '$1.5K · 8 refs' },
+                      { lvl: 'L4', bonus: '4%', req: '$5K · 20 refs' },
+                      { lvl: 'L5', bonus: '5%', req: '$12K · 50 refs' },
+                      { lvl: 'L6', bonus: '6%', req: '$30K · 100 refs' },
+                    ].map((p) => (
+                      <div key={p.lvl} className="rounded border border-border/40 bg-card/40 p-2 text-center">
+                        <p className="font-mono text-[10px] text-muted-foreground">{p.lvl}</p>
+                        <p className={`font-mono text-sm font-bold ${p.bonus === '—' ? 'text-muted-foreground' : 'text-secondary'}`}>{p.bonus}</p>
+                        <p className="text-[9px] text-muted-foreground mt-0.5">{p.req}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                    Active = referral with ≥$100 Trading Wallet. Bonus applies to team trading activity.
                   </p>
                 </div>
               </div>
