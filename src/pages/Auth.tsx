@@ -741,13 +741,13 @@ const Auth = () => {
             <CyberCard hoverable glowColor="purple" className="animate-fade-in-up" style={{
             animationDelay: '0.1s'
           }}>
-              <a href="mailto:stakebright@proton.me" className="block p-4 sm:p-6 md:p-8 text-center group">
+              <a href="mailto:team@stakebright.space" className="block p-4 sm:p-6 md:p-8 text-center group">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center border border-primary/50 group-hover:scale-110 transition-transform">
                   <Headphones className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-primary" />
                 </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold mb-1 sm:mb-2">Email Support</h3>
                 <p className="text-muted-foreground text-sm mb-2 sm:mb-4">Detailed inquiries and documentation</p>
-                <span className="text-primary font-mono text-sm sm:text-base">stakebright@proton.me →</span>
+                <span className="text-primary font-mono text-sm sm:text-base">team@stakebright.space →</span>
               </a>
             </CyberCard>
           </div>
@@ -826,7 +826,7 @@ const Auth = () => {
               <a href="https://t.me/StakeBright" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary transition-colors">
                 <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
-              <a href="mailto:stakebright@proton.me" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="mailto:team@stakebright.space" className="text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
             </div>

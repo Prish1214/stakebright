@@ -61,7 +61,7 @@ export const Layout = ({ children }: LayoutProps) => {
             className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform neon-glow-purple"
             asChild
           >
-            <a href="mailto:stakebright@proton.me">
+            <a href="mailto:team@stakebright.space">
               <Mail className="h-5 w-5" />
             </a>
           </Button>
