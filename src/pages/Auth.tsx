@@ -397,7 +397,8 @@ const Auth = () => {
                 <h3 className="text-base sm:text-lg md:text-xl font-mono font-semibold">Referral Rewards</h3>
                 <p className="text-muted-foreground text-sm sm:text-base">
                   Earn 5% activation bonus when a referral's first staking deposits reach $50, plus 1% of every
-                  staking yield they earn — forever. Paid straight to your Withdrawable Earnings.
+                  staking yield they earn — forever. Also build an AI Trading team to unlock up to 6% team bonuses.
+                  Paid straight to your Withdrawable Earnings.
                 </p>
               </div>
             </CyberCard>
