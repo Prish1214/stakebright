@@ -17,6 +17,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
 import LatestUpdates from "./pages/LatestUpdates";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/faq" element={<Layout><FAQ /></Layout>} />
             <Route path="/about" element={<Layout><About /></Layout>} />
             <Route path="/latest-updates" element={<Layout><LatestUpdates /></Layout>} />
+            <Route path="/profile" element={<Layout><Profile /></Layout>} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
