@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import CryptoProfitsTicker from '@/components/CryptoProfitsTicker';
 import { FrozenBanner } from '@/components/FrozenBanner';
 import { AnnouncementsBanner } from '@/components/AnnouncementsBanner';
+import BottomNav from '@/components/BottomNav';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -40,13 +41,14 @@ export const Layout = ({ children }: LayoutProps) => {
           <FrozenBanner />
           <Header />
           <AnnouncementsBanner />
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6 pb-24">
             {children}
           </main>
         </div>
+        <BottomNav />
 
         {/* Floating action buttons */}
-        <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+        <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 flex flex-col gap-3 z-50">
           <Button
             size="icon"
             className="h-12 w-12 rounded-full shadow-lg hover:scale-110 transition-transform neon-glow-cyan bg-secondary hover:bg-secondary/90"
