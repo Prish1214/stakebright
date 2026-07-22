@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import {
   ArrowDownToLine, ArrowUpFromLine, Copy, Coins, Pickaxe, LineChart as LineIcon,
-  Users, Share2, TrendingUp, Wallet, Sparkles, Trophy, CheckCircle2,
+  Users, Share2, TrendingUp, Wallet, Sparkles, Trophy, CheckCircle2, LogOut,
 } from 'lucide-react';
 
 interface ProfileRow {
