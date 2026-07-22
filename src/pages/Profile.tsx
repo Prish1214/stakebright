@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import {
   ArrowDownToLine, ArrowUpFromLine, Copy, Coins, Pickaxe, LineChart as LineIcon,
-  Users, Share2, TrendingUp, Wallet, Sparkles, Trophy, CheckCircle2,
+  Users, Share2, TrendingUp, Wallet, Sparkles, Trophy, CheckCircle2, LogOut,
 } from 'lucide-react';
 
 interface ProfileRow {
@@ -41,7 +41,7 @@ const startOfTodayUTC = () => {
 };
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -358,6 +358,18 @@ const Profile = () => {
             </div>
           </div>
         </div>
+      </CyberCard>
+
+      {/* Logout */}
+      <CyberCard glowColor="purple" className="p-4">
+        <Button
+          variant="destructive"
+          className="w-full gap-2"
+          onClick={signOut}
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Log out</span>
+        </Button>
       </CyberCard>
     </div>
   );
