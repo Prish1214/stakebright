@@ -3,7 +3,7 @@ import App from "./App.tsx";
 import "./index.css";
 
 // Apply saved theme before render to avoid flash
-const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('app-theme')) || 'dark';
+const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('app-theme')) || 'light';
 document.documentElement.classList.remove('dark', 'light');
 document.documentElement.classList.add(saved);
 
