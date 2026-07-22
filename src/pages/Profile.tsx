@@ -359,6 +359,18 @@ const Profile = () => {
           </div>
         </div>
       </CyberCard>
+
+      {/* Logout */}
+      <CyberCard glowColor="purple" className="p-4">
+        <Button
+          variant="destructive"
+          className="w-full gap-2"
+          onClick={signOut}
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Log out</span>
+        </Button>
+      </CyberCard>
     </div>
   );
 };
