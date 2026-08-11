@@ -1,73 +1,74 @@
-# Welcome to your Lovable project
+# stakebright
 
-## Project info
+Build me a USDT Staking Website (BEP20 Network)
+Core Features:
+User Accounts & Wallets
+Users can register/login with email and password.
+Every Registered user can login back with their username and password .
 
-**URL**: https://lovable.dev/projects/b7f01019-9d71-4382-94fc-961a2ea3df11
+In Deposit section user should be shown given QR image with this Address 0x652fdEab799Bd430038f010773CC340eAd9a6338 and mention that only support USDT bep20 with a copy option to copy Address 
 
-## How can I edit this code?
+At time of Deposits user must enter amount and transaction hash and after Deposit request will go in database table in admin supabase where amount, transaction hash and user name will be shown and when admin confirms deposit then admin will add user balance .
 
-There are several ways of editing your application.
+Staking Plans
+Minimum Deposit: 25 USDT.
+Lock period must be at least 30+ days.
 
-**Use Lovable**
+Plans should look realistic with sustainable returns:
+Plan A: 30 days lock → 1.5% daily return
+Plan B: 60 days lock → 2% daily return
+Plan C: 90 days lock → 2.5% daily return
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b7f01019-9d71-4382-94fc-961a2ea3df11) and start prompting.
+Withdrawals
+Allowed only for daily returns getting in particular stake showing in total earning where referral earning is also added and principal allowed to withdraw after staking period ends.
 
-Changes made via Lovable will be committed automatically to this repo.
+System should automatically apply a 10% withdrawal fee (configurable in admin).
 
-**Use your preferred IDE**
+Referral System
+Each user gets a referral link.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Referrer earns 5% of referred user’s deposits.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Show referral earnings in dashboard separately.
 
-Follow these steps:
+User Dashboard: -
+Wallet Balance (total USDT available).
+Active Stakes (amount, plan, days left).
+Earnings (daily + total earned).
+Amount to withdraw (Daily earning+ refferal earning)
+
+Staking Calculator (user enters amount → shows expected daily and total returns).
+
+Referral Earnings tab.
+
+Transaction History (deposits, staking, withdrawals, referral rewards, fees).
+
+Clean modern UI with cards, “Stake More” button, and easy navigation.
+
+Admin Panel in Supabase :-
+View/manage all users, wallet balance,deposits, stakes, withdrawals, and referrals
+Change staking % rates, fees, and referral % anytime.
+Approve/reject withdrawals manually
+
+This project was built with [Lovable](https://lovable.dev).
+
+**Live app**: https://stakebright.lovable.app
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/b7f01019-9d71-4382-94fc-961a2ea3df11).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b7f01019-9d71-4382-94fc-961a2ea3df11) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
