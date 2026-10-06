@@ -487,12 +487,12 @@ const Auth = () => {
               </div>
               <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
-                  { lvl: 'L1', name: 'Recruit', range: '0.8–1.0%', req: '$100 bal' },
-                  { lvl: 'L2', name: 'Operator', range: '1.05–1.2%', req: '$500 · 3 refs' },
-                  { lvl: 'L3', name: 'Strategist', range: '1.5–1.7%', req: '$1.5K · 8 refs' },
-                  { lvl: 'L4', name: 'Commander', range: '1.85–2.0%', req: '$5K · 20 refs' },
-                  { lvl: 'L5', name: 'Architect', range: '2.2–2.6%', req: '$12K · 50 refs' },
-                  { lvl: 'L6', name: 'Sovereign', range: '3.2–3.5%', req: '$30K · 100 refs' },
+                  { lvl: 'L1', name: 'Recruit', range: '2–2.1%', req: '$100 bal' },
+                  { lvl: 'L2', name: 'Operator', range: '2.5–2.7%', req: '$500 · 3 refs' },
+                  { lvl: 'L3', name: 'Strategist', range: '3–3.2%', req: '$1.5K · 8 refs' },
+                  { lvl: 'L4', name: 'Commander', range: '3.7–4%', req: '$5K · 20 refs' },
+                  { lvl: 'L5', name: 'Architect', range: '4.5–5%', req: '$12K · 50 refs' },
+                  { lvl: 'L6', name: 'Sovereign', range: '5.5–6%', req: '$30K · 100 refs' },
                 ].map(p => (
                   <div key={p.lvl} className="rounded-lg border border-secondary/30 bg-background/50 p-3 text-center hover:border-secondary/50 transition-colors">
                     <p className="font-mono text-[10px] text-muted-foreground uppercase">{p.lvl} {p.name}</p>
@@ -512,12 +512,12 @@ const Auth = () => {
                 <GlowingIcon icon={Cpu} color="gold" size="lg" />
                 <h3 className="text-xl sm:text-2xl font-mono font-bold gradient-text">Cloud Mining</h3>
                 <p className="text-sm text-muted-foreground">
-                  Rent virtual hashpower for Bitcoin, Litecoin or Dogecoin and earn USDT rewards without buying hardware.
+                  Rent virtual hashpower for Bitcoin and earn USDT rewards without buying hardware. Litecoin and Dogecoin miners are coming soon.
                   Yields stream into your Withdrawable Earnings; allocated principal stays locked until runtime ends,
                   then becomes withdrawable Unlocked Principal — just like staking. Mining Wallet is only used to start new rentals.
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 pt-2">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> 3 coins: BTC, LTC, DOGE</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> BTC available · LTC & DOGE coming soon</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Continuous reward accrual while active</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Fee-free principal unlock at end of runtime</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success" /> Principal does not return to Mining Wallet</li>
@@ -531,10 +531,16 @@ const Auth = () => {
                 ].map(p => (
                   <div key={p.coin} className="rounded-lg border border-crypto-gold/30 bg-background/50 p-3 text-center hover:border-crypto-gold/50 transition-colors">
                     <p className="font-mono text-xs text-muted-foreground uppercase">{p.coin}</p>
-                    <p className="text-sm font-mono font-bold text-crypto-gold mt-1">{p.tier}</p>
-                    <p className="text-[10px] text-muted-foreground">{p.price}</p>
-                    <p className="text-[10px] text-success mt-1">{p.daily} daily</p>
-                    <p className="text-[10px] text-muted-foreground">{p.days}</p>
+                    {p.coin === 'Bitcoin' ? (
+                      <>
+                        <p className="text-sm font-mono font-bold text-crypto-gold mt-1">{p.tier}</p>
+                        <p className="text-[10px] text-muted-foreground">{p.price}</p>
+                        <p className="text-[10px] text-success mt-1">{p.daily} daily</p>
+                        <p className="text-[10px] text-muted-foreground">{p.days}</p>
+                      </>
+                    ) : (
+                      <p className="text-sm font-mono font-bold text-muted-foreground mt-4">Coming Soon</p>
+                    )}
                   </div>
                 ))}
               </div>

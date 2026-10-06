@@ -8,6 +8,7 @@ import GlowingIcon from '@/components/ui/GlowingIcon';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { Pickaxe, Zap, Cpu, Activity, RefreshCw, Server, Bitcoin, Clock, Flame, Lock, TrendingUp, Gauge } from 'lucide-react';
 
 type Coin = 'BTC' | 'LTC' | 'DOGE';
@@ -131,6 +132,7 @@ const Mining = () => {
   }, [user]);
 
   const startRental = async (tier: Tier) => {
+    if (selectedCoin !== 'BTC') return;
     setBusy(`start-${tier}`);
     try {
       const { error } = await (supabase as any).rpc('start_mining_rental', { p_coin: selectedCoin, p_tier: tier });
@@ -213,11 +215,12 @@ const Mining = () => {
             <h2 className="text-xl font-mono font-bold flex items-center gap-2"><Bitcoin className="h-5 w-5 text-crypto-gold" /> Hashpower Marketplace</h2>
             <p className="text-sm text-muted-foreground">Pick a coin, then a plan. Funds lock from Mining Wallet for the runtime.</p>
           </div>
-          <div className="flex gap-2">
+           <div className="flex flex-wrap gap-2">
             {(['BTC','LTC','DOGE'] as Coin[]).map(c => (
-              <button key={c} onClick={() => setSelectedCoin(c)} className={`px-4 py-2 rounded-lg font-mono text-sm border transition-all ${selectedCoin===c ? 'border-primary bg-primary/20 text-primary neon-glow-purple' : 'border-muted/40 text-muted-foreground hover:border-primary/40'}`}>
+               <Button key={c} variant="outline" disabled={c !== 'BTC'} onClick={() => setSelectedCoin(c)} className={`h-auto px-4 py-2 rounded-lg font-mono text-sm border transition-all ${selectedCoin===c ? 'border-primary bg-primary/20 text-primary neon-glow-purple' : 'border-muted/40 text-muted-foreground'}`}>
                 {c}
-              </button>
+                 {c !== 'BTC' && <span className="ml-2 text-[10px]">Coming Soon</span>}
+               </Button>
             ))}
           </div>
         </div>
