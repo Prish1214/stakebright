@@ -27,12 +27,12 @@ interface Session {
 }
 
 const LEVELS = [
-  { lvl: 1, bal: 100,   refs: 0,   min: 0.8,  max: 1.0,  name: 'Recruit',   color: 'cyan',   icon: Shield },
-  { lvl: 2, bal: 500,   refs: 3,   min: 1.05, max: 1.2,  name: 'Operator',  color: 'purple', icon: Target },
-  { lvl: 3, bal: 1500,  refs: 8,   min: 1.5,  max: 1.7,  name: 'Strategist',color: 'pink',   icon: Radar },
-  { lvl: 4, bal: 5000,  refs: 20,  min: 1.85, max: 2.0,  name: 'Commander', color: 'gold',   icon: Gauge },
-  { lvl: 5, bal: 12000, refs: 50,  min: 2.2,  max: 2.6,  name: 'Architect', color: 'pink',   icon: Sparkles },
-  { lvl: 6, bal: 30000, refs: 100, min: 3.2,  max: 3.5,  name: 'Sovereign', color: 'gold',   icon: Crown },
+  { lvl: 1, bal: 100,   refs: 0,   min: 2,    max: 2.1,  name: 'Recruit',   color: 'cyan',   icon: Shield },
+  { lvl: 2, bal: 500,   refs: 3,   min: 2.5,  max: 2.7,  name: 'Operator',  color: 'purple', icon: Target },
+  { lvl: 3, bal: 1500,  refs: 8,   min: 3,    max: 3.2,  name: 'Strategist',color: 'pink',   icon: Radar },
+  { lvl: 4, bal: 5000,  refs: 20,  min: 3.7,  max: 4,    name: 'Commander', color: 'gold',   icon: Gauge },
+  { lvl: 5, bal: 12000, refs: 50,  min: 4.5,  max: 5,    name: 'Architect', color: 'pink',   icon: Sparkles },
+  { lvl: 6, bal: 30000, refs: 100, min: 5.5,  max: 6,    name: 'Sovereign', color: 'gold',   icon: Crown },
 ] as const;
 
 const SYMS: Sym[] = ['BTC', 'ETH', 'SOL', 'BNB'];
@@ -97,7 +97,7 @@ const Trading = () => {
   const canRun = !!profile && Number(profile.trading_wallet) >= 100 && !onCooldown && phase === 'idle';
 
   const runScalp = async () => {
-    if (!canRun) return;
+    if (!canRun || !profile) return;
     setBusy(true);
     setPhase('scanning');
     setScanTrades([]);
@@ -107,7 +107,7 @@ const Trading = () => {
 
     const totalMs = 10000 + Math.floor(Math.random() * 15000); // 10-25s
     const start = Date.now();
-    const capital = Number(profile!.trading_wallet);
+    const capital = Number(profile.trading_wallet);
 
     // phase transitions
     const phaseTimer1 = setTimeout(() => setPhase('analyzing'), Math.floor(totalMs * 0.25));
