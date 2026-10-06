@@ -293,9 +293,9 @@ const Auth = () => {
                       
                       <div className="space-y-1.5 sm:space-y-2">
                         <Label htmlFor="signup-referral" className="font-mono text-xs sm:text-sm">
-                          Referral Code <span className="text-accent">*</span>
+                          Referral Code <span className="text-muted-foreground">(optional)</span>
                         </Label>
-                        <Input id="signup-referral" name="referralCode" type="text" placeholder="Enter referral code (required)" value={referralCode} onChange={e => setReferralCode(e.target.value)} required className="bg-muted/30 border-primary/20 focus:border-primary text-sm h-9 sm:h-10" />
+                        <Input id="signup-referral" name="referralCode" type="text" placeholder="Enter referral code (optional)" value={referralCode} onChange={e => setReferralCode(e.target.value)} className="bg-muted/30 border-primary/20 focus:border-primary text-sm h-9 sm:h-10" />
                       </div>
                       
                       <NeonButton type="submit" className="w-full text-sm" disabled={loading} glowColor="cyan">
