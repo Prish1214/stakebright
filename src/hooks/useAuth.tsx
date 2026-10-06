@@ -53,19 +53,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = async (email: string, password: string, username?: string, referralCode?: string) => {
     try {
-      // Validate referral code - it's required
-      if (!referralCode) {
-        toast({
-          title: "Referral code required",
-          description: "You must enter a valid referral code to sign up.",
-          variant: "destructive"
-        });
-        return { error: { message: "Referral code required" } };
-      }
-
-      // Use secure RPC function to validate referral code (works for anonymous users)
+      const normalizedReferralCode = referralCode?.trim() || '';
+      // Only validate a referral code when one was provided.
+      if (normalizedReferralCode) {
       const { data: isValidCode, error: validationError } = await supabase
-        .rpc('validate_referral_code', { code: referralCode });
+        .rpc('validate_referral_code', { code: normalizedReferralCode });
 
       if (validationError) {
         toast({
@@ -84,6 +76,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         });
         return { error: { message: "Invalid referral code" } };
       }
+      }
 
       const redirectUrl = `${window.location.origin}/verify`;
       
@@ -94,7 +87,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           emailRedirectTo: redirectUrl,
           data: {
             username: username || email.split('@')[0],
-            referralCode: referralCode
+            ...(normalizedReferralCode ? { referralCode: normalizedReferralCode } : {})
           }
         }
       });
